@@ -119,73 +119,214 @@
       vertical-align: middle;
     }
 
-    /* ── Print : reproduit le rendu desktop 3 colonnes ── */
-    @page { size: A4; margin: 10mm; }
+    /* ── Print : A4 paysage, mise en page desktop 3 colonnes, 1 page ── */
+    @page { size: A4 landscape; margin: 5mm 6mm; }
     @media print {
-      html, body { background: white !important; }
+      html, body { background: #fff !important; }
       body {
-        color: black !important;
+        color: #000 !important;
         padding: 0 !important;
-        font-size: 10pt;
-        line-height: 1.35;
+        margin: 0 !important;
+        font-size: 7pt !important;
+        line-height: 1.18 !important;
       }
       body::before { display: none !important; }
-      .no-print { display: none !important; }
-      * {
-        color: black !important;
-        border-color: #555 !important;
+      .no-print, .skip-link { display: none !important; }
+
+      /* Reset agressif : noir sur blanc, pas d'ombres ni d'animations */
+      *, *::before, *::after {
+        color: #000 !important;
         background: transparent !important;
         box-shadow: none !important;
         text-shadow: none !important;
         animation: none !important;
+        transition: none !important;
       }
-      .codex { max-width: none !important; }
+      [class*="border-"] { border-color: #444 !important; }
 
-      /* Force la grille hero en 3 colonnes */
+      .codex { max-width: none !important; margin: 0 !important; }
+      .divider-fleuron::after { display: none !important; }
+
+      /* ── HERO : 3 colonnes serrées ── */
       .print-hero {
         display: grid !important;
-        grid-template-columns: auto 1fr auto !important;
-        gap: 16px !important;
-        text-align: left !important;
-        padding-bottom: 12px !important;
-        margin-bottom: 12px !important;
+        grid-template-columns: 22mm 1fr auto !important;
+        align-items: center !important;
+        gap: 3mm !important;
+        padding: 0 0 1.5mm 0 !important;
+        margin: 0 0 2mm 0 !important;
+        border-bottom: 0.5pt solid #000 !important;
         page-break-after: avoid;
       }
-      .print-hero h1 { font-size: 26pt !important; }
-      .print-hero figure { width: 28mm !important; height: 38mm !important; }
-      .print-hero img { filter: grayscale(100%) contrast(1.1) !important; }
+      .print-hero > * { justify-self: start !important; }
+      .print-hero figure {
+        width: 22mm !important;
+        height: 28mm !important;
+        border: 0.5pt solid #000 !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+      }
+      .print-hero img {
+        filter: grayscale(100%) contrast(1.05) !important;
+        width: 100% !important; height: 100% !important;
+        object-fit: cover !important;
+      }
+      .print-hero h1 {
+        font-size: 15pt !important;
+        line-height: 0.95 !important;
+        margin: 0 0 0.5mm 0 !important;
+        letter-spacing: 0.08em !important;
+      }
+      .print-hero h1 span { display: inline !important; margin: 0 !important; }
+      .print-hero h1 span + span { margin-left: 0.4em !important; }
+      .print-hero p { font-size: 8pt !important; margin: 0 0 1mm 0 !important; display: block !important; }
+      .print-hero dl {
+        display: grid !important;
+        grid-template-columns: repeat(2, auto) !important;
+        gap: 1.5mm !important;
+        justify-self: end !important;
+      }
+      .print-hero dl > div {
+        padding: 0.8mm 1.5mm !important;
+        border: 0.5pt solid #000 !important;
+        min-width: 22mm !important;
+      }
+      .print-hero dt { font-size: 5.5pt !important; letter-spacing: 0.08em !important; }
+      .print-hero dd { font-size: 10pt !important; margin: 0.2mm 0 0 0 !important; }
 
-      /* Force le body grid en 3 colonnes */
+      /* ── BODY GRID : 3 colonnes ── */
       .print-body-grid {
         display: grid !important;
-        grid-template-columns: 42mm 1fr 1fr !important;
-        gap: 8mm !important;
+        grid-template-columns: 38mm 1fr 1fr !important;
+        gap: 3mm !important;
+        align-items: start !important;
       }
+
+      /* Caractéristiques compactes : hauteur fixe pour libérer la 1re colonne */
+      .print-body-grid > section:first-child { display: block !important; break-inside: avoid; }
+      .print-body-grid > section:first-child > div {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0.6mm 1.5mm !important;
+        border: 0.5pt solid #000 !important;
+        margin-bottom: 0.6mm !important;
+        height: 9mm !important;
+        line-height: 1 !important;
+      }
+      .print-body-grid > section:first-child > div * { line-height: 1 !important; }
+      .print-body-grid > section:first-child > div p { margin: 0 !important; }
+      .print-body-grid > section:first-child > div p:first-of-type { font-size: 5pt !important; }
+      .print-body-grid > section:first-child > div > div > p:nth-child(2) { font-size: 9pt !important; margin-top: 0.4mm !important; }
+      .print-body-grid > section:first-child > div > div > p:last-child { font-size: 4.5pt !important; margin-top: 0.3mm !important; }
+      .print-body-grid > section:first-child > div > p:last-child { font-size: 9pt !important; }
+
+      /* Titres de section */
+      h2 {
+        font-size: 7pt !important;
+        margin: 0 0 0.6mm 0 !important;
+        padding-bottom: 0.3mm !important;
+        border-bottom: 0.3pt solid #000 !important;
+        letter-spacing: 0.06em !important;
+      }
+      h3 { font-size: 6.5pt !important; margin: 0.4mm 0 !important; }
+      .section-title::before { color: #000 !important; font-size: 5pt !important; margin-right: 4px !important; }
+
+      /* Listes compactes */
+      ul, dl, ol { margin: 0 0 1mm 0 !important; padding: 0 !important; }
+      li { margin: 0 0 0.3mm !important; font-size: 6.5pt !important; }
+      .print-body-grid section { margin-bottom: 1.5mm !important; }
+      .print-body-grid > div > section { break-inside: avoid; }
+      .print-body-grid p { margin: 0 0 0.5mm !important; font-size: 6.5pt !important; }
+      .print-body-grid strong { font-size: 6.5pt !important; }
+
+      /* Neutralise space-y-* Tailwind qui créent des marges 16-32px */
+      .print-body-grid > div > * + * { margin-top: 1.5mm !important; }
+      .print-body-grid ul > li + li { margin-top: 0.3mm !important; }
+      .print-body-grid dl > div + div { margin-top: 0.5mm !important; }
+      .print-body-grid ul.space-y-4 > li + li,
+      .print-body-grid ul.space-y-2 > li + li { margin-top: 0.5mm !important; }
+      .print-body-grid .mb-4 { margin-bottom: 0.8mm !important; }
+      .print-body-grid .mt-4 { margin-top: 0.8mm !important; }
+      .print-body-grid .mb-2 { margin-bottom: 0.4mm !important; }
+      .print-body-grid .mt-2 { margin-top: 0.4mm !important; }
+      .print-body-grid .pb-2 { padding-bottom: 0.4mm !important; }
+      .print-body-grid .gap-4 { gap: 1mm !important; }
 
       /* Arsenal : table en print, jamais cards */
       .print-arsenal-cards { display: none !important; }
-      .print-arsenal-table { display: table !important; width: 100% !important; }
+      .print-arsenal-table {
+        display: table !important;
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+      .print-arsenal-table th,
+      .print-arsenal-table td {
+        padding: 0.4mm 0.8mm !important;
+        border-bottom: 0.3pt solid #888 !important;
+        white-space: nowrap !important;
+        font-size: 6.5pt !important;
+        vertical-align: top !important;
+      }
+      .print-arsenal-table th { font-size: 5.5pt !important; }
+      .print-arsenal-table td div { font-size: 6.5pt !important; }
+      .print-arsenal-table td .text-xs { font-size: 5.5pt !important; }
+
+      /* Slots de sorts visibles en print */
+      #spell-slots { display: flex !important; gap: 1.2mm !important; }
+      #spell-slots [data-slot] {
+        width: 3mm !important; height: 3mm !important;
+        background: #fff !important;
+        border: 0.8pt solid #000 !important;
+        padding: 0 !important;
+      }
+      #spell-slots [data-slot][aria-pressed="true"] { background: #000 !important; }
 
       /* Rites en 3 colonnes */
       .print-rituals-grid {
         display: grid !important;
         grid-template-columns: 1fr 1fr 1fr !important;
-        gap: 6mm !important;
+        gap: 3mm !important;
       }
+      .print-rituals-grid article {
+        border-left: 0.5pt solid #000 !important;
+        padding-left: 2mm !important;
+      }
+      .print-rituals-grid p { margin: 0 0 0.8mm !important; font-size: 6.5pt !important; }
+      .print-rituals-grid h3 { font-size: 7.5pt !important; margin-bottom: 1mm !important; }
 
-      /* Évite la coupure des sections au milieu */
-      section, article { break-inside: avoid; page-break-inside: avoid; }
+      /* Section rituels : forcée sur page 2 entière (jamais coupée) */
+      section[aria-labelledby="rites-title"] {
+        margin-top: 0 !important;
+        padding: 3mm 4mm !important;
+        border: 0.5pt solid #444 !important;
+        break-before: page !important;
+        page-break-before: always !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      section[aria-labelledby="rites-title"] header { text-align: center !important; margin-bottom: 1mm !important; }
+      section[aria-labelledby="rites-title"] header * { text-align: center !important; }
+      section[aria-labelledby="rites-title"] header h2 { font-size: 8pt !important; border: none !important; margin: 0 !important; }
+      section[aria-labelledby="rites-title"] header p { font-size: 6pt !important; margin: 0 !important; }
 
-      /* Compaction verticale */
-      h1, h2, h3, p, ul, dl { margin-top: 0 !important; margin-bottom: 4px !important; }
-      .mt-16 { margin-top: 8mm !important; }
+      /* Footer masqué en print pour libérer de la place */
+      footer { display: none !important; }
 
-      /* Bordures dorées → noires fines */
-      [class*="border-gold"] { border-color: #333 !important; }
+      /* Override fort des space-y-* Tailwind dans le body grid */
+      .print-body-grid [class*="space-y"] > * + * { margin-top: 1mm !important; }
+      .print-body-grid .space-y-8 > * + * { margin-top: 1.5mm !important; }
+      .print-body-grid .space-y-4 > * + * { margin-top: 0.6mm !important; }
+      .print-body-grid .space-y-3 > * + * { margin-top: 0.5mm !important; }
+      .print-body-grid .space-y-2 > * + * { margin-top: 0.3mm !important; }
+      .print-rituals-grid [class*="space-y"] > * + * { margin-top: 0.5mm !important; }
 
-      /* Compteur d'emplacements visible aussi en print */
-      #spell-slots [data-slot] { background: #fff !important; border: 1.5pt solid #000 !important; }
-      #spell-slots [data-slot][aria-pressed="true"] { background: #000 !important; }
+      /* Anti-coupure */
+      section, article, header { break-inside: avoid; page-break-inside: avoid; }
+
+      /* Langues : pavés inline noirs */
+      ul.flex { display: flex !important; flex-wrap: wrap !important; gap: 1.5mm !important; }
+      ul.flex li { border: 0.5pt solid #000 !important; padding: 0.5mm 1.5mm !important; font-size: 7pt !important; }
     }
   </style>
 </head>
