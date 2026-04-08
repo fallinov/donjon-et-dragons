@@ -5,7 +5,7 @@ function print(): void {
 </script>
 
 <template>
-  <div class="no-print fixed top-4 right-4 z-20">
+  <div class="no-print fixed bottom-4 right-4 z-20">
     <button
       type="button"
       aria-label="Imprimer la fiche"
