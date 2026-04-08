@@ -1,0 +1,246 @@
+@import "tailwindcss";
+
+/* ── Polices auto-hébergées (souveraineté CEJEF) ─────── */
+@font-face { font-family: 'Cinzel'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-400.ttf') format('truetype'); }
+@font-face { font-family: 'Cinzel'; font-weight: 600; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-600.ttf') format('truetype'); }
+@font-face { font-family: 'Cinzel'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-700.ttf') format('truetype'); }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/EBGaramond-400.ttf') format('truetype'); }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: italic; font-display: swap; src: url('/fonts/EBGaramond-400i.ttf') format('truetype'); }
+
+/* ── Tokens design (Tailwind v4 @theme) ──────────────── */
+@theme {
+  --color-obsidian: #0b0907;
+  --color-charcoal: #15110d;
+  --color-ash: #1f1a14;
+
+  --color-parchment: #e8d9b5;
+  --color-parchment-dim: #c4b388;
+  --color-parchment-mute: #b09d72;
+  --color-bone: #d8c89e;
+
+  --color-gold: #c9a24a;
+  --color-gold-bright: #f2d07a;
+  --color-gold-dim: #a8842f;
+
+  --color-ember: #c23b1a;
+  --color-ember-bright: #e8652a;
+  --color-blood: #6a1310;
+
+  --font-display: 'Cinzel', 'Trajan Pro', serif;
+  --font-body: 'EB Garamond', Garamond, Palatino, serif;
+
+  --tracking-wider-2: 0.14em;
+  --tracking-wider-3: 0.22em;
+  --tracking-wider-4: 0.32em;
+  --tracking-wider-5: 0.40em;
+
+  --animate-rise: rise 0.5s ease-out both;
+  --animate-ember: ember 3s ease-in-out infinite;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ember {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; filter: brightness(1.25); }
+  }
+}
+
+/* ── Fond + grain ────────────────────────────────────── */
+html, body { background: var(--color-obsidian); }
+body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 30% 0%, rgba(194, 59, 26, 0.10), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 100%, rgba(201, 162, 74, 0.08), transparent 60%),
+    radial-gradient(circle at 50% 50%, var(--color-charcoal) 0%, var(--color-obsidian) 70%);
+  font-feature-settings: "liga", "dlig", "onum";
+}
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 1;
+  opacity: 0.12; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Focus visible custom (a11y WCAG 2.4.7) ──────────── */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-gold-bright);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── Skip link ───────────────────────────────────────── */
+.skip-link {
+  position: absolute; left: -9999px; top: 12px;
+  background: var(--color-gold-bright); color: var(--color-obsidian);
+  padding: 8px 14px; font-weight: 600;
+  border-radius: 4px; z-index: 100;
+}
+.skip-link:focus { left: 12px; }
+
+/* ── Reduced motion (a11y WCAG 2.3.3) ────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ── Petits joyaux décoratifs ────────────────────────── */
+.divider-fleuron::after {
+  content: "❦";
+  position: absolute; bottom: -14px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-obsidian); color: var(--color-gold);
+  padding: 0 18px; font-size: 18px;
+}
+.section-title::before {
+  content: "◆";
+  color: var(--color-ember); font-size: 8px; margin-right: 12px;
+  vertical-align: middle;
+}
+
+/* ── Print : A4 paysage 3 colonnes ───────────────────── */
+@page { size: A4 landscape; margin: 5mm 6mm; }
+@media print {
+  html, body { background: #fff !important; }
+  body {
+    color: #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 7pt !important;
+    line-height: 1.18 !important;
+  }
+  body::before { display: none !important; }
+  .no-print, .skip-link { display: none !important; }
+
+  *, *::before, *::after {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  [class*="border-"] { border-color: #444 !important; }
+
+  .codex { max-width: none !important; margin: 0 !important; }
+  .divider-fleuron::after { display: none !important; }
+
+  .print-hero {
+    display: grid !important;
+    grid-template-columns: 22mm 1fr auto !important;
+    align-items: center !important;
+    gap: 3mm !important;
+    padding: 0 0 1.5mm 0 !important;
+    margin: 0 0 2mm 0 !important;
+    border-bottom: 0.5pt solid #000 !important;
+    page-break-after: avoid;
+  }
+  .print-hero > * { justify-self: start !important; }
+  .print-hero figure {
+    width: 22mm !important; height: 28mm !important;
+    border: 0.5pt solid #000 !important; border-radius: 0 !important; margin: 0 !important;
+  }
+  .print-hero img {
+    filter: grayscale(100%) contrast(1.05) !important;
+    width: 100% !important; height: 100% !important; object-fit: cover !important;
+  }
+  .print-hero h1 {
+    font-size: 15pt !important; line-height: 0.95 !important;
+    margin: 0 0 0.5mm 0 !important; letter-spacing: 0.08em !important;
+  }
+  .print-hero h1 span { display: inline !important; margin: 0 !important; }
+  .print-hero h1 span + span { margin-left: 0.4em !important; }
+  .print-hero p { font-size: 7pt !important; margin: 0 0 1mm 0 !important; display: block !important; }
+  .print-hero dl {
+    display: grid !important; grid-template-columns: repeat(2, auto) !important;
+    gap: 1.5mm !important; justify-self: end !important;
+  }
+  .print-hero dl > div {
+    padding: 0.8mm 1.5mm !important; border: 0.5pt solid #000 !important; min-width: 22mm !important;
+  }
+  .print-hero dt { font-size: 5.5pt !important; letter-spacing: 0.08em !important; }
+  .print-hero dd { font-size: 10pt !important; margin: 0.2mm 0 0 0 !important; }
+
+  .print-body-grid {
+    display: grid !important;
+    grid-template-columns: 38mm 1fr 1fr !important;
+    gap: 3mm !important;
+    align-items: start !important;
+  }
+  .print-body-grid > section:first-child { display: block !important; break-inside: avoid; }
+  .print-body-grid > section:first-child > div {
+    display: flex !important; align-items: center !important; justify-content: space-between !important;
+    padding: 0.6mm 1.5mm !important; border: 0.5pt solid #000 !important;
+    margin-bottom: 0.6mm !important; height: 9mm !important; line-height: 1 !important;
+  }
+  .print-body-grid > section:first-child > div * { line-height: 1 !important; }
+  .print-body-grid > section:first-child > div p { margin: 0 !important; }
+  .print-body-grid > section:first-child > div p:first-of-type { font-size: 5pt !important; }
+  .print-body-grid > section:first-child > div > div > p:nth-child(2) { font-size: 9pt !important; margin-top: 0.4mm !important; }
+  .print-body-grid > section:first-child > div > div > p:last-child { font-size: 4.5pt !important; margin-top: 0.3mm !important; }
+  .print-body-grid > section:first-child > div > p:last-child { font-size: 9pt !important; }
+
+  h2 {
+    font-size: 7pt !important; margin: 0 0 0.6mm 0 !important;
+    padding-bottom: 0.3mm !important; border-bottom: 0.3pt solid #000 !important;
+    letter-spacing: 0.06em !important;
+  }
+  h3 { font-size: 6.5pt !important; margin: 0.4mm 0 !important; }
+  .section-title::before { color: #000 !important; font-size: 5pt !important; margin-right: 4px !important; }
+
+  ul, dl, ol { margin: 0 0 1mm 0 !important; padding: 0 !important; }
+  li { margin: 0 0 0.3mm !important; font-size: 6.5pt !important; }
+  .print-body-grid section { margin-bottom: 1.5mm !important; }
+  .print-body-grid > div > section { break-inside: avoid; }
+  .print-body-grid p { margin: 0 0 0.5mm !important; font-size: 6.5pt !important; }
+  .print-body-grid strong { font-size: 6.5pt !important; }
+
+  .print-body-grid [class*="space-y"] > * + * { margin-top: 1mm !important; }
+  .print-body-grid .space-y-8 > * + * { margin-top: 1.5mm !important; }
+  .print-body-grid .space-y-4 > * + * { margin-top: 0.6mm !important; }
+  .print-body-grid .space-y-3 > * + * { margin-top: 0.5mm !important; }
+  .print-body-grid .space-y-2 > * + * { margin-top: 0.3mm !important; }
+
+  .print-arsenal-cards { display: none !important; }
+  .print-arsenal-table { display: table !important; width: 100% !important; border-collapse: collapse !important; }
+  .print-arsenal-table th, .print-arsenal-table td {
+    padding: 0.4mm 0.8mm !important; border-bottom: 0.3pt solid #888 !important;
+    white-space: nowrap !important; font-size: 6.5pt !important; vertical-align: top !important;
+  }
+  .print-arsenal-table th { font-size: 5.5pt !important; }
+
+  #spell-slots { display: flex !important; gap: 1.2mm !important; }
+  #spell-slots [data-slot] {
+    width: 3mm !important; height: 3mm !important;
+    background: #fff !important; border: 0.8pt solid #000 !important; padding: 0 !important;
+  }
+  #spell-slots [data-slot][aria-pressed="true"] { background: #000 !important; }
+
+  .print-rituals-grid {
+    display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 3mm !important;
+  }
+  .print-rituals-grid article { border-left: 0.5pt solid #000 !important; padding-left: 2mm !important; }
+  .print-rituals-grid p { margin: 0 0 0.8mm !important; font-size: 6.5pt !important; }
+  .print-rituals-grid h3 { font-size: 7.5pt !important; margin-bottom: 1mm !important; }
+
+  section[aria-labelledby="rites-title"] {
+    margin-top: 0 !important; padding: 3mm 4mm !important; border: 0.5pt solid #444 !important;
+    break-before: page !important; page-break-before: always !important;
+    break-inside: avoid !important; page-break-inside: avoid !important;
+  }
+  section[aria-labelledby="rites-title"] header { text-align: center !important; margin-bottom: 1mm !important; }
+  section[aria-labelledby="rites-title"] header * { text-align: center !important; }
+  section[aria-labelledby="rites-title"] header h2 { font-size: 8pt !important; border: none !important; margin: 0 !important; }
+  section[aria-labelledby="rites-title"] header p { font-size: 6pt !important; margin: 0 !important; }
+
+  footer { display: none !important; }
+
+  ul.flex { display: flex !important; flex-wrap: wrap !important; gap: 1.5mm !important; }
+  ul.flex li { border: 0.5pt solid #000 !important; padding: 0.5mm 1.5mm !important; font-size: 7pt !important; }
+}
