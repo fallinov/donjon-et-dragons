@@ -39,6 +39,15 @@ export interface SpellLevel {
   slots: number
   spells: Trait[]
   saveDc: number
+  /** Les emplacements se rechargent lors d'un repos court (occultiste) */
+  shortRestRefresh?: boolean
+}
+
+export type HitDieSize = 6 | 8 | 10 | 12
+
+export interface HitDice {
+  die: HitDieSize
+  total: number
 }
 
 export interface Personality {
@@ -72,6 +81,9 @@ export interface Character {
   level: number
   background: string
   alignment: string
+  proficiencyBonus: number
+  maxHp: number
+  hitDice: HitDice
   portrait: { src: string, alt: string }
   vitals: Vital[]
   abilities: Record<AbilityKey, Ability>

@@ -11,6 +11,10 @@ export const zanna: Character = {
   background: 'Sage',
   alignment: 'Neutre bon',
 
+  proficiencyBonus: 2,
+  maxHp: 19,
+  hitDice: { die: 8, total: 3 },
+
   portrait: {
     src: '/img/zanna.png',
     alt: "Portrait peint de Zanna, jolie gnome des forêts occultiste, cheveux châtain ornés de feuilles, yeux lumineux, robe de sage brodée, grimoire et familier",
@@ -85,6 +89,7 @@ export const zanna: Character = {
     level: 2,
     slots: 2,
     saveDc: 12,
+    shortRestRefresh: true,
     spells: [
       { title: 'Illusion mineure', description: "Sort mineur. Crée un son ou une image immobile dans un cube de 1,50 m, durée 1 minute." },
       { title: 'Explosion occulte', description: 'Sort mineur. Trait de force à 36 m, 1d10 dégâts (2 traits au niveau 5).' },

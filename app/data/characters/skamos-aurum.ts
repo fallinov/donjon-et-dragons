@@ -11,6 +11,10 @@ export const skamosAurum: Character = {
   background: 'Sauvageon',
   alignment: 'Loyal bon',
 
+  proficiencyBonus: 2,
+  maxHp: 33,
+  hitDice: { die: 6, total: 4 },
+
   portrait: {
     src: '/img/skamos-aurum.png',
     alt: "Portrait peint de Skamos Aurum, tieffelin ensorceleur à la peau rouge, cornes sombres courbées vers l'arrière, yeux dorés luminescents, cape à capuche",

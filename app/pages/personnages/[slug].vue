@@ -39,6 +39,8 @@ useSeoMeta({
 
       <CodexHero :character="character" />
 
+      <CodexStatusBar :character="character" />
+
       <div class="print-body-grid grid grid-cols-1 lg:grid-cols-[260px_1fr_1fr] gap-8 lg:gap-10 motion-safe:animate-rise">
         <CodexAbilityScores :abilities="character.abilities" />
 
@@ -62,7 +64,7 @@ useSeoMeta({
           </CodexSection>
 
           <CodexSection v-if="character.spellcasting" id="incant-title" title="Sorts">
-            <CodexSpells :spellcasting="character.spellcasting" />
+            <CodexSpells :character="character" />
           </CodexSection>
 
           <CodexSection id="langues-title" title="Langues">
