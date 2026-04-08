@@ -19,7 +19,7 @@
             obsidian: '#0b0907',
             charcoal: '#15110d',
             ash: '#1f1a14',
-            parchment: { DEFAULT: '#e8d9b5', dim: '#c4b388', mute: '#9a8a64' },
+            parchment: { DEFAULT: '#e8d9b5', dim: '#c4b388', mute: '#b09d72' },
             bone: '#d8c89e',
             gold: { DEFAULT: '#c9a24a', bright: '#f2d07a', dim: '#a8842f' },
             ember: { DEFAULT: '#c23b1a', bright: '#e8652a' },
@@ -46,7 +46,7 @@
             },
           },
           animation: {
-            rise: 'rise 0.9s ease-out both',
+            rise: 'rise 0.5s ease-out both',
             ember: 'ember 3s ease-in-out infinite',
           },
         },
@@ -119,12 +119,73 @@
       vertical-align: middle;
     }
 
-    /* ── Print ────────────────────────────────────────── */
+    /* ── Print : reproduit le rendu desktop 3 colonnes ── */
+    @page { size: A4; margin: 10mm; }
     @media print {
-      body { background: white !important; color: black !important; padding: 20px !important; }
-      body::before { display: none; }
+      html, body { background: white !important; }
+      body {
+        color: black !important;
+        padding: 0 !important;
+        font-size: 10pt;
+        line-height: 1.35;
+      }
+      body::before { display: none !important; }
       .no-print { display: none !important; }
-      * { color: black !important; border-color: #999 !important; }
+      * {
+        color: black !important;
+        border-color: #555 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        animation: none !important;
+      }
+      .codex { max-width: none !important; }
+
+      /* Force la grille hero en 3 colonnes */
+      .print-hero {
+        display: grid !important;
+        grid-template-columns: auto 1fr auto !important;
+        gap: 16px !important;
+        text-align: left !important;
+        padding-bottom: 12px !important;
+        margin-bottom: 12px !important;
+        page-break-after: avoid;
+      }
+      .print-hero h1 { font-size: 26pt !important; }
+      .print-hero figure { width: 28mm !important; height: 38mm !important; }
+      .print-hero img { filter: grayscale(100%) contrast(1.1) !important; }
+
+      /* Force le body grid en 3 colonnes */
+      .print-body-grid {
+        display: grid !important;
+        grid-template-columns: 42mm 1fr 1fr !important;
+        gap: 8mm !important;
+      }
+
+      /* Arsenal : table en print, jamais cards */
+      .print-arsenal-cards { display: none !important; }
+      .print-arsenal-table { display: table !important; width: 100% !important; }
+
+      /* Rites en 3 colonnes */
+      .print-rituals-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 6mm !important;
+      }
+
+      /* Évite la coupure des sections au milieu */
+      section, article { break-inside: avoid; page-break-inside: avoid; }
+
+      /* Compaction verticale */
+      h1, h2, h3, p, ul, dl { margin-top: 0 !important; margin-bottom: 4px !important; }
+      .mt-16 { margin-top: 8mm !important; }
+
+      /* Bordures dorées → noires fines */
+      [class*="border-gold"] { border-color: #333 !important; }
+
+      /* Compteur d'emplacements visible aussi en print */
+      #spell-slots [data-slot] { background: #fff !important; border: 1.5pt solid #000 !important; }
+      #spell-slots [data-slot][aria-pressed="true"] { background: #000 !important; }
     }
   </style>
 </head>
@@ -133,10 +194,18 @@
 
   <a href="#contenu" class="skip-link">Aller au contenu</a>
 
+  <div class="no-print fixed top-4 right-4 z-20">
+    <button type="button" onclick="window.print()"
+            aria-label="Imprimer la fiche"
+            class="border border-gold/60 bg-charcoal/80 hover:bg-charcoal text-gold-bright font-display text-xs tracking-wider-3 uppercase px-3 py-2 transition-colors">
+      ⎙ Imprimer
+    </button>
+  </div>
+
   <main id="contenu" class="codex relative max-w-6xl mx-auto z-10">
 
     <!-- ─── HERO ─── -->
-    <header class="relative pb-10 mb-10 border-b border-gold/35 divider-fleuron motion-safe:animate-rise grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] items-center gap-8 lg:gap-12 text-center lg:text-left">
+    <header class="print-hero relative pb-10 mb-10 border-b border-gold/35 divider-fleuron motion-safe:animate-rise grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] items-center gap-8 lg:gap-12 text-center lg:text-left">
 
       <figure class="justify-self-center lg:justify-self-end relative w-44 h-60 sm:w-48 sm:h-64 rounded border border-gold/80 overflow-hidden shadow-[0_0_30px_rgba(201,162,74,0.25),inset_0_0_40px_rgba(0,0,0,0.5)]">
         <img src="img/dareth-brumeval.png" alt="Portrait peint de Dareth Brumeval, demi-elfe rôdeur encapuchonné, arc dans le dos, dans une forêt brumeuse"
@@ -144,7 +213,7 @@
       </figure>
 
       <div class="min-w-0">
-        <p class="font-display text-[11px] sm:text-xs tracking-wider-5 text-parchment-dim uppercase mb-3">Codex du Chasseur</p>
+        <p class="font-display text-xs sm:text-xs tracking-wider-5 text-parchment-dim uppercase mb-3">Codex du Chasseur</p>
         <h1 class="font-display uppercase tracking-wider-2 font-normal leading-[0.95] text-gold-bright text-[clamp(2rem,8vw,4.25rem)]">
           <span class="block sm:inline">Dareth</span>
           <span class="block sm:inline sm:ml-3">Brumeval</span>
@@ -159,26 +228,26 @@
 
       <dl class="justify-self-center lg:justify-self-end grid grid-cols-2 gap-3 sm:gap-4 text-left">
         <div class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[88px]">
-          <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Points de vie</dt>
-          <dd class="font-display text-2xl text-parchment mt-1">33<span class="text-[10px] tracking-wider-3 text-parchment-mute ml-1">/ 33</span></dd>
+          <dt class="font-display text-xs tracking-wider-4 text-gold uppercase">Points de vie</dt>
+          <dd class="font-display text-2xl text-parchment mt-1">33<span class="text-xs tracking-wider-3 text-parchment-mute ml-1">/ 33</span></dd>
         </div>
         <div class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[88px]">
-          <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Classe d'armure</dt>
+          <dt class="font-display text-xs tracking-wider-4 text-gold uppercase">Classe d'armure</dt>
           <dd class="font-display text-2xl text-parchment mt-1">15</dd>
         </div>
         <div class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[88px]">
-          <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Initiative</dt>
+          <dt class="font-display text-xs tracking-wider-4 text-gold uppercase">Initiative</dt>
           <dd class="font-display text-2xl text-parchment mt-1">+4</dd>
         </div>
         <div class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[88px]">
-          <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Vitesse</dt>
-          <dd class="font-display text-2xl text-parchment mt-1">9<span class="text-[10px] tracking-wider-3 text-parchment-mute ml-1">m</span></dd>
+          <dt class="font-display text-xs tracking-wider-4 text-gold uppercase">Vitesse</dt>
+          <dd class="font-display text-2xl text-parchment mt-1">9<span class="text-xs tracking-wider-3 text-parchment-mute ml-1">m</span></dd>
         </div>
       </dl>
     </header>
 
     <!-- ─── BODY GRID ─── -->
-    <div class="grid grid-cols-1 lg:grid-cols-[260px_1fr_1fr] gap-8 lg:gap-10 motion-safe:animate-rise [animation-delay:0.2s]">
+    <div class="print-body-grid grid grid-cols-1 lg:grid-cols-[260px_1fr_1fr] gap-8 lg:gap-10 motion-safe:animate-rise [animation-delay:0.2s]">
 
       <!-- Caractéristiques -->
       <section aria-labelledby="caracs-title" class="space-y-3">
@@ -187,9 +256,9 @@
         <!-- Force -->
         <div class="border border-gold/30 bg-charcoal/50 p-4 flex items-center justify-between">
           <div>
-            <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Force</p>
+            <p class="font-display text-xs tracking-wider-4 text-gold uppercase">Force</p>
             <p class="font-display text-3xl text-parchment mt-1">10</p>
-            <p class="text-[11px] text-parchment-mute mt-1">sauv · +0</p>
+            <p class="text-xs text-parchment-mute mt-1">sauv · +0</p>
           </div>
           <p class="font-display text-3xl text-gold-bright">+0</p>
         </div>
@@ -197,9 +266,9 @@
         <!-- Dextérité (maîtrise) -->
         <div class="border border-gold bg-gradient-to-br from-charcoal to-ash p-4 flex items-center justify-between shadow-[inset_0_0_20px_rgba(201,162,74,0.15)]">
           <div>
-            <p class="font-display text-[10px] tracking-wider-4 text-gold-bright uppercase">Dextérité</p>
+            <p class="font-display text-xs tracking-wider-4 text-gold-bright uppercase">Dextérité</p>
             <p class="font-display text-3xl text-parchment mt-1">18</p>
-            <p class="text-[11px] text-gold mt-1">sauv · +6 <span aria-label="maîtrise">◆</span></p>
+            <p class="text-xs text-gold mt-1">sauv · +6 <abbr title="Maîtrise" class="ml-1 inline-block border border-gold-bright text-gold-bright text-[10px] font-display tracking-wider-2 px-1.5 leading-none py-0.5 no-underline">M</abbr></p>
           </div>
           <p class="font-display text-3xl text-gold-bright">+4</p>
         </div>
@@ -207,9 +276,9 @@
         <!-- Constitution -->
         <div class="border border-gold/30 bg-charcoal/50 p-4 flex items-center justify-between">
           <div>
-            <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Constitution</p>
+            <p class="font-display text-xs tracking-wider-4 text-gold uppercase">Constitution</p>
             <p class="font-display text-3xl text-parchment mt-1">14</p>
-            <p class="text-[11px] text-parchment-mute mt-1">sauv · +2</p>
+            <p class="text-xs text-parchment-mute mt-1">sauv · +2</p>
           </div>
           <p class="font-display text-3xl text-gold-bright">+2</p>
         </div>
@@ -217,9 +286,9 @@
         <!-- Intelligence -->
         <div class="border border-gold/30 bg-charcoal/50 p-4 flex items-center justify-between">
           <div>
-            <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Intelligence</p>
+            <p class="font-display text-xs tracking-wider-4 text-gold uppercase">Intelligence</p>
             <p class="font-display text-3xl text-parchment mt-1">13</p>
-            <p class="text-[11px] text-parchment-mute mt-1">sauv · +1</p>
+            <p class="text-xs text-parchment-mute mt-1">sauv · +1</p>
           </div>
           <p class="font-display text-3xl text-gold-bright">+1</p>
         </div>
@@ -227,9 +296,9 @@
         <!-- Sagesse (maîtrise) -->
         <div class="border border-gold bg-gradient-to-br from-charcoal to-ash p-4 flex items-center justify-between shadow-[inset_0_0_20px_rgba(201,162,74,0.15)]">
           <div>
-            <p class="font-display text-[10px] tracking-wider-4 text-gold-bright uppercase">Sagesse</p>
+            <p class="font-display text-xs tracking-wider-4 text-gold-bright uppercase">Sagesse</p>
             <p class="font-display text-3xl text-parchment mt-1">15</p>
-            <p class="text-[11px] text-gold mt-1">sauv · +4 <span aria-label="maîtrise">◆</span></p>
+            <p class="text-xs text-gold mt-1">sauv · +4 <abbr title="Maîtrise" class="ml-1 inline-block border border-gold-bright text-gold-bright text-[10px] font-display tracking-wider-2 px-1.5 leading-none py-0.5 no-underline">M</abbr></p>
           </div>
           <p class="font-display text-3xl text-gold-bright">+2</p>
         </div>
@@ -237,9 +306,9 @@
         <!-- Charisme -->
         <div class="border border-gold/30 bg-charcoal/50 p-4 flex items-center justify-between">
           <div>
-            <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase">Charisme</p>
+            <p class="font-display text-xs tracking-wider-4 text-gold uppercase">Charisme</p>
             <p class="font-display text-3xl text-parchment mt-1">12</p>
-            <p class="text-[11px] text-parchment-mute mt-1">sauv · +1</p>
+            <p class="text-xs text-parchment-mute mt-1">sauv · +1</p>
           </div>
           <p class="font-display text-3xl text-gold-bright">+1</p>
         </div>
@@ -267,7 +336,7 @@
           <ul class="space-y-4">
             <li>
               <strong class="block font-display text-xs tracking-wider-3 text-gold-bright uppercase mb-1">— Ennemi juré · Dragons</strong>
-              <span class="text-parchment-dim">Avantage pour pister, connaître et démasquer les dragons. Draconique su comme langue maternelle.</span>
+              <span class="text-parchment-dim">Avantage pour pister, connaître et démasquer les dragons. Draconique parlé comme langue maternelle.</span>
             </li>
             <li>
               <strong class="block font-display text-xs tracking-wider-3 text-gold-bright uppercase mb-1">— Explorateur né</strong>
@@ -288,19 +357,19 @@
           <h2 id="perso-title" class="section-title font-display text-sm tracking-wider-3 text-gold uppercase mb-4 pb-2 border-b border-gold/25">Personnalité</h2>
           <dl class="space-y-3 text-parchment-dim">
             <div>
-              <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-1">Trait de personnalité</dt>
+              <dt class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">Trait de personnalité</dt>
               <dd>La forêt est sa seule cathédrale.</dd>
             </div>
             <div>
-              <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-1">Idéal — Liberté</dt>
+              <dt class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">Idéal — Liberté</dt>
               <dd>Nul seigneur, nul dieu, nulle chaîne.</dd>
             </div>
             <div>
-              <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-1">Lien</dt>
+              <dt class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">Lien</dt>
               <dd>Un dragon a réduit son village en cendres. Il n'oublie pas.</dd>
             </div>
             <div>
-              <dt class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-1">Défaut</dt>
+              <dt class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">Défaut</dt>
               <dd>Méfie-toi de quiconque porte un titre.</dd>
             </div>
           </dl>
@@ -314,7 +383,7 @@
           <h2 id="arsenal-title" class="section-title font-display text-sm tracking-wider-3 text-gold uppercase mb-4 pb-2 border-b border-gold/25">Attaques et incantations</h2>
 
           <!-- Mobile : cards. Desktop : table -->
-          <div class="space-y-3 md:hidden">
+          <div class="print-arsenal-cards space-y-3 md:hidden">
             <article class="border border-gold/25 bg-charcoal/40 p-3">
               <p class="font-display text-gold-bright text-base">Arc long</p>
               <p class="text-xs text-parchment-mute italic">45 m / 180 m</p>
@@ -341,12 +410,13 @@
             </article>
           </div>
 
-          <table class="hidden md:table w-full border-collapse">
+          <table class="print-arsenal-table hidden md:table w-full border-collapse">
+            <caption class="sr-only">Armes équipées de Dareth Brumeval, avec bonus d'attaque et dégâts</caption>
             <thead>
               <tr class="border-b border-gold/30">
-                <th class="text-left font-display text-[10px] tracking-wider-4 text-gold uppercase pb-2">Arme</th>
-                <th class="text-left font-display text-[10px] tracking-wider-4 text-gold uppercase pb-2">Bonus d'att.</th>
-                <th class="text-left font-display text-[10px] tracking-wider-4 text-gold uppercase pb-2">Dégâts</th>
+                <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">Arme</th>
+                <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">Bonus d'att.</th>
+                <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">Dégâts</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gold/15">
@@ -378,15 +448,18 @@
           <h2 id="incant-title" class="section-title font-display text-sm tracking-wider-3 text-gold uppercase mb-4 pb-2 border-b border-gold/25">Sorts</h2>
           <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
             <div>
-              <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-2">Sorts de niveau 1 — emplacements</p>
-              <div class="flex gap-2" role="group" aria-label="Emplacements de sort de niveau 1 restants : 3 sur 3">
-                <span class="w-4 h-4 rotate-45 bg-ember motion-safe:animate-ember"></span>
-                <span class="w-4 h-4 rotate-45 bg-ember motion-safe:animate-ember [animation-delay:0.6s]"></span>
-                <span class="w-4 h-4 rotate-45 bg-ember motion-safe:animate-ember [animation-delay:1.2s]"></span>
+              <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-2">Sorts de niveau 1 — emplacements <span id="slots-count" class="text-gold-bright ml-1">3 / 3</span></p>
+              <div id="spell-slots" class="flex gap-2" role="group" aria-label="Emplacements de sort de niveau 1">
+                <button type="button" data-slot aria-pressed="false" aria-label="Emplacement de sort 1, disponible"
+                        class="w-5 h-5 rotate-45 bg-ember motion-safe:animate-ember border border-ember-bright/60 cursor-pointer"></button>
+                <button type="button" data-slot aria-pressed="false" aria-label="Emplacement de sort 2, disponible"
+                        class="w-5 h-5 rotate-45 bg-ember motion-safe:animate-ember border border-ember-bright/60 cursor-pointer [animation-delay:0.6s]"></button>
+                <button type="button" data-slot aria-pressed="false" aria-label="Emplacement de sort 3, disponible"
+                        class="w-5 h-5 rotate-45 bg-ember motion-safe:animate-ember border border-ember-bright/60 cursor-pointer [animation-delay:1.2s]"></button>
               </div>
             </div>
             <div class="text-right">
-              <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase">DD de sauvegarde des sorts</p>
+              <p class="font-display text-xs tracking-wider-4 text-gold uppercase">DD de sauvegarde des sorts</p>
               <p class="font-display text-3xl text-gold-bright">12</p>
             </div>
           </div>
@@ -426,9 +499,9 @@
         <p class="mt-2 text-parchment-dim italic text-sm">— trois séquences à graver dans la mémoire du bras —</p>
       </header>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="print-rituals-grid grid grid-cols-1 md:grid-cols-3 gap-6">
         <article class="border-l-2 border-gold pl-5">
-          <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-2">— Rite I</p>
+          <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-2">— Rite I</p>
           <h3 class="font-display text-base sm:text-lg tracking-wider-2 text-parchment uppercase mb-3">L'ouverture silencieuse</h3>
           <p class="text-sm text-parchment-dim mb-1">Action bonus · <em class="text-bone">Marque du chasseur</em></p>
           <p class="text-sm text-parchment-dim mb-3">Action · tir à l'arc long</p>
@@ -436,7 +509,7 @@
         </article>
 
         <article class="border-l-2 border-gold pl-5">
-          <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-2">— Rite II</p>
+          <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-2">— Rite II</p>
           <h3 class="font-display text-base sm:text-lg tracking-wider-2 text-parchment uppercase mb-3">La proie ensanglantée</h3>
           <p class="text-sm text-parchment-dim mb-3">Cible déjà blessée, une fois par tour :</p>
           <p class="font-display text-sm text-gold-bright bg-charcoal/60 px-3 py-2 border-l border-ember">1d20 + 6 &nbsp;⟶&nbsp; 1d8 + 4 + 1d6 + 1d8</p>
@@ -444,7 +517,7 @@
         </article>
 
         <article class="border-l-2 border-gold pl-5">
-          <p class="font-display text-[10px] tracking-wider-4 text-gold uppercase mb-2">— Rite III</p>
+          <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-2">— Rite III</p>
           <h3 class="font-display text-base sm:text-lg tracking-wider-2 text-parchment uppercase mb-3">La danse des deux armes</h3>
           <p class="text-sm text-parchment-dim mb-1">Action · cimeterre</p>
           <p class="text-sm text-parchment-dim mb-3">Action bonus · épée courte</p>
@@ -462,5 +535,30 @@
     </footer>
 
   </main>
+
+  <script>
+    // Toggle interactif des emplacements de sorts
+    (function () {
+      const slots = document.querySelectorAll('#spell-slots [data-slot]');
+      const counter = document.getElementById('slots-count');
+      const total = slots.length;
+      function update() {
+        const used = Array.from(slots).filter(s => s.getAttribute('aria-pressed') === 'true').length;
+        const left = total - used;
+        counter.textContent = `${left} / ${total}`;
+      }
+      slots.forEach((slot, i) => {
+        slot.addEventListener('click', () => {
+          const used = slot.getAttribute('aria-pressed') === 'true';
+          slot.setAttribute('aria-pressed', String(!used));
+          slot.setAttribute('aria-label', `Emplacement de sort ${i + 1}, ${!used ? 'consommé' : 'disponible'}`);
+          slot.classList.toggle('opacity-25');
+          slot.classList.toggle('bg-ember');
+          slot.classList.toggle('bg-charcoal');
+          update();
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
