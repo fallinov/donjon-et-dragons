@@ -37,7 +37,7 @@ useSeoMeta({
               {{ character.eyebrow }}
             </p>
             <h2 class="font-display text-2xl text-gold-bright uppercase tracking-wider-2 leading-tight">
-              {{ character.firstName }} {{ character.lastName }}
+              {{ character.firstName }}<span v-if="character.lastName"> {{ character.lastName }}</span>
             </h2>
             <p class="mt-2 text-sm text-parchment-dim italic">
               {{ character.race }} · {{ character.className }} niveau {{ character.level }}

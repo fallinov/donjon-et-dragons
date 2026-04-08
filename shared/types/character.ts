@@ -65,7 +65,7 @@ export interface Ritual {
 export interface Character {
   slug: string
   firstName: string
-  lastName: string
+  lastName?: string
   eyebrow: string
   race: string
   className: string

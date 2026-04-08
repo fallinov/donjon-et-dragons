@@ -10,8 +10,15 @@ if (!character.value) {
 }
 
 useSeoMeta({
-  title: () => `Codex — ${character.value!.firstName} ${character.value!.lastName}`,
-  description: () => `Fiche de personnage D&D 5e : ${character.value!.firstName} ${character.value!.lastName}, ${character.value!.race} ${character.value!.className} niveau ${character.value!.level}.`,
+  title: () => {
+    const c = character.value!
+    return `Codex — ${c.firstName}${c.lastName ? ` ${c.lastName}` : ''}`
+  },
+  description: () => {
+    const c = character.value!
+    const fullName = `${c.firstName}${c.lastName ? ` ${c.lastName}` : ''}`
+    return `Fiche de personnage D&D 5e : ${fullName}, ${c.race} ${c.className} niveau ${c.level}.`
+  },
 })
 </script>
 

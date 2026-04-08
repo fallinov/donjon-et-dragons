@@ -20,7 +20,7 @@ defineProps<{ character: Character }>()
       </p>
       <h1 class="font-display uppercase tracking-wider-2 font-normal leading-[0.95] text-gold-bright text-[clamp(2rem,6vw,3.5rem)]">
         <span class="block">{{ character.firstName }}</span>
-        <span class="block">{{ character.lastName }}</span>
+        <span v-if="character.lastName" class="block">{{ character.lastName }}</span>
       </h1>
       <p class="mt-4 text-parchment-dim italic text-sm sm:text-base flex flex-wrap gap-x-3 gap-y-1 justify-center xl:justify-start">
         <span>{{ character.race }}</span><span aria-hidden="true">·</span>
