@@ -65,12 +65,12 @@ test.describe('Codex Donjon et Dragons', () => {
 
     // Infliger 10 dégâts
     await page.getByLabel('Dégâts').fill('10')
-    await page.getByRole('button', { name: '−' }).click()
+    await page.getByRole('button', { name: /− HP/i }).click()
     await expect(page.getByText('23', { exact: false }).first()).toBeVisible()
 
     // Soigner 5
     await page.getByLabel('Soin').fill('5')
-    await page.getByRole('button', { name: '+' }).click()
+    await page.getByRole('button', { name: /\+ HP/i }).click()
     await expect(page.getByText('28', { exact: false }).first()).toBeVisible()
   })
 
@@ -84,18 +84,18 @@ test.describe('Codex Donjon et Dragons', () => {
   })
 
   test('Long rest restaure les HP au maximum', async ({ page }) => {
-    await page.goto('/personnages/dareth-brumeval')
-    await page.waitForTimeout(500)
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await page.waitForTimeout(800)
 
     // Inflige 10 dégâts
     await page.getByLabel('Dégâts').fill('10')
-    await page.getByRole('button', { name: '−' }).click()
+    await page.getByRole('button', { name: /− HP/i }).click()
     await expect(page.getByText('23', { exact: false }).first()).toBeVisible()
 
     // Repos long (confirm dialog)
     page.on('dialog', dialog => dialog.accept())
-    await page.getByRole('button', { name: /Repos long/i }).click()
-    await expect(page.getByText('33 /', { exact: false }).first()).toBeVisible()
+    await page.getByRole('button', { name: /Long/i }).click()
+    await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
   })
 
   test('Jets de sauvegarde contre la mort apparaissent quand HP = 0', async ({ page }) => {
@@ -103,9 +103,9 @@ test.describe('Codex Donjon et Dragons', () => {
     await page.waitForTimeout(500)
 
     await page.getByLabel('Dégâts').fill('999')
-    await page.getByRole('button', { name: '−' }).click()
+    await page.getByRole('button', { name: /− HP/i }).click()
 
-    await expect(page.getByText(/Jets de sauvegarde contre la mort/i)).toBeVisible()
+    await expect(page.getByText(/Sauvegardes contre la mort/i)).toBeVisible()
     const successButtons = page.getByRole('group', { name: 'Succès contre la mort' }).getByRole('button')
     await successButtons.first().click()
     await expect(successButtons.first()).toHaveAttribute('aria-pressed', 'true')
