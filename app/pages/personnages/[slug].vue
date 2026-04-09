@@ -30,7 +30,7 @@ useSeoMeta({
       id="contenu"
       class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-6 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto"
     >
-      <nav aria-label="Fil d'Ariane" class="no-print mb-6">
+      <nav aria-label="Fil d'Ariane" class="no-print mb-2 xl:mb-6">
         <NuxtLink
           to="/"
           class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
