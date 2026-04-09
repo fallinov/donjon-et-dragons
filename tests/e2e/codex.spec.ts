@@ -27,8 +27,10 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('emplacements de sort interactifs', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    // Attendre l'hydratation Vue avant de cliquer
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(800)
+    // Sur mobile, naviguer vers l'onglet Sorts d'abord
+    const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
+    if (await sortsTab.isVisible()) await sortsTab.click()
     await expect(page.locator('#slots-count')).toHaveText('3 / 3')
 
     const slots = page.locator('[data-slot]')

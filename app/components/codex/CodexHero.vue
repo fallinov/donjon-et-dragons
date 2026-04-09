@@ -8,7 +8,7 @@ defineProps<{ character: Character }>()
   <header class="print-hero relative mb-10 motion-safe:animate-rise">
 
     <!-- ═══ MOBILE : carte de jeu pleine largeur ═══ -->
-    <div class="xl:hidden">
+    <div class="lg:hidden">
       <!-- Photo arrière-plan avec gradient -->
       <div class="relative aspect-[3/4] sm:aspect-[16/9] overflow-hidden w-screen -ml-4 sm:-ml-8 lg:-ml-10">
         <NuxtImg

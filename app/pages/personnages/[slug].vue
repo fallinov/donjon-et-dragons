@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { getCharacter } from '~/data/characters'
+import { useMobileTab } from '~/composables/useMobileTab'
+import { useIsDesktop } from '~/composables/useIsDesktop'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
@@ -20,6 +22,9 @@ useSeoMeta({
     return `Fiche de personnage D&D 5e : ${fullName}, ${c.race} ${c.className} niveau ${c.level}.`
   },
 })
+
+const { activeTab } = useMobileTab()
+const isDesktop = useIsDesktop()
 </script>
 
 <template>
@@ -28,9 +33,10 @@ useSeoMeta({
 
     <main
       id="contenu"
-      class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-6 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto"
+      class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-3 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto pb-24 lg:pb-16"
     >
-      <nav aria-label="Fil d'Ariane" class="no-print mb-2 xl:mb-6">
+      <!-- Breadcrumb (desktop + mobile) -->
+      <nav aria-label="Fil d'Ariane" class="no-print mb-2 lg:mb-6">
         <NuxtLink
           to="/"
           class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
@@ -40,48 +46,106 @@ useSeoMeta({
         </NuxtLink>
       </nav>
 
+      <!-- Hero (toujours visible) -->
       <CodexHero :character="character" />
 
-      <CodexStatusBar :character="character" />
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- MOBILE : navigation par onglets + swipe (< xl)         -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div v-if="!isDesktop">
+        <MobileSwipeContainer>
+          <!-- Onglet Combat -->
+          <div v-if="activeTab === 'combat'" class="space-y-6">
+            <CodexStatusBar :character="character" />
+            <CodexSection id="arsenal-title-m" title="Attaques et incantations">
+              <CodexAttacks :attacks="character.attacks" />
+            </CodexSection>
+          </div>
 
-      <div class="print-body-grid grid grid-cols-1 lg:grid-cols-[260px_1fr_1fr] gap-8 lg:gap-10 motion-safe:animate-rise">
-        <CodexAbilityScores :abilities="character.abilities" />
+          <!-- Onglet Sorts -->
+          <div v-if="activeTab === 'sorts'" class="space-y-6">
+            <CodexSection v-if="character.spellcasting" id="incant-title-m" title="Sorts">
+              <CodexSpells :character="character" />
+            </CodexSection>
+            <p v-else class="text-parchment-mute italic text-center py-8">Aucun sort connu.</p>
+          </div>
 
-        <div class="space-y-8">
-          <CodexSection id="arts-title" title="Compétences">
-            <CodexSkillList :skills="character.skills" />
-          </CodexSection>
+          <!-- Onglet Stats -->
+          <div v-if="activeTab === 'stats'" class="space-y-6">
+            <CodexAbilityScores :abilities="character.abilities" />
+            <CodexSection id="arts-title-m" title="Compétences">
+              <CodexSkillList :skills="character.skills" />
+            </CodexSection>
+          </div>
 
-          <CodexSection id="dons-title" title="Capacités et traits">
-            <CodexFeatureList :features="character.features" />
-          </CodexSection>
+          <!-- Onglet Traits -->
+          <div v-if="activeTab === 'traits'" class="space-y-6">
+            <CodexSection id="dons-title-m" title="Capacités et traits">
+              <CodexFeatureList :features="character.features" />
+            </CodexSection>
+            <CodexSection id="langues-title-m" title="Langues">
+              <CodexLanguages :languages="character.languages" />
+            </CodexSection>
+          </div>
 
-          <CodexSection id="perso-title" title="Personnalité">
-            <CodexPersonality :personality="character.personality" />
-          </CodexSection>
-        </div>
-
-        <div class="space-y-8">
-          <CodexSection id="arsenal-title" title="Attaques et incantations">
-            <CodexAttacks :attacks="character.attacks" />
-          </CodexSection>
-
-          <CodexSection v-if="character.spellcasting" id="incant-title" title="Sorts">
-            <CodexSpells :character="character" />
-          </CodexSection>
-
-          <CodexSection id="langues-title" title="Langues">
-            <CodexLanguages :languages="character.languages" />
-          </CodexSection>
-        </div>
+          <!-- Onglet Perso -->
+          <div v-if="activeTab === 'perso'" class="space-y-6">
+            <CodexSection id="perso-title-m" title="Personnalité">
+              <CodexPersonality :personality="character.personality" />
+            </CodexSection>
+            <CodexRituals :rituals="character.rituals" />
+            <footer class="pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
+              <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>
+              <p>{{ character.colophon }}</p>
+            </footer>
+          </div>
+        </MobileSwipeContainer>
       </div>
 
-      <CodexRituals :rituals="character.rituals" />
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- DESKTOP : layout 3 colonnes classique (>= xl)          -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div v-if="isDesktop">
+        <CodexStatusBar :character="character" />
 
-      <footer class="mt-16 pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
-        <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>
-        <p>{{ character.colophon }}</p>
-      </footer>
+        <div class="print-body-grid grid grid-cols-[260px_1fr_1fr] gap-10 motion-safe:animate-rise">
+          <CodexAbilityScores :abilities="character.abilities" />
+
+          <div class="space-y-8">
+            <CodexSection id="arts-title" title="Compétences">
+              <CodexSkillList :skills="character.skills" />
+            </CodexSection>
+            <CodexSection id="dons-title" title="Capacités et traits">
+              <CodexFeatureList :features="character.features" />
+            </CodexSection>
+            <CodexSection id="perso-title" title="Personnalité">
+              <CodexPersonality :personality="character.personality" />
+            </CodexSection>
+          </div>
+
+          <div class="space-y-8">
+            <CodexSection id="arsenal-title" title="Attaques et incantations">
+              <CodexAttacks :attacks="character.attacks" />
+            </CodexSection>
+            <CodexSection v-if="character.spellcasting" id="incant-title" title="Sorts">
+              <CodexSpells :character="character" />
+            </CodexSection>
+            <CodexSection id="langues-title" title="Langues">
+              <CodexLanguages :languages="character.languages" />
+            </CodexSection>
+          </div>
+        </div>
+
+        <CodexRituals :rituals="character.rituals" />
+
+        <footer class="mt-16 pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
+          <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>
+          <p>{{ character.colophon }}</p>
+        </footer>
+      </div>
     </main>
+
+    <!-- Bottom tab bar mobile -->
+    <MobileTabBar />
   </div>
 </template>
