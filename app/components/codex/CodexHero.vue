@@ -1,14 +1,21 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import type { Character } from '~~/shared/types/character'
 
 defineProps<{ character: Character }>()
+
+const fogRevealed = ref(false)
+
+onMounted(() => {
+  requestAnimationFrame(() => { fogRevealed.value = true })
+})
 </script>
 
 <template>
   <header class="print-hero relative mb-10 motion-safe:animate-rise">
 
     <!-- ═══ MOBILE : carte de jeu pleine largeur ═══ -->
-    <div class="lg:hidden">
+    <div class="lg:hidden" ref="mobileCard">
       <!-- Lien retour au-dessus de la carte -->
       <NuxtLink
         to="/"
@@ -27,6 +34,16 @@ defineProps<{ character: Character }>()
         />
         <!-- Gradient bas : noir vers transparent -->
         <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/50 via-40% to-transparent to-75%" />
+
+        <!-- Brouillard qui se dissipe à l'ouverture -->
+        <div
+          class="motion-safe:fog-overlay absolute inset-0 pointer-events-none z-10 transition-all duration-[2000ms] ease-out"
+          :class="fogRevealed ? 'opacity-0 scale-110 blur-xl' : 'opacity-100 scale-100 blur-none'"
+          aria-hidden="true"
+        >
+          <div class="absolute inset-0 bg-obsidian/80" />
+          <div class="absolute inset-0 mix-blend-soft-light opacity-60" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 400 400%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22f%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.015%22 numOctaves=%224%22 seed=%2242%22/%3E%3CfeDisplacementMap in=%22SourceGraphic%22 scale=%2280%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23f)%22 fill=%22%23b09d72%22 opacity=%220.3%22/%3E%3C/svg%3E')" />
+        </div>
 
         <!-- Texte superposé en bas de la carte -->
         <div class="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-4 sm:px-5 sm:pb-5 sm:pt-6">

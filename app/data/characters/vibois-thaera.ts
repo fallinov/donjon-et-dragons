@@ -71,7 +71,7 @@ export const viboisThaera: Character = {
     },
     {
       title: 'Canalisation · Présence conquérante',
-      description: "Chaque créature au choix dans un rayon de 9 m doit réussir un jet de Sagesse (DD 13) ou être effrayée pendant 1 minute.",
+      description: "Chaque créature au choix dans un rayon de 9 m doit réussir un jet de Sagesse (difficulté 13) ou être effrayée pendant 1 minute.",
     },
   ],
 
@@ -133,7 +133,7 @@ export const viboisThaera: Character = {
         { text: 'Action · ', emphasis: 'Présence conquérante (canalisation)' },
         { text: 'Tour suivant · attaque + châtiment sur cible effrayée' },
       ],
-      formulas: ['DD 13 Sag ⟶ effrayée 1 min', '1d20 + 4 ⟶ 1d8 + 2 + 2d8 radiant'],
+      formulas: ['difficulté 13 Sag ⟶ effrayée 1 min', '1d20 + 4 ⟶ 1d8 + 2 + 2d8 radiant'],
     },
   ],
 

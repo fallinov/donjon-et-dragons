@@ -16,9 +16,9 @@ describe('CodexSpells', () => {
     expect(slots).toHaveLength(3)
   })
 
-  it('affiche le DD de sauvegarde des sorts', () => {
+  it('affiche la difficulté de sauvegarde des sorts', () => {
     const wrapper = mount(CodexSpells, { props: { character: darethBrumeval } })
-    expect(wrapper.text()).toContain('DD de sauvegarde des sorts')
+    expect(wrapper.text()).toContain('Difficulté de sauvegarde')
     expect(wrapper.text()).toContain('12')
   })
 

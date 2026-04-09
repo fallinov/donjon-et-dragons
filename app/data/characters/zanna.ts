@@ -55,7 +55,7 @@ export const zanna: Character = {
     },
     {
       title: "Magie occulte · Patron d'un autre monde",
-      description: "Zanna a scellé un pacte avec une entité d'outre-monde qui lui confère ses sorts et ses invocations occultes. DD de sauvegarde 12, bonus d'attaque avec un sort +4.",
+      description: "Zanna a scellé un pacte avec une entité d'outre-monde qui lui confère ses sorts et ses invocations occultes. Difficulté de sauvegarde 12, bonus d'attaque avec un sort +4.",
     },
     {
       title: 'Pacte de la Chaîne',

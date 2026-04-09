@@ -84,7 +84,7 @@ export const thunon: Character = {
 
   attacks: [
     { name: 'Trait de feu',      note: 'sort, 36 m',          attackBonus: '1d20+6', damage: '1d10',  damageType: 'feu'   },
-    { name: 'Aspersion acide',   note: 'sort, 18 m, DD 14',   attackBonus: 'DD 14',  damage: '1d6',   damageType: 'acide' },
+    { name: 'Aspersion acide',   note: 'sort, 18 m, difficulté 14',   attackBonus: 'difficulté 14',  damage: '1d6',   damageType: 'acide' },
     { name: 'Bâton',             note: 'versatile (1d8)',      attackBonus: '1d20+2', damage: '1d6',   damageType: 'cont.' },
   ],
 
@@ -95,16 +95,16 @@ export const thunon: Character = {
     spells: [
       { title: 'Lumière',              description: 'Illumine un objet pendant 1 heure. Pas de concentration.',                                          level: 0, cost: 'cantrip' },
       { title: 'Trait de feu',         description: "1d10 dégâts de feu à 36 m. L'attaque de prédilection du magicien.",                                  level: 0, cost: 'cantrip' },
-      { title: 'Aspersion acide',      description: '1d6 dégâts acide, DD 14 DEX, peut cibler 2 créatures adjacentes à 18 m.',                           level: 0, cost: 'cantrip' },
+      { title: 'Aspersion acide',      description: '1d6 dégâts acide, difficulté 14 DEX, peut cibler 2 créatures adjacentes à 18 m.',                           level: 0, cost: 'cantrip' },
       { title: 'Armure du mage',       description: '8 heures. CA = 13 + DEX (+3) = 16. Pas de concentration.',                                          level: 1, cost: 'slot' },
       { title: 'Bouclier',             description: 'Réaction. +5 CA jusqu\'au prochain tour, y compris contre l\'attaque déclencheuse.',                  level: 1, cost: 'slot' },
       { title: 'Projectile magique',   description: 'Évocation. 3 projectiles de 1d4+1 force. Touche automatique, pas de jet.',                           level: 1, cost: 'slot' },
-      { title: 'Rayon empoisonné',     description: '1d20+6 au toucher, 2d8 poison. DD 14 CON ou empoisonné jusqu\'à la fin du prochain tour.',            level: 1, cost: 'slot' },
-      { title: 'Vague tonnante',       description: 'Évocation. Créatures dans un cube de 4,5 m : DD 14 CON ou 2d8 tonnerre + repoussées de 3 m.',       level: 1, cost: 'slot' },
-      { title: 'Sphère enflammée',     description: 'Évocation, concentration. Sphère de feu de 1,5 m : 2d6 feu, DD 14 DEX. Déplaçable en action bonus.', level: 2, cost: 'slot' },
+      { title: 'Rayon empoisonné',     description: '1d20+6 au toucher, 2d8 poison. difficulté 14 CON ou empoisonné jusqu\'à la fin du prochain tour.',            level: 1, cost: 'slot' },
+      { title: 'Vague tonnante',       description: 'Évocation. Créatures dans un cube de 4,5 m : difficulté 14 CON ou 2d8 tonnerre + repoussées de 3 m.',       level: 1, cost: 'slot' },
+      { title: 'Sphère enflammée',     description: 'Évocation, concentration. Sphère de feu de 1,5 m : 2d6 feu, difficulté 14 DEX. Déplaçable en action bonus.', level: 2, cost: 'slot' },
       { title: 'Flèche acide de Melf', description: 'Évocation. 1d20+6, 4d4 acide immédiat + 2d4 acide à la fin du tour suivant.',                       level: 2, cost: 'slot' },
-      { title: 'Immobilisation de personne', description: 'Concentration. DD 14 SAG ou paralysé. La cible retente à chaque tour.',                        level: 2, cost: 'slot' },
-      { title: 'Boule de feu',         description: 'Évocation. Rayon de 6 m, DD 14 DEX : 8d6 feu. Disponible au niveau 5.',                             level: 3, cost: 'slot' },
+      { title: 'Immobilisation de personne', description: 'Concentration. difficulté 14 SAG ou paralysé. La cible retente à chaque tour.',                        level: 2, cost: 'slot' },
+      { title: 'Boule de feu',         description: 'Évocation. Rayon de 6 m, difficulté 14 DEX : 8d6 feu. Disponible au niveau 5.',                             level: 3, cost: 'slot' },
     ],
   },
 
@@ -141,7 +141,7 @@ export const thunon: Character = {
         { text: 'Action bonus · déplacer la sphère sur une cible' },
         { text: 'Tours suivants · trait de feu + déplacement sphère' },
       ],
-      formulas: ['DD 14 DEX ⟶ 2d6 feu (sphère)', '1d20 + 6 ⟶ 1d10 feu (trait)'],
+      formulas: ['difficulté 14 DEX ⟶ 2d6 feu (sphère)', '1d20 + 6 ⟶ 1d10 feu (trait)'],
       footnote: 'Façonnage de sorts protège les alliés dans la zone.',
     },
   ],
