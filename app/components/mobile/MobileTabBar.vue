@@ -14,7 +14,7 @@ const { activeTab, tabs, setTab } = useMobileTab()
         <button
           type="button"
           :aria-current="activeTab === tab.id ? 'page' : undefined"
-          class="w-full flex flex-col items-center gap-0.5 py-2 transition-colors relative"
+          class="w-full flex flex-col items-center gap-0.5 py-2 transition-colors relative outline-none"
           :class="activeTab === tab.id ? 'text-gold-bright' : 'text-parchment-mute hover:text-parchment'"
           @click="setTab(tab.id)"
         >
@@ -26,7 +26,7 @@ const { activeTab, tabs, setTab } = useMobileTab()
 
           <!-- Icônes SVG inline (combat = plus grand) -->
           <svg
-            :class="tab.id === 'combat' ? 'w-7 h-7' : 'w-5 h-5'"
+            class="w-5 h-5"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -47,14 +47,11 @@ const { activeTab, tabs, setTab } = useMobileTab()
               <path d="M17 6l-2.5 2.5" /><path d="M14 8l-1.5 1.5" />
               <path d="M7 18l2.5-2.5" /><path d="M3.5 14.5l.5-.5" />
             </template>
-            <!-- Combat : épées croisées -->
+            <!-- Combat : bouclier + épée -->
             <template v-else-if="tab.icon === 'sword'">
-              <path d="m14.5 17.5 3 3 4-4-3-3" />
-              <path d="m3 6.5 17 17" />
-              <path d="m3 6.5 4-4 8.5 8.5" />
-              <path d="m9.5 17.5 3 3-4 4-3-3" />
-              <path d="M21 6.5 4 23.5" />
-              <path d="M21 6.5 17 2.5l-8.5 8.5" />
+              <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="none" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="9" y1="10" x2="15" y2="10" />
             </template>
             <!-- Sorts : étincelles -->
             <template v-else-if="tab.icon === 'sparkles'">
