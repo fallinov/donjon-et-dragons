@@ -67,3 +67,15 @@ Pattern utilisé :
 **Correction** : remplacer `spell.level - 1` par `slotLevels.findIndex(sl => sl.level === spell.level)` dans `CodexSpells.vue` et `useCharacterState.ts`.
 
 **Règle** : **ne jamais supposer que l'index d'un tableau correspond au niveau du sort**. Les occultistes et certaines classes n'ont pas de slots à chaque niveau. Toujours faire un `findIndex` par `level`.
+
+---
+
+## 2026-04-09 — Brouillard CSS : textures PNG sans canal alpha = bords visibles
+
+**Contexte** : effet brouillard multi-couches CSS avec des PNG de fog en `background-size: cover` sur des layers de 200% de large.
+
+**Erreur** : les premières textures fog utilisées avaient un fond opaque (pas de canal alpha). Les bords rectangulaires des images étaient clairement visibles malgré les animations de dérive. Tentatives de fix avec masque radial CSS et scale → résultats médiocres.
+
+**Correction** : remplacer les PNG par des textures avec **canal alpha** (source : [CSS_FOG_ANIMATION](https://github.com/danielstuart14/CSS_FOG_ANIMATION)). Les volutes se fondent naturellement vers le transparent. Ajout de `scale: 1.2` sur les layers pour pousser les derniers bords hors de l'`overflow: hidden`.
+
+**Règle** : pour un effet de brouillard CSS en couches, **toujours utiliser des textures PNG RGBA** dont les bords se fondent progressivement vers le transparent. Ne jamais utiliser de textures avec un fond opaque, même avec des masques CSS — le résultat est toujours inférieur.

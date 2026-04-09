@@ -23,7 +23,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par slug
-- **Tests** : Vitest (unit, 24 tests) + Playwright (e2e, 10 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 25 tests) + Playwright (e2e, 18 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -38,7 +38,9 @@ donjon-et-dragons/
 │   ├── components/
 │   │   ├── PrintButton.vue
 │   │   └── codex/
-│   │       ├── CodexHero.vue        # portrait + nom + vitals
+│   │       ├── CodexCharacterCard.vue # carte accueil avec brouillard au scroll
+│   │       ├── CodexCounter.vue     # compteur +/− générique
+│   │       ├── CodexHero.vue        # portrait + nom + vitals + brouillard animé
 │   │       ├── CodexStatusBar.vue   # HP tracker + inspiration + repos + jets de mort
 │   │       ├── CodexAbilityScores.vue
 │   │       ├── CodexSkillList.vue
@@ -65,7 +67,7 @@ donjon-et-dragons/
 │   └── character-portrait.md        # template prompt pour la génération des portraits (Gemini)
 ├── public/
 │   ├── fonts/                       # Cinzel, EB Garamond (.ttf)
-│   └── img/                         # portraits (6) + favicons
+│   └── img/                         # portraits (6) + fog textures (fog1/fog2.png) + favicons
 ├── tests/
 │   ├── unit/                        # Vitest
 │   └── e2e/                         # Playwright
@@ -90,9 +92,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 24 tests (composable d'état, dataset, composants)
+pnpm test             # Vitest (unit) — 25 tests (composable d'état, dataset, composants)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 10 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 18 tests (chromium desktop + mobile safari)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt pour permettre de tester le composable hors d'un contexte Nuxt.

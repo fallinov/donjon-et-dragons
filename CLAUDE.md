@@ -42,3 +42,6 @@ type SpellCost = 'cantrip' | 'slot' | 'daily'
 
 ### Style des portraits
 Tous les portraits doivent respecter le même style visuel (peinture à l'huile dark fantasy). Le prompt de base est dans `prompts/character-portrait.md` — ne jamais modifier la partie commune, uniquement la personnalisation.
+
+### Brouillard animé
+Effet CSS multi-couches sur le hero mobile (`CodexHero.vue`) et les cartes d'accueil (`CodexCharacterCard.vue`). Textures `public/img/fog1.png` et `fog2.png` (PNG avec canal alpha, source : [CSS_FOG_ANIMATION](https://github.com/danielstuart14/CSS_FOG_ANIMATION)). 6 layers (3 paires avec doublons pour boucle sans couture), `scale: 1.2` pour masquer les bords, opacités basses à durées non-multiples. Dissipation via `opacity/filter` transition. Sur les cartes d'accueil, l'animation démarre via `IntersectionObserver` au scroll (statique avant).
