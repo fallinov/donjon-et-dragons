@@ -35,11 +35,19 @@ defineProps<{ character: Character }>()
             <span>{{ character.alignment }}</span>
           </p>
 
-          <!-- Vitals en texte (CA, Initiative, Vitesse) -->
-          <dl class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-            <div v-for="vital in character.vitals.filter(v => v.label !== 'Points de vie')" :key="vital.label" class="flex items-baseline gap-1">
-              <dt class="font-display text-xs tracking-wider-3 text-gold/80 uppercase">{{ vital.label }}</dt>
-              <dd class="font-display text-base text-parchment tabular-nums">{{ vital.value }}<span v-if="vital.unit" class="text-xs text-parchment-mute ml-0.5">{{ vital.unit }}</span></dd>
+          <!-- Vitals : 3 cases glassmorphism -->
+          <dl class="mt-3 grid grid-cols-3 gap-2">
+            <div class="bg-obsidian/60 backdrop-blur-sm border border-gold/30 rounded px-2 py-2 text-center">
+              <dd class="font-display text-xl text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === "Classe d'armure")?.value }}</dd>
+              <dt class="font-display text-[10px] tracking-wider-3 text-gold/70 uppercase mt-1">Armure</dt>
+            </div>
+            <div class="bg-obsidian/60 backdrop-blur-sm border border-gold/30 rounded px-2 py-2 text-center">
+              <dd class="font-display text-xl text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Initiative')?.value }}</dd>
+              <dt class="font-display text-[10px] tracking-wider-3 text-gold/70 uppercase mt-1">Initiative</dt>
+            </div>
+            <div class="bg-obsidian/60 backdrop-blur-sm border border-gold/30 rounded px-2 py-2 text-center">
+              <dd class="font-display text-xl text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Vitesse')?.value }}<span class="text-xs text-parchment-mute">{{ character.vitals.find(v => v.label === 'Vitesse')?.unit }}</span></dd>
+              <dt class="font-display text-[10px] tracking-wider-3 text-gold/70 uppercase mt-1">Vitesse</dt>
             </div>
           </dl>
         </div>
