@@ -56,22 +56,25 @@ test.describe('Codex Donjon et Dragons', () => {
     expect(errors).toEqual([])
   })
 
-  test('HP tracker permet les dégâts et les soins', async ({ page }) => {
+  test('HP tracker permet les dégâts et les soins via boutons −/+', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800) // attendre hydratation
+    await page.waitForTimeout(800)
 
-    // HP initial doit être 33 / 33
+    // HP initial = 33
     await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
 
-    // Infliger 10 dégâts
-    await page.getByLabel('Dégâts').fill('10')
-    await page.getByRole('button', { name: /− HP/i }).click()
-    await expect(page.getByText('23', { exact: false }).first()).toBeVisible()
+    // Cliquer 3× sur le bouton − (retirer 3 HP)
+    const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
+    await minusBtn.click()
+    await minusBtn.click()
+    await minusBtn.click()
+    await expect(page.getByText('30', { exact: false }).first()).toBeVisible()
 
-    // Soigner 5
-    await page.getByLabel('Soin').fill('5')
-    await page.getByRole('button', { name: /\+ HP/i }).click()
-    await expect(page.getByText('28', { exact: false }).first()).toBeVisible()
+    // Cliquer 2× sur le bouton + (ajouter 2 HP)
+    const plusBtn = page.getByRole('button', { name: /Ajouter 1 point de vie/i })
+    await plusBtn.click()
+    await plusBtn.click()
+    await expect(page.getByText('32', { exact: false }).first()).toBeVisible()
   })
 
   test('Inspiration toggle', async ({ page }) => {
@@ -87,10 +90,10 @@ test.describe('Codex Donjon et Dragons', () => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
 
-    // Inflige 10 dégâts
-    await page.getByLabel('Dégâts').fill('10')
-    await page.getByRole('button', { name: /− HP/i }).click()
-    await expect(page.getByText('23', { exact: false }).first()).toBeVisible()
+    // Retirer 5 HP
+    const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
+    for (let i = 0; i < 5; i++) await minusBtn.click()
+    await expect(page.getByText('28', { exact: false }).first()).toBeVisible()
 
     // Repos long (confirm dialog)
     page.on('dialog', dialog => dialog.accept())
@@ -102,8 +105,11 @@ test.describe('Codex Donjon et Dragons', () => {
     await page.goto('/personnages/dareth-brumeval')
     await page.waitForTimeout(500)
 
-    await page.getByLabel('Dégâts').fill('999')
-    await page.getByRole('button', { name: /− HP/i }).click()
+    // Cliquer − jusqu'à HP=0 (le bouton se disable à 0)
+    const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
+    while (await minusBtn.isEnabled()) {
+      await minusBtn.click()
+    }
 
     await expect(page.getByText(/Sauvegardes contre la mort/i)).toBeVisible()
     const successButtons = page.getByRole('group', { name: 'Succès contre la mort' }).getByRole('button')

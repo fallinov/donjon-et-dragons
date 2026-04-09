@@ -32,11 +32,11 @@ defineProps<{ character: Character }>()
       </p>
     </div>
 
-    <dl class="justify-self-center xl:justify-self-end grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-3 sm:gap-4 text-left">
+    <dl class="justify-self-center xl:justify-self-end grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 text-left">
       <div
-        v-for="vital in character.vitals"
+        v-for="vital in character.vitals.filter(v => v.label !== 'Points de vie')"
         :key="vital.label"
-        class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[88px]"
+        class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[80px]"
       >
         <dt class="font-display text-xs tracking-wider-4 text-gold uppercase">{{ vital.label }}</dt>
         <dd class="font-display text-2xl text-parchment mt-1">
