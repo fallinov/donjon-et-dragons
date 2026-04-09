@@ -30,12 +30,15 @@ useSeoMeta({
       id="contenu"
       class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-6 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto"
     >
-      <NuxtLink
-        to="/"
-        class="no-print inline-block mb-6 text-xs font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
-      >
-        ← Retour aux codex
-      </NuxtLink>
+      <nav aria-label="Fil d'Ariane" class="no-print mb-6">
+        <NuxtLink
+          to="/"
+          class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
+          Retour aux codex
+        </NuxtLink>
+      </nav>
 
       <CodexHero :character="character" />
 
@@ -75,9 +78,9 @@ useSeoMeta({
 
       <CodexRituals :rituals="character.rituals" />
 
-      <footer class="mt-16 pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-xs tracking-wider-2">
+      <footer class="mt-16 pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
         <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>
-        {{ character.colophon }}
+        <p>{{ character.colophon }}</p>
       </footer>
     </main>
   </div>

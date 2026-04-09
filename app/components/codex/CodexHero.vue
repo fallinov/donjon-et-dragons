@@ -7,11 +7,13 @@ defineProps<{ character: Character }>()
 <template>
   <header class="print-hero relative pb-10 mb-10 border-b border-gold/35 divider-fleuron motion-safe:animate-rise grid grid-cols-1 xl:grid-cols-[auto_1fr_auto] items-center gap-8 xl:gap-10 text-center xl:text-left">
     <figure class="justify-self-center xl:justify-self-end relative w-44 h-60 sm:w-48 sm:h-64 rounded border border-gold/80 overflow-hidden shadow-[0_0_30px_rgba(201,162,74,0.25),inset_0_0_40px_rgba(0,0,0,0.5)]">
-      <img
+      <NuxtImg
         :src="character.portrait.src"
         :alt="character.portrait.alt"
+        loading="lazy"
+        sizes="176px sm:192px"
         class="block w-full h-full object-cover saturate-90 contrast-105"
-      >
+      />
     </figure>
 
     <div class="min-w-0">

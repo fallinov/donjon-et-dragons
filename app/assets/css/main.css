@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
-/* ── Polices auto-hébergées (souveraineté CEJEF) ─────── */
-@font-face { font-family: 'Cinzel'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-400.ttf') format('truetype'); }
-@font-face { font-family: 'Cinzel'; font-weight: 600; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-600.ttf') format('truetype'); }
-@font-face { font-family: 'Cinzel'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-700.ttf') format('truetype'); }
-@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/EBGaramond-400.ttf') format('truetype'); }
-@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: italic; font-display: swap; src: url('/fonts/EBGaramond-400i.ttf') format('truetype'); }
+/* ── Polices auto-hébergées (souveraineté CEJEF) — WOFF2 + TTF fallback ─── */
+@font-face { font-family: 'Cinzel'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-400.woff2') format('woff2'), url('/fonts/Cinzel-400.ttf') format('truetype'); }
+@font-face { font-family: 'Cinzel'; font-weight: 600; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-600.woff2') format('woff2'), url('/fonts/Cinzel-600.ttf') format('truetype'); }
+@font-face { font-family: 'Cinzel'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/Cinzel-700.woff2') format('woff2'), url('/fonts/Cinzel-700.ttf') format('truetype'); }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/EBGaramond-400.woff2') format('woff2'), url('/fonts/EBGaramond-400.ttf') format('truetype'); }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: italic; font-display: swap; src: url('/fonts/EBGaramond-400i.woff2') format('woff2'), url('/fonts/EBGaramond-400i.ttf') format('truetype'); }
 
 /* ── Tokens design (Tailwind v4 @theme) ──────────────── */
 @theme {
@@ -65,7 +65,11 @@ body::before {
 }
 
 /* ── Focus visible custom (a11y WCAG 2.4.7) ──────────── */
-:focus { outline: none; }
+:focus:not(:focus-visible) {
+  outline: 2px solid var(--color-gold-bright);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
 :focus-visible {
   outline: 2px solid var(--color-gold-bright);
   outline-offset: 3px;

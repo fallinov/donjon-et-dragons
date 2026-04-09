@@ -27,11 +27,13 @@ useSeoMeta({
             class="block border border-gold/30 bg-charcoal/50 hover:bg-charcoal/70 hover:border-gold transition-colors p-5 group"
           >
             <figure class="aspect-[3/4] mb-4 border border-gold/40 overflow-hidden">
-              <img
+              <NuxtImg
                 :src="character.portrait.src"
                 :alt="character.portrait.alt"
+                loading="lazy"
+                sizes="320px sm:280px lg:300px"
                 class="w-full h-full object-cover saturate-90 group-hover:saturate-100 transition"
-              >
+              />
             </figure>
             <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">
               {{ character.eyebrow }}

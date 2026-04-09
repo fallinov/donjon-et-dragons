@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Codex Donjon et Dragons', () => {
+  // Reset localStorage avant chaque test pour éviter la pollution d'état
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.clear())
+  })
   test('liste des personnages affiche Dareth', async ({ page }) => {
     const errors: string[] = []
     page.on('console', msg => {
@@ -53,8 +57,8 @@ test.describe('Codex Donjon et Dragons', () => {
   })
 
   test('HP tracker permet les dégâts et les soins', async ({ page }) => {
-    await page.goto('/personnages/dareth-brumeval')
-    await page.waitForTimeout(500) // attendre hydratation
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await page.waitForTimeout(800) // attendre hydratation
 
     // HP initial doit être 33 / 33
     await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
@@ -71,8 +75,8 @@ test.describe('Codex Donjon et Dragons', () => {
   })
 
   test('Inspiration toggle', async ({ page }) => {
-    await page.goto('/personnages/dareth-brumeval')
-    await page.waitForTimeout(500)
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await page.waitForTimeout(800)
     const btn = page.getByRole('button', { name: /Inspiration/i })
     await expect(btn).toHaveAttribute('aria-pressed', 'false')
     await btn.click()
@@ -88,7 +92,8 @@ test.describe('Codex Donjon et Dragons', () => {
     await page.getByRole('button', { name: '−' }).click()
     await expect(page.getByText('23', { exact: false }).first()).toBeVisible()
 
-    // Repos long
+    // Repos long (confirm dialog)
+    page.on('dialog', dialog => dialog.accept())
     await page.getByRole('button', { name: /Repos long/i }).click()
     await expect(page.getByText('33 /', { exact: false }).first()).toBeVisible()
   })
