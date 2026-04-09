@@ -190,7 +190,7 @@ onUnmounted(stopRepeat)
             <button
               type="button"
               :disabled="state.inspiration === 0"
-              class="h-10 w-10 rounded-full border-2 border-gold/40 text-gold-bright flex items-center justify-center hover:bg-gold/10 active:bg-gold/20 disabled:opacity-30 transition-colors select-none"
+              class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
               aria-label="Utiliser 1 inspiration"
               @click="useInspiration"
             ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
@@ -199,7 +199,7 @@ onUnmounted(stopRepeat)
             </p>
             <button
               type="button"
-              class="h-10 w-10 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 transition-colors select-none"
+              class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 transition-colors select-none"
               aria-label="Ajouter 1 inspiration"
               @click="addInspiration"
             ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
@@ -213,7 +213,7 @@ onUnmounted(stopRepeat)
             <button
               type="button"
               :disabled="hitDiceRemaining === 0"
-              class="h-10 w-10 rounded-full border-2 border-gold/40 text-gold-bright flex items-center justify-center hover:bg-gold/10 active:bg-gold/20 disabled:opacity-30 transition-colors select-none"
+              class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
               aria-label="Dépenser 1 dé de vie"
               @click="spendHitDie"
             ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
@@ -223,7 +223,7 @@ onUnmounted(stopRepeat)
             <button
               type="button"
               :disabled="hitDiceRemaining >= character.hitDice.total"
-              class="h-10 w-10 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none"
+              class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
               aria-label="Récupérer 1 dé de vie"
               @click="restoreHitDie"
             ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
