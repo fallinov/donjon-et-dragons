@@ -16,7 +16,7 @@ const TABS_RIGHT: Tab[] = [
   { id: 'stats', label: 'Stats', icon: 'chart' },
 ]
 
-const activeTab = ref<TabId>('combat')
+const activeTab = ref<TabId>('perso')
 const leftHanded = ref(false)
 
 export function useMobileTab() {
