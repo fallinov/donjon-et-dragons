@@ -37,9 +37,9 @@ onMounted(() => {
 
         <!-- Brouillard multi-couches qui se dissipe -->
         <div
-          class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-[3000ms] ease-in-out overflow-hidden"
+          class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-[6000ms] ease-in-out overflow-hidden"
           :class="fogRevealed ? 'opacity-0' : 'opacity-100'"
-          :style="{ filter: fogRevealed ? 'blur(8px)' : 'blur(1px) grayscale(0.2) saturate(1.2) sepia(0.2)', transition: 'opacity 3s ease-in-out, filter 3s ease-in-out' }"
+          :style="{ filter: fogRevealed ? 'blur(8px)' : 'blur(1px) grayscale(0.2) saturate(1.2) sepia(0.2)', transition: 'opacity 6s ease-in-out, filter 6s ease-in-out' }"
           aria-hidden="true"
         >
           <div class="fog-layer fog-layer-1" />
