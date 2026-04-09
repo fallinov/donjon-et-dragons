@@ -28,7 +28,7 @@ defineProps<{ character: Character }>()
             <dd class="font-display text-sm text-parchment tabular-nums">{{ character.vitals.find(v => v.label === "Classe d'armure")?.value }}</dd>
           </div>
           <div class="flex items-center gap-1.5 bg-obsidian/70 backdrop-blur-sm border border-gold/40 rounded px-2 py-1">
-            <svg class="w-4 h-4 text-gold shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+            <svg class="w-4 h-4 text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a5 5 0 0 0-4.78 3.55A3.5 3.5 0 0 0 4 9a3.5 3.5 0 0 0 1.11 2.56A3.5 3.5 0 0 0 4 14a3.5 3.5 0 0 0 2.36 3.31A3.5 3.5 0 0 0 9.5 21H12m0-19a5 5 0 0 1 4.78 3.55A3.5 3.5 0 0 1 20 9a3.5 3.5 0 0 1-1.11 2.56A3.5 3.5 0 0 1 20 14a3.5 3.5 0 0 1-2.36 3.31A3.5 3.5 0 0 1 14.5 21H12"/><line x1="12" y1="2" x2="12" y2="21"/></svg>
             <dt class="sr-only">Initiative</dt>
             <dd class="font-display text-sm text-parchment tabular-nums">{{ character.vitals.find(v => v.label === 'Initiative')?.value }}</dd>
           </div>
