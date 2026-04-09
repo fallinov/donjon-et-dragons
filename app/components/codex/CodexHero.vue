@@ -21,7 +21,7 @@ defineProps<{ character: Character }>()
         <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/60 to-transparent" />
 
         <!-- Texte superposé en bas de la carte -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+        <div class="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-4 sm:px-5 sm:pb-5 sm:pt-6">
           <p class="font-display text-xs tracking-wider-5 text-parchment-dim/80 uppercase mb-1">
             {{ character.eyebrow }}
           </p>
