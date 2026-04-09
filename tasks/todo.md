@@ -6,23 +6,22 @@ Features inspirées de [D&D Beyond](https://www.dndbeyond.com/) pour transformer
 
 **Persistance de l'état mutable** (HP, slots, inspiration, notes) :
 
-- [ ] Choisir : `localStorage` seul / `localStorage` + export JSON / Neon Postgres + auth / URL state
-- **Recommandation** : démarrer par `localStorage` (composable `useCharacterState(slug)`), ajouter un export JSON en option, prévoir Neon + auth plus tard si multi-device.
+- [x] **Choix retenu** : `localStorage` par slug (clé `codex:<slug>:state`) via composable `useCharacterState(character)` singleton `useState` Nuxt. Export JSON / Neon + auth reportés si besoin multi-device.
 
 ---
 
 ## ⭐ Lot 1 — Haute valeur (aligné scope "codex de table")
 
-- [ ] **1. HP tracker interactif** — current / max / temp avec boutons +/−, reset au long rest, persistance localStorage (S, 🟢🟢🟢)
-- [ ] **2. Bonus de maîtrise** — bloc dédié en haut de la fiche (+2, +3…) (XS, 🟢🟢)
-- [ ] **3. Sagesse passive (Perception)** — affichée explicitement dans le hero ou aside caractéristiques (XS, 🟢🟢)
-- [ ] **4. Dés de vie** — affichage `1d8 × N` avec compteur consommé, reset partiel au long rest (½ récupérés) (S, 🟢🟢)
-- [ ] **5. Jets de sauvegarde contre la mort** — 3 cases succès / 3 cases échecs cochables (S, 🟢🟢)
-- [ ] **6. Dice roller visuel** — clic sur compétence/attaque/sauv → animation de dé, résultat affiché (M, 🟢🟢🟢)
-- [ ] **7. Short rest / Long rest buttons** — restaurent HP/slots/dés de vie selon règles D&D 5e (S, 🟢🟢)
-- [ ] **8. Inspiration toggle** — case cochable avec petite animation dorée (XS, 🟢)
-- [ ] **9. Conditions actives** — toggles visibles (empoisonné, à terre, étourdi, concentration…) (M, 🟢🟢)
-- [ ] **10. Concentration tracker** — indique le sort de concentration en cours, case "briser la concentration" (S, 🟢🟢)
+- [x] **1. HP tracker interactif** — current / max / temp avec inputs +/−, reset au long rest, persistance localStorage (PR #5)
+- [x] **2. Bonus de maîtrise** — bloc dédié dans le bandeau `CodexStatusBar` (PR #5)
+- [x] **3. Sagesse passive (Perception)** — calculée via `computePassivePerception` et affichée dans le bandeau (PR #5)
+- [x] **4. Dés de vie** — compteur `Nd<die>` cliquable dans le bandeau, récupération ½ au long rest (PR #5)
+- [x] **5. Jets de sauvegarde contre la mort** — 3 cases succès / 3 cases échecs, visibles uniquement à HP=0 (PR #5)
+- [ ] **6. Dice roller visuel** — clic sur compétence/attaque/sauv → animation de dé, résultat affiché (M, 🟢🟢🟢) — **reporté**
+- [x] **7. Short rest / Long rest buttons** — règles D&D 5e (short restaure slots occultiste, long restaure HP+slots+½dés de vie+jets de mort) (PR #5)
+- [x] **8. Inspiration toggle** — badge cochable dans le bandeau (PR #5)
+- [ ] **9. Conditions actives** — toggles visibles (empoisonné, à terre, étourdi, concentration…) (M, 🟢🟢) — **reporté**
+- [ ] **10. Concentration tracker** — indique le sort de concentration en cours, case "briser la concentration" (S, 🟢🟢) — **reporté**
 
 ## 🟡 Lot 2 — Valeur moyenne
 

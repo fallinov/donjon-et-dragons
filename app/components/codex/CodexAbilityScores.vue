@@ -14,7 +14,7 @@ const items = computed(() => order.map(key => ({ key, ability: props.abilities[k
 </script>
 
 <template>
-  <section aria-labelledby="caracs-title" class="space-y-3">
+  <section aria-labelledby="caracs-title" class="space-y-3 md:grid md:grid-cols-2 md:gap-3 md:space-y-0 lg:block lg:space-y-3">
     <h2 id="caracs-title" class="sr-only">Caractéristiques</h2>
 
     <div
@@ -27,7 +27,7 @@ const items = computed(() => order.map(key => ({ key, ability: props.abilities[k
     >
       <div>
         <p
-          class="font-display text-xs tracking-wider-4 uppercase"
+          class="font-display text-sm tracking-wider-4 uppercase"
           :class="item.ability.proficient ? 'text-gold-bright' : 'text-gold'"
         >
           {{ item.ability.label }}

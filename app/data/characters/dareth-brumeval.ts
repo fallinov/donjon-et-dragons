@@ -11,6 +11,10 @@ export const darethBrumeval: Character = {
   background: 'Sauvageon',
   alignment: 'Chaotique neutre',
 
+  proficiencyBonus: 2,
+  maxHp: 33,
+  hitDice: { die: 10, total: 4 },
+
   portrait: {
     src: '/img/dareth-brumeval.png',
     alt: 'Portrait peint de Dareth Brumeval, demi-elfe rôdeur encapuchonné, arc dans le dos, dans une forêt brumeuse',
@@ -87,6 +91,8 @@ export const darethBrumeval: Character = {
       { title: 'Soins',              description: 'Action, contact. Rend 1d8+2 points de souffle.' },
     ],
   },
+
+  darkvision: 18,
 
   languages: [
     { name: 'Commun' },

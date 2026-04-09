@@ -11,6 +11,10 @@ export const skamosAurum: Character = {
   background: 'Sauvageon',
   alignment: 'Loyal bon',
 
+  proficiencyBonus: 2,
+  maxHp: 33,
+  hitDice: { die: 6, total: 4 },
+
   portrait: {
     src: '/img/skamos-aurum.png',
     alt: "Portrait peint de Skamos Aurum, tieffelin ensorceleur à la peau rouge, cornes sombres courbées vers l'arrière, yeux dorés luminescents, cape à capuche",
@@ -97,6 +101,8 @@ export const skamosAurum: Character = {
       { title: 'Représailles infernales', description: 'Réaction tieffelin (1/repos long). Quand on vous blesse, infligez 2d10 feu à l’attaquant.' },
     ],
   },
+
+  darkvision: 18,
 
   languages: [
     { name: 'Commun' },

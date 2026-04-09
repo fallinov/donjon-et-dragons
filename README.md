@@ -19,7 +19,8 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **TypeScript strict** (zéro `any`)
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
-- **Tests** : Vitest (unit) + Playwright (e2e, chromium + mobile safari)
+- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots) via `useState` Nuxt + `localStorage` par slug
+- **Tests** : Vitest (unit, 24 tests) + Playwright (e2e, 10 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -29,16 +30,19 @@ donjon-et-dragons/
 ├── app/
 │   ├── app.vue                      # layout racine + skip link
 │   ├── assets/css/main.css          # @theme Tailwind + @font-face + print A4 paysage
+│   ├── composables/
+│   │   └── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
 │   ├── components/
 │   │   ├── PrintButton.vue
 │   │   └── codex/
 │   │       ├── CodexHero.vue        # portrait + nom + vitals
+│   │       ├── CodexStatusBar.vue   # HP tracker + inspiration + repos + jets de mort
 │   │       ├── CodexAbilityScores.vue
 │   │       ├── CodexSkillList.vue
 │   │       ├── CodexFeatureList.vue
 │   │       ├── CodexPersonality.vue
 │   │       ├── CodexAttacks.vue
-│   │       ├── CodexSpells.vue      # slots interactifs aria-pressed
+│   │       ├── CodexSpells.vue      # slots interactifs aria-pressed, consomme useCharacterState
 │   │       ├── CodexLanguages.vue
 │   │       ├── CodexRituals.vue
 │   │       └── CodexSection.vue
@@ -78,12 +82,21 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 10 tests
+pnpm test             # Vitest (unit) — 24 tests (composable d'état, dataset, composants)
 pnpm test:watch       # Vitest en mode watch
 pnpm test:e2e         # Playwright e2e — 10 tests (chromium desktop + mobile safari)
 ```
 
-Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant.
+Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt pour permettre de tester le composable hors d'un contexte Nuxt.
+
+### État mutable interactif
+
+Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharacterState.ts) expose l'état mutable de chaque personnage (HP courant/temp, inspiration, dés de vie utilisés, jets de mort, emplacements de sort consommés) avec :
+
+- **Persistance** : `localStorage` par slug, clé `codex:<slug>:state`
+- **Singleton** : via `useState` Nuxt pour que `CodexStatusBar` et `CodexSpells` partagent le même state
+- **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
+- **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée
 
 ## Déploiement
 

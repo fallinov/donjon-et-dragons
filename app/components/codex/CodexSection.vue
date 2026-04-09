@@ -6,7 +6,7 @@ defineProps<{ id: string, title: string }>()
   <section :aria-labelledby="id">
     <h2
       :id="id"
-      class="section-title font-display text-sm tracking-wider-3 text-gold uppercase mb-4 pb-2 border-b border-gold/25"
+      class="section-title font-display text-sm lg:text-base tracking-wider-3 text-gold uppercase mb-4 pb-2 border-b border-gold/25"
     >
       {{ title }}
     </h2>

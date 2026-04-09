@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { SpellLevel } from '~~/shared/types/character'
+import { computed } from 'vue'
+import type { Character } from '~~/shared/types/character'
+import { useCharacterState } from '~/composables/useCharacterState'
 
-const props = defineProps<{ spellcasting: SpellLevel }>()
+const props = defineProps<{ character: Character }>()
 
-const used = ref<boolean[]>(Array.from({ length: props.spellcasting.slots }, () => false))
+const spellcasting = computed(() => props.character.spellcasting!)
+const { state, consumeSpellSlot, restoreSpellSlot } = useCharacterState(props.character)
 
-const remaining = computed(() => used.value.filter(v => !v).length)
-const total = computed(() => used.value.length)
+const total = computed(() => spellcasting.value.slots)
+const remaining = computed(() => total.value - state.value.spellSlotsUsed)
+const slots = computed(() =>
+  Array.from({ length: total.value }, (_, i) => ({
+    index: i,
+    used: i < state.value.spellSlotsUsed,
+  })),
+)
 
-function toggle(index: number): void {
-  used.value[index] = !used.value[index]
+function toggle(slot: { index: number, used: boolean }): void {
+  if (slot.used) restoreSpellSlot()
+  else consumeSpellSlot()
 }
 </script>
 
@@ -18,23 +27,27 @@ function toggle(index: number): void {
   <div>
     <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
       <div>
-        <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-2">
+        <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-2" aria-live="polite" aria-atomic="true">
           Sorts de niveau {{ spellcasting.level }} — emplacements
           <span id="slots-count" class="text-gold-bright ml-1">{{ remaining }} / {{ total }}</span>
         </p>
-        <div id="spell-slots" class="flex gap-2" role="group" aria-label="Emplacements de sort">
+        <div id="spell-slots" class="flex gap-3" role="group" aria-label="Emplacements de sort">
           <button
-            v-for="(isUsed, i) in used"
-            :key="i"
+            v-for="slot in slots"
+            :key="slot.index"
             type="button"
             data-slot
-            :aria-pressed="isUsed"
-            :aria-label="`Emplacement de sort ${i + 1}, ${isUsed ? 'consommé' : 'disponible'}`"
-            class="w-5 h-5 rotate-45 motion-safe:animate-ember border border-ember-bright/60 cursor-pointer"
-            :class="isUsed ? 'bg-charcoal opacity-25' : 'bg-ember'"
-            :style="{ animationDelay: `${i * 0.6}s` }"
-            @click="toggle(i)"
-          />
+            :aria-pressed="slot.used"
+            :aria-label="`Emplacement de sort ${slot.index + 1}, ${slot.used ? 'consommé' : 'disponible'}`"
+            class="w-11 h-11 flex items-center justify-center cursor-pointer"
+            @click="toggle(slot)"
+          >
+            <span
+              class="w-5 h-5 block rotate-45 motion-safe:animate-ember border border-ember-bright/60"
+              :class="slot.used ? 'bg-charcoal opacity-25' : 'bg-ember'"
+              :style="{ animationDelay: `${slot.index * 0.6}s` }"
+            />
+          </button>
         </div>
       </div>
       <div class="text-right">

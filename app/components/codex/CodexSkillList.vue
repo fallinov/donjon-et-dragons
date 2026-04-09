@@ -16,8 +16,8 @@ function fmt(n: number): string {
       class="flex justify-between"
       :class="skill.proficient ? 'text-gold-bright' : 'text-parchment-dim'"
     >
-      <span>
-        {{ skill.name }}
+      <span :class="skill.proficient ? 'font-semibold' : ''">
+        <span v-if="skill.proficient" class="text-ember-bright mr-1" aria-hidden="true">●</span>{{ skill.name }}
         <span class="text-parchment-mute text-xs">({{ skill.ability }})</span>
       </span>
       <span class="font-display">{{ fmt(skill.modifier) }}</span>
