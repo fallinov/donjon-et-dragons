@@ -25,21 +25,23 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Brumeval')
   })
 
-  test('emplacements de sort interactifs', async ({ page }) => {
+  test('lancer un sort consomme un emplacement', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
-    // Sur mobile, naviguer vers l'onglet Sorts d'abord
+    // Sur mobile, naviguer vers l'onglet Sorts
     const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
     if (await sortsTab.isVisible()) { await sortsTab.dispatchEvent('click'); await page.waitForTimeout(500) }
     await expect(page.locator('#slots-count')).toHaveText('3 / 3')
 
-    const slots = page.locator('[data-slot]')
-    await slots.first().click()
+    // Cliquer "Lancer" sur le premier sort
+    const launchBtn = page.getByRole('button', { name: /Lancer/i }).first()
+    await launchBtn.dispatchEvent('click')
     await expect(page.locator('#slots-count')).toHaveText('2 / 3')
-    await expect(slots.first()).toHaveAttribute('aria-pressed', 'true')
 
-    await slots.first().click()
-    await expect(page.locator('#slots-count')).toHaveText('3 / 3')
+    // Lancer encore 2 fois → 0/3 → boutons désactivés
+    await launchBtn.dispatchEvent('click')
+    await page.getByRole('button', { name: /Lancer/i }).first().dispatchEvent('click')
+    await expect(page.locator('#slots-count')).toHaveText('0 / 3')
   })
 
   test('skip link cible le contenu principal', async ({ page }) => {

@@ -2,6 +2,7 @@ import type { Character } from '~~/shared/types/character'
 
 export const thunon: Character = {
   slug: 'thunon',
+  player: 'Juan',
   firstName: 'Thunon',
   eyebrow: "Codex de l'Arcaniste",
   race: 'Haut-elfe',

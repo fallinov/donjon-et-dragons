@@ -2,6 +2,7 @@ import type { Character } from '~~/shared/types/character'
 
 export const darethBrumeval: Character = {
   slug: 'dareth-brumeval',
+  player: 'Steve',
   firstName: 'Dareth',
   lastName: 'Brumeval',
   eyebrow: 'Codex du Chasseur',
@@ -82,13 +83,12 @@ export const darethBrumeval: Character = {
   ],
 
   spellcasting: {
-    level: 1,
-    slots: 3,
     saveDc: 12,
+    slotLevels: [{ level: 1, slots: 3 }],
     spells: [
-      { title: 'Marque du chasseur', description: 'Action bonus, concentration. +1d6 sur chaque coup porté à la proie marquée.' },
-      { title: "Grêle d'épines",    description: 'Action bonus, concentration. La prochaine flèche se démultiplie en tempête végétale.' },
-      { title: 'Soins',              description: 'Action, contact. Rend 1d8+2 points de souffle.' },
+      { title: 'Marque du chasseur', description: 'Action bonus, concentration. +1d6 sur chaque coup porté à la proie marquée.', level: 1, cost: 'slot' },
+      { title: "Grêle d'épines",     description: 'Action bonus, concentration. La prochaine flèche se démultiplie en tempête végétale.', level: 1, cost: 'slot' },
+      { title: 'Soins',              description: 'Action, contact. Rend 1d8+2 points de souffle.', level: 1, cost: 'slot' },
     ],
   },
 

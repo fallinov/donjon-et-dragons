@@ -2,6 +2,7 @@ import type { Character } from '~~/shared/types/character'
 
 export const viboisThaera: Character = {
   slug: 'vibois-thaera',
+  player: 'Sandra',
   firstName: 'Vibois',
   lastName: 'Thaera',
   eyebrow: 'Codex du Conquérant',

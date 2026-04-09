@@ -26,6 +26,15 @@ export interface Trait {
   description: string
 }
 
+export type SpellCost = 'cantrip' | 'slot' | 'daily'
+
+export interface Spell {
+  title: string
+  description: string
+  level: number
+  cost: SpellCost
+}
+
 export interface Attack {
   name: string
   note: string
@@ -34,12 +43,16 @@ export interface Attack {
   damageType: string
 }
 
-export interface SpellLevel {
+export interface SpellSlotLevel {
   level: number
   slots: number
-  spells: Trait[]
+}
+
+export interface Spellcasting {
   saveDc: number
-  /** Les emplacements se rechargent lors d'un repos court (occultiste) */
+  attackBonus?: number
+  slotLevels: SpellSlotLevel[]
+  spells: Spell[]
   shortRestRefresh?: boolean
 }
 
@@ -73,6 +86,7 @@ export interface Ritual {
 
 export interface Character {
   slug: string
+  player: string
   firstName: string
   lastName?: string
   eyebrow: string
@@ -91,7 +105,7 @@ export interface Character {
   features: Trait[]
   personality: Personality
   attacks: Attack[]
-  spellcasting?: SpellLevel
+  spellcasting?: Spellcasting
   darkvision?: number
   languages: { name: string, rare?: boolean }[]
   rituals: Ritual[]

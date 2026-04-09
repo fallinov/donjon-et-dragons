@@ -82,16 +82,18 @@ describe('useCharacterState — repos', () => {
     if (typeof window !== 'undefined') window.localStorage.clear()
   })
 
-  it('longRest restaure HP, slots, HP temp et reset jets de mort', () => {
-    const { state, damage, setTempHp, consumeSpellSlot, toggleDeathSaveFailure, longRest } = useCharacterState(darethBrumeval)
+  it('longRest restaure HP, slots, HP temp, daily et reset jets de mort', () => {
+    const { state, damage, setTempHp, consumeSlot, toggleDeathSaveFailure, longRest } = useCharacterState(darethBrumeval)
     damage(20)
     setTempHp(4)
-    consumeSpellSlot()
+    consumeSlot(0)
     toggleDeathSaveFailure(0)
+    state.value.dailySpellsUsed = ['test']
     longRest()
     expect(state.value.hpCurrent).toBe(33)
     expect(state.value.hpTemp).toBe(0)
-    expect(state.value.spellSlotsUsed).toBe(0)
+    expect(state.value.spellSlotsUsed[0]).toBe(0)
+    expect(state.value.dailySpellsUsed).toEqual([])
     expect(state.value.deathSaves.failures).toBe(0)
   })
 
@@ -107,19 +109,19 @@ describe('useCharacterState — repos', () => {
   })
 
   it('shortRest restaure les emplacements de sort pour un occultiste', () => {
-    const { state, consumeSpellSlot, shortRest } = useCharacterState(zanna)
-    consumeSpellSlot()
-    consumeSpellSlot()
-    expect(state.value.spellSlotsUsed).toBe(2)
+    const { state, consumeSlot, shortRest } = useCharacterState(zanna)
+    consumeSlot(0)
+    consumeSlot(0)
+    expect(state.value.spellSlotsUsed[0]).toBe(2)
     shortRest()
-    expect(state.value.spellSlotsUsed).toBe(0)
+    expect(state.value.spellSlotsUsed[0]).toBe(0)
   })
 
   it('shortRest ne restaure PAS les emplacements pour un non-occultiste', () => {
-    const { state, consumeSpellSlot, shortRest } = useCharacterState(darethBrumeval)
-    consumeSpellSlot()
+    const { state, consumeSlot, shortRest } = useCharacterState(darethBrumeval)
+    consumeSlot(0)
     shortRest()
-    expect(state.value.spellSlotsUsed).toBe(1)
+    expect(state.value.spellSlotsUsed[0]).toBe(1)
   })
 })
 

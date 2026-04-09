@@ -2,6 +2,7 @@ import type { Character } from '~~/shared/types/character'
 
 export const zanna: Character = {
   slug: 'zanna',
+  player: 'Myriam',
   firstName: 'Zanna',
   lastName: '',
   eyebrow: 'Codex de la sage',
@@ -61,7 +62,7 @@ export const zanna: Character = {
       description: "Appelle un familier amélioré (imp, pseudo-dragon, quasit, sprite) qui sert de messager, espion et canal pour ses sorts de contact.",
     },
     {
-      title: 'Invocation · Vision d\'un autre monde',
+      title: "Invocation · Vision d\'un autre monde",
       description: "Voit à travers les ténèbres magiques et non magiques jusqu'à 36 m, comme si elles n'existaient pas.",
     },
     {
@@ -86,20 +87,20 @@ export const zanna: Character = {
   ],
 
   spellcasting: {
-    level: 2,
-    slots: 2,
     saveDc: 12,
+    attackBonus: 4,
     shortRestRefresh: true,
+    slotLevels: [{ level: 2, slots: 2 }],
     spells: [
-      { title: 'Illusion mineure', description: "Sort mineur. Crée un son ou une image immobile dans un cube de 1,50 m, durée 1 minute." },
-      { title: 'Explosion occulte', description: 'Sort mineur. Trait de force à 36 m, 1d10 dégâts (2 traits au niveau 5).' },
-      { title: 'Protection contre les armes', description: 'Sort mineur de défense — réduit les dégâts d\'arme lors d\'une attaque ciblée.' },
-      { title: 'Lueurs féeriques', description: 'Niveau 1, concentration. Révèle les créatures invisibles et leur inflige désavantage aux attaques contre elles.' },
-      { title: 'Sommeil', description: "Niveau 1. Endort 5d8 pv de créatures dans une sphère de 6 m." },
-      { title: 'Armure du mage', description: 'Niveau 1. CA = 13 + mod Dex pour 8 h tant que la cible ne porte pas d\'armure.' },
-      { title: 'Appel d\'un familier', description: 'Rituel. Invoque son familier du pacte de la chaîne.' },
-      { title: "Onde de choc", description: "Niveau 2. Explosion de force qui repousse et assourdit." },
-      { title: "Détection de l'invisibilité", description: "Niveau 2. Permet de voir les créatures invisibles dans un rayon de 9 m pendant 1 heure." },
+      { title: 'Illusion mineure',          description: "Sort mineur. Crée un son ou une image immobile dans un cube de 1,50 m, durée 1 minute.", level: 0, cost: 'cantrip' },
+      { title: 'Explosion occulte',         description: "Sort mineur. Trait de force à 36 m, 1d10 dégâts (2 traits au niveau 5).", level: 0, cost: 'cantrip' },
+      { title: 'Protection contre les armes', description: "Sort mineur de défense — réduit les dégâts d'arme lors d'une attaque ciblée.", level: 0, cost: 'cantrip' },
+      { title: 'Lueurs féeriques',          description: "Niveau 1, concentration. Révèle les créatures invisibles et leur inflige désavantage aux attaques contre elles.", level: 1, cost: 'slot' },
+      { title: 'Sommeil',                   description: "Niveau 1. Endort 5d8 pv de créatures dans une sphère de 6 m.", level: 1, cost: 'slot' },
+      { title: 'Armure du mage',            description: "Niveau 1. CA = 13 + mod Dex pour 8 h tant que la cible ne porte pas d'armure.", level: 1, cost: 'slot' },
+      { title: "Appel d'un familier",       description: "Rituel. Invoque son familier du pacte de la chaîne.", level: 1, cost: 'slot' },
+      { title: 'Onde de choc',              description: "Niveau 2. Explosion de force qui repousse et assourdit.", level: 2, cost: 'slot' },
+      { title: "Détection de l'invisibilité", description: "Niveau 2. Permet de voir les créatures invisibles dans un rayon de 9 m pendant 1 heure.", level: 2, cost: 'slot' },
     ],
   },
 

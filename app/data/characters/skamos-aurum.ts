@@ -2,6 +2,7 @@ import type { Character } from '~~/shared/types/character'
 
 export const skamosAurum: Character = {
   slug: 'skamos-aurum',
+  player: 'Normand',
   firstName: 'Skamos',
   lastName: 'Aurum',
   eyebrow: "Codex de l'ensorceleur",
@@ -58,7 +59,7 @@ export const skamosAurum: Character = {
     },
     {
       title: 'Vision dans le noir',
-      description: 'Voit dans la pénombre jusqu’à 18 mètres comme en pleine lumière, et dans le noir complet en nuances de gris.',
+      description: "Voit dans la pénombre jusqu'à 18 mètres comme en pleine lumière, et dans le noir complet en nuances de gris.",
     },
     {
       title: 'Points de sorcellerie (3)',
@@ -78,8 +79,8 @@ export const skamosAurum: Character = {
     trait: "Je n'accorde aucune importance à l'argent ni aux gens pleins de bonnes manières. Ce n'est pas ça qui sauve d'un hibours.",
     ideal: 'Le monde naturel est plus important que les constructions de la civilisation.',
     idealLabel: 'Nature',
-    bond: 'Ami de Goudred Trocroch, venu en aide quand j’étais seul et exilé.',
-    flaw: 'Difficulté à maîtriser mes émotions — quand la colère monte face à l’injustice, mes yeux luisent et ma magie draconique déferle, incontrôlée.',
+    bond: "Ami de Goudred Trocroch, venu en aide quand j'étais seul et exilé.",
+    flaw: "Difficulté à maîtriser mes émotions — quand la colère monte face à l'injustice, mes yeux luisent et ma magie draconique déferle, incontrôlée.",
   },
 
   attacks: [
@@ -90,15 +91,18 @@ export const skamosAurum: Character = {
   ],
 
   spellcasting: {
-    level: 1,
-    slots: 3,
     saveDc: 13,
+    attackBonus: 5,
+    slotLevels: [{ level: 1, slots: 3 }, { level: 2, slots: 2 }],
     spells: [
-      { title: 'Bouclier', description: 'Réaction, 1 round. +5 CA jusqu’au début de votre prochain tour, annule projectile magique.' },
-      { title: 'Projectiles magiques', description: 'Action, 3 projectiles autoguidés infligeant 1d4+1 dégâts de force chacun.' },
-      { title: 'Suggestion (niveau 2)', description: "Action, concentration jusqu'à 8 h. Suggère un acte raisonnable à une créature qui rate son jet de Sagesse." },
-      { title: 'Pas brumeux (niveau 2)', description: 'Action bonus, téléportation de 9 m dans une brume argentée.' },
-      { title: 'Représailles infernales', description: 'Réaction tieffelin (1/repos long). Quand on vous blesse, infligez 2d10 feu à l’attaquant.' },
+      { title: 'Trait de feu',         description: "Sort mineur. Trait de feu à 36 m, 1d10 dégâts (2 traits au niveau 5).", level: 0, cost: 'cantrip' },
+      { title: 'Poigne électrique',    description: "Sort mineur de contact. Inflige 1d8 dégâts de foudre et empêche la cible de se désengager.", level: 0, cost: 'cantrip' },
+      { title: 'Message',              description: "Sort mineur. Murmure un message à une créature à 36 m ; elle peut répondre en chuchotant.", level: 0, cost: 'cantrip' },
+      { title: 'Bouclier',             description: "Réaction, 1 round. +5 CA jusqu'au début de votre prochain tour, annule projectile magique.", level: 1, cost: 'slot' },
+      { title: 'Projectiles magiques', description: "Action, 3 projectiles autoguidés infligeant 1d4+1 dégâts de force chacun.", level: 1, cost: 'slot' },
+      { title: 'Suggestion',           description: "Action, concentration jusqu'à 8 h. Suggère un acte raisonnable à une créature qui rate son jet de Sagesse.", level: 2, cost: 'slot' },
+      { title: 'Pas brumeux',          description: "Action bonus, téléportation de 9 m dans une brume argentée.", level: 2, cost: 'slot' },
+      { title: 'Représailles infernales', description: "Réaction tieffelin (1/repos long). Quand on vous blesse, infligez 2d10 feu à l'attaquant.", level: 0, cost: 'daily' },
     ],
   },
 
@@ -133,7 +137,7 @@ export const skamosAurum: Character = {
     },
     {
       number: 'Rite III',
-      title: 'La colère du dragon d’or',
+      title: "La colère du dragon d'or",
       steps: [
         { text: 'Réaction · ', emphasis: 'Représailles infernales' },
         { text: 'Action · Trait de feu' },

@@ -14,7 +14,10 @@ export interface CharacterState {
   inspiration: number
   hitDiceUsed: number
   deathSaves: { successes: number, failures: number }
-  spellSlotsUsed: number
+  /** Emplacements consommés par niveau (index 0 = niv 1, etc.) */
+  spellSlotsUsed: number[]
+  /** Sorts daily déjà utilisés (titres) */
+  dailySpellsUsed: string[]
 }
 
 function storageKey(slug: string): string {
@@ -28,7 +31,8 @@ function defaultState(character: Character): CharacterState {
     inspiration: 0,
     hitDiceUsed: 0,
     deathSaves: { successes: 0, failures: 0 },
-    spellSlotsUsed: 0,
+    spellSlotsUsed: (character.spellcasting?.slotLevels ?? []).map(() => 0),
+    dailySpellsUsed: [],
   }
 }
 
@@ -40,7 +44,7 @@ function isValidState(value: unknown): value is CharacterState {
     && typeof s.hpTemp === 'number'
     && typeof s.inspiration === 'number'
     && typeof s.hitDiceUsed === 'number'
-    && typeof s.spellSlotsUsed === 'number'
+    && Array.isArray(s.spellSlotsUsed)
     && typeof s.deathSaves === 'object'
     && s.deathSaves !== null
   )
@@ -136,17 +140,33 @@ export function useCharacterState(character: Character) {
     }
   }
 
-  function consumeSpellSlot(): void {
-    const max = character.spellcasting?.slots ?? 0
-    if (state.value.spellSlotsUsed < max) {
-      state.value.spellSlotsUsed += 1
-    }
+  /** Consomme un emplacement pour un niveau donné (index 0 = niv 1) */
+  function consumeSlot(levelIndex: number): boolean {
+    const levels = character.spellcasting?.slotLevels ?? []
+    if (levelIndex < 0 || levelIndex >= levels.length) return false
+    const max = levels[levelIndex]!.slots
+    const used = state.value.spellSlotsUsed[levelIndex] ?? 0
+    if (used >= max) return false
+    state.value.spellSlotsUsed = state.value.spellSlotsUsed.map((v, i) => i === levelIndex ? v + 1 : v)
+    return true
   }
 
-  function restoreSpellSlot(): void {
-    if (state.value.spellSlotsUsed > 0) {
-      state.value.spellSlotsUsed -= 1
+  /** Marque un sort daily comme utilisé */
+  function useDailySpell(title: string): boolean {
+    if (state.value.dailySpellsUsed.includes(title)) return false
+    state.value.dailySpellsUsed = [...state.value.dailySpellsUsed, title]
+    return true
+  }
+
+  /** Lance un sort : consomme la ressource appropriée selon son cost */
+  function castSpell(spell: { title: string, level: number, cost: string }): boolean {
+    if (spell.cost === 'cantrip') return true
+    if (spell.cost === 'daily') return useDailySpell(spell.title)
+    if (spell.cost === 'slot') {
+      const levelIndex = spell.level - 1
+      return consumeSlot(levelIndex)
     }
+    return false
   }
 
   function toggleDeathSaveSuccess(index: number): void {
@@ -171,7 +191,7 @@ export function useCharacterState(character: Character) {
    */
   function shortRest(): void {
     if (character.spellcasting?.shortRestRefresh) {
-      state.value.spellSlotsUsed = 0
+      state.value.spellSlotsUsed = state.value.spellSlotsUsed.map(() => 0)
     }
   }
 
@@ -186,7 +206,8 @@ export function useCharacterState(character: Character) {
   function longRest(): void {
     state.value.hpCurrent = character.maxHp
     state.value.hpTemp = 0
-    state.value.spellSlotsUsed = 0
+    state.value.spellSlotsUsed = state.value.spellSlotsUsed.map(() => 0)
+    state.value.dailySpellsUsed = []
     state.value.deathSaves = { successes: 0, failures: 0 }
     const recovered = Math.max(1, Math.floor(character.hitDice.total / 2))
     state.value.hitDiceUsed = Math.max(0, state.value.hitDiceUsed - recovered)
@@ -201,8 +222,9 @@ export function useCharacterState(character: Character) {
     useInspiration,
     spendHitDie,
     restoreHitDie,
-    consumeSpellSlot,
-    restoreSpellSlot,
+    consumeSlot,
+    useDailySpell,
+    castSpell,
     toggleDeathSaveSuccess,
     toggleDeathSaveFailure,
     shortRest,
