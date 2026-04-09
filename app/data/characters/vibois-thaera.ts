@@ -91,14 +91,13 @@ export const viboisThaera: Character = {
   ],
 
   spellcasting: {
-    level: 1,
-    slots: 3,
     saveDc: 13,
+    slotLevels: [{ level: 1, slots: 3 }],
     spells: [
-      { title: "Armure d'Agathys",  description: 'Serment. Gagne 5 PV temporaires ; inflige 5 dégâts de froid à quiconque touche le paladin au corps à corps.' },
-      { title: 'Injonction',        description: "Serment. Une créature doit réussir un jet de Sagesse ou obéir à un ordre d'un mot (Fuis, Approche, Tombe…)." },
-      { title: 'Soins',             description: 'Action, contact. Rend 1d8 + 3 points de vie.' },
-      { title: 'Bouclier de la foi', description: 'Action bonus, concentration, 10 min. +2 à la CA de la cible.' },
+      { title: "Armure d'Agathys",   description: 'Serment. Gagne 5 PV temporaires ; inflige 5 dégâts de froid à quiconque touche le paladin au corps à corps.', level: 1, cost: 'slot' },
+      { title: 'Injonction',         description: "Serment. Une créature doit réussir un jet de Sagesse ou obéir à un ordre d'un mot (Fuis, Approche, Tombe…).", level: 1, cost: 'slot' },
+      { title: 'Soins',              description: 'Action, contact. Rend 1d8 + 3 points de vie.', level: 1, cost: 'slot' },
+      { title: 'Bouclier de la foi', description: 'Action bonus, concentration, 10 min. +2 à la CA de la cible.', level: 1, cost: 'slot' },
     ],
   },
 

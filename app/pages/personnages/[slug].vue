@@ -95,9 +95,7 @@ setTab('profil')
 
           <!-- Onglet Sorts -->
           <div v-if="activeTab === 'sorts'" class="space-y-6">
-            <CodexSection v-if="character.spellcasting" id="incant-title-m" title="Sorts">
-              <CodexSpells :character="character" />
-            </CodexSection>
+            <CodexSpells v-if="character.spellcasting" :character="character" />
             <p v-else class="text-parchment-mute italic text-center py-8">Aucun sort connu.</p>
           </div>
 

@@ -6,11 +6,14 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 
 ## Personnages consignés
 
-| Slug | Personnage | Race · Classe |
-|---|---|---|
-| [`dareth-brumeval`](https://donjon-et-dragons.vercel.app/personnages/dareth-brumeval) | Dareth Brumeval | Demi-elfe · Rôdeur niveau 4 |
-| [`skamos-aurum`](https://donjon-et-dragons.vercel.app/personnages/skamos-aurum) | Skamos Aurum | Tieffelin · Ensorceleur niveau 4 |
-| [`zanna`](https://donjon-et-dragons.vercel.app/personnages/zanna) | Zanna la sage | Gnome des forêts · Occultiste niveau 3 |
+| Slug | Personnage | Joueur | Race · Classe |
+|---|---|---|---|
+| [`dareth-brumeval`](https://donjon-et-dragons.vercel.app/personnages/dareth-brumeval) | Dareth Brumeval | Steve | Demi-elfe · Rôdeur niveau 4 |
+| [`skamos-aurum`](https://donjon-et-dragons.vercel.app/personnages/skamos-aurum) | Skamos Aurum | Normand | Tieffelin · Ensorceleur niveau 4 |
+| [`zanna`](https://donjon-et-dragons.vercel.app/personnages/zanna) | Zanna | Myriam | Gnome des forêts · Occultiste niveau 3 |
+| [`vibois-thaera`](https://donjon-et-dragons.vercel.app/personnages/vibois-thaera) | Vibois Thaera | Sandra | Humain · Paladin (Conquête) niveau 4 |
+| [`thunon`](https://donjon-et-dragons.vercel.app/personnages/thunon) | Thunon | Juan | Haut-elfe · Magicien (Évocation) niveau 4 |
+| [`kael-draven`](https://donjon-et-dragons.vercel.app/personnages/kael-draven) | Kael Draven | Jérôme | Humain · Roublard (Voleur) niveau 4 |
 
 ## Stack
 
@@ -19,7 +22,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **TypeScript strict** (zéro `any`)
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
-- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots) via `useState` Nuxt + `localStorage` par slug
+- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par slug
 - **Tests** : Vitest (unit, 24 tests) + Playwright (e2e, 10 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
@@ -50,14 +53,19 @@ donjon-et-dragons/
 │   │   ├── index.ts                 # agrégation + getCharacter(slug)
 │   │   ├── dareth-brumeval.ts
 │   │   ├── skamos-aurum.ts
-│   │   └── zanna.ts
+│   │   ├── zanna.ts
+│   │   ├── vibois-thaera.ts
+│   │   ├── thunon.ts
+│   │   └── kael-draven.ts
 │   └── pages/
 │       ├── index.vue                # liste des codex
 │       └── personnages/[slug].vue   # fiche dynamique
 ├── shared/types/character.ts        # interface Character (abilities, skills, attacks, spellcasting, rituals, personality)
+├── prompts/
+│   └── character-portrait.md        # template prompt pour la génération des portraits (Gemini)
 ├── public/
 │   ├── fonts/                       # Cinzel, EB Garamond (.ttf)
-│   └── img/                         # portraits + favicons
+│   └── img/                         # portraits (6) + favicons
 ├── tests/
 │   ├── unit/                        # Vitest
 │   └── e2e/                         # Playwright
@@ -111,9 +119,9 @@ Le projet est lié via `.vercel/project.json` (org `steves-projects-7a849401`, p
 
 ## Ajouter un personnage
 
-1. Créer `app/data/characters/<slug>.ts` exportant un `Character` typé depuis `~~/shared/types/character`
+1. Créer `app/data/characters/<slug>.ts` exportant un `Character` typé depuis `~~/shared/types/character` (ne pas oublier le champ `player`)
 2. L'importer dans `app/data/characters/index.ts` et l'ajouter au tableau `characters`
-3. Ajouter le portrait dans `public/img/<slug>.png` (3:4 recommandé, style painterly medieval oil pour la cohérence)
+3. Générer le portrait avec le template `prompts/character-portrait.md` et le sauvegarder dans `public/img/<slug>.png` (3:4, style painterly medieval oil)
 4. La fiche est automatiquement accessible sur `/personnages/<slug>`
 5. Tester : `pnpm test && pnpm test:e2e`
 

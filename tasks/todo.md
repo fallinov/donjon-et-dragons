@@ -25,8 +25,8 @@ Features inspirées de [D&D Beyond](https://www.dndbeyond.com/) pour transformer
 
 ## 🟡 Lot 2 — Valeur moyenne
 
-- [ ] **11. Tabs mobile** — Combat / Actions / Sorts / Équipement / Personnage / Notes (pattern DDB mobile) (M, 🟡🟡)
-- [ ] **12. Emplacements de sort multi-niveaux** — niv 1, 2, 3… (actuellement un seul niveau) (S, 🟡🟡)
+- [x] **11. Tabs mobile** — 4 onglets Profil/Combat/Sorts/Stats (feat/mobile-tabs)
+- [x] **12. Emplacements de sort multi-niveaux** — `SpellSlotLevel[]` + `Spell.cost` (cantrip/slot/daily) + bouton Lancer dans CodexSpells
 - [ ] **13. Monnaie** — PO/PA/PE/PC/PP + inventaire simple (M, 🟡)
 - [ ] **14. Poids d'équipement / encombrement** — calcul automatique selon Force (S, 🟡)
 - [ ] **15. Niveau XP + barre de progression** — vers niveau suivant selon table D&D 5e (XS, 🟡)

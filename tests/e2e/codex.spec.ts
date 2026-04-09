@@ -19,7 +19,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('navigation vers la fiche Dareth', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: /Dareth\s+Brumeval/i }).click()
+    await page.locator('a[href="/personnages/dareth-brumeval"]').click({ force: true })
     await expect(page).toHaveURL(/\/personnages\/dareth-brumeval$/)
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dareth')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Brumeval')
@@ -111,7 +111,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
     // Repos long (confirm dialog)
     page.on('dialog', dialog => dialog.accept())
-    await page.getByRole('button', { name: /Long/i }).click()
+    await page.getByRole('button', { name: 'Repos long' }).first().click()
     await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
   })
 

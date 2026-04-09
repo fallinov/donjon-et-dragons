@@ -43,3 +43,15 @@ Pattern utilisé :
 **Correction** : utiliser un port dédié pour les tests e2e (3210) via `pnpm dev --port 3210` et `playwright.config.ts` pointant sur ce port avec `reuseExistingServer: false`.
 
 **Règle** : sur une machine qui héberge plusieurs projets Nuxt, **toujours réserver un port non-standard pour les tests e2e** dans `playwright.config.ts` pour éviter la collision silencieuse.
+
+---
+
+## 2026-04-09 — Migration spellcasting : ne pas oublier les données existantes
+
+**Contexte** : migration du modèle `SpellLevel` (single level) vers `Spellcasting` (multi-niveaux avec `slotLevels[]` et `Spell.cost`).
+
+**Erreur** : les 3 personnages existants (Dareth, Skamos, Zanna) ont été migrés, mais les 2 nouveaux (Vibois Thaera, Thunon) créés juste avant la migration sont restés à l'ancien format (`level`, `slots`, spells `Trait[]`). Le type-checker ne les a pas détectés car `vue-tsc` peut être permissif avec les objets imbriqués.
+
+**Correction** : migrer manuellement vibois-thaera.ts et thunon.ts vers le nouveau format `Spellcasting`.
+
+**Règle** : lors d'une migration de type, **vérifier tous les fichiers de données**, pas seulement ceux qui existaient avant. Lancer `grep -r 'ancienne propriété' app/data/` pour détecter les retardataires.

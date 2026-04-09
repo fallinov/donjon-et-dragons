@@ -5,7 +5,16 @@ import { useCharacterState } from '~/composables/useCharacterState'
 
 const props = defineProps<{ character: Character }>()
 const sc = computed(() => props.character.spellcasting!)
-const { state, castSpell } = useCharacterState(props.character)
+const { state, castSpell, shortRest, longRest } = useCharacterState(props.character)
+
+function doShortRest(): void {
+  shortRest()
+}
+
+function doLongRest(): void {
+  if (!confirm('Repos long : restaure emplacements et sorts quotidiens. Confirmer ?')) return
+  longRest()
+}
 
 function slotsRemaining(levelIndex: number): number {
   const max = sc.value.slotLevels[levelIndex]?.slots ?? 0
@@ -47,9 +56,9 @@ function costLabel(spell: Spell): string {
 
 <template>
   <div class="space-y-6">
-    <!-- DD de sauvegarde -->
+    <!-- Difficulté de sauvegarde -->
     <div class="flex flex-wrap gap-4 items-baseline">
-      <p class="font-display text-sm tracking-wider-4 text-gold uppercase">DD de sauvegarde des sorts</p>
+      <p class="font-display text-sm tracking-wider-4 text-gold uppercase">Difficulté de sauvegarde</p>
       <p class="font-display text-3xl text-gold-bright">{{ sc.saveDc }}</p>
       <p v-if="sc.attackBonus" class="text-sm text-parchment-dim">Bonus d'attaque +{{ sc.attackBonus }}</p>
     </div>
@@ -69,6 +78,12 @@ function costLabel(spell: Spell): string {
           :class="i <= (state.spellSlotsUsed[idx] ?? 0) ? 'bg-charcoal opacity-25' : 'bg-ember'"
         />
       </div>
+    </div>
+
+    <!-- Boutons repos -->
+    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-gold/20">
+      <button type="button" class="min-h-12 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doShortRest">Repos court</button>
+      <button type="button" class="min-h-12 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doLongRest">Repos long</button>
     </div>
 
     <!-- Sorts mineurs (cantrips) -->
@@ -123,5 +138,6 @@ function costLabel(spell: Spell): string {
         </li>
       </ul>
     </div>
+
   </div>
 </template>

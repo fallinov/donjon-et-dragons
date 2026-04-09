@@ -22,29 +22,7 @@ useSeoMeta({
 
       <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <li v-for="character in characters" :key="character.slug">
-          <NuxtLink
-            :to="`/personnages/${character.slug}`"
-            class="block border border-gold/30 bg-charcoal/50 hover:bg-charcoal/70 hover:border-gold transition-colors p-5 group"
-          >
-            <figure class="aspect-[3/4] mb-4 border border-gold/40 overflow-hidden">
-              <NuxtImg
-                :src="character.portrait.src"
-                :alt="character.portrait.alt"
-                loading="lazy"
-                sizes="320px sm:280px lg:300px"
-                class="w-full h-full object-cover saturate-90 group-hover:saturate-100 transition"
-              />
-            </figure>
-            <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">
-              {{ character.eyebrow }}
-            </p>
-            <h2 class="font-display text-2xl text-gold-bright uppercase tracking-wider-2 leading-tight">
-              {{ character.firstName }}{{ character.lastName ? ` ${character.lastName}` : '' }}
-            </h2>
-            <p class="mt-2 text-sm text-parchment-dim italic">
-              {{ character.race }} · {{ character.className }} niveau {{ character.level }}
-            </p>
-          </NuxtLink>
+          <CodexCharacterCard :character="character" />
         </li>
       </ul>
     </div>
