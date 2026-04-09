@@ -23,8 +23,11 @@ useSeoMeta({
   },
 })
 
-const { activeTab } = useMobileTab()
+const { activeTab, setTab } = useMobileTab()
 const isDesktop = useIsDesktop()
+
+// Reset à l'onglet Perso à chaque ouverture de fiche
+setTab('perso')
 </script>
 
 <template>
