@@ -57,7 +57,7 @@ function doLongRest(): void {
 <template>
   <section
     aria-label="Tableau de bord du personnage"
-    class="no-print mb-8 border border-gold/40 bg-charcoal/60 p-4 sm:p-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-[2fr_1fr_1fr_auto] items-start motion-safe:animate-rise"
+    class="no-print mb-8 border border-gold/40 bg-charcoal/60 p-4 sm:p-5 flex flex-wrap gap-6 items-start motion-safe:animate-rise"
   >
     <!-- Toast feedback -->
     <Transition name="fade">
@@ -65,14 +65,14 @@ function doLongRest(): void {
         v-if="toast"
         role="status"
         aria-live="polite"
-        class="sm:col-span-2 xl:col-span-4 text-center font-display text-sm text-gold-bright bg-gold/10 border border-gold/30 px-3 py-2"
+        class="w-full text-center font-display text-sm text-gold-bright bg-gold/10 border border-gold/30 px-3 py-2"
       >
         {{ toast }}
       </p>
     </Transition>
 
     <!-- HP Tracker -->
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 flex-1 min-w-[260px]">
       <div class="flex items-baseline justify-between">
         <p class="font-display text-sm tracking-wider-4 text-gold uppercase">Points de vie</p>
         <p class="text-sm text-parchment-mute" v-if="state.hpTemp > 0">+{{ state.hpTemp }} temp</p>
@@ -122,7 +122,7 @@ function doLongRest(): void {
     </div>
 
     <!-- Stats fixes -->
-    <div class="grid grid-cols-3 gap-3 text-center sm:text-left">
+    <div class="flex flex-wrap gap-x-8 gap-y-3 text-center sm:text-left">
       <div>
         <p class="font-display text-sm tracking-wider-4 text-gold uppercase">Maîtrise</p>
         <p class="font-display text-2xl text-gold-bright mt-1">{{ fmtBonus(character.proficiencyBonus) }}</p>
@@ -144,7 +144,7 @@ function doLongRest(): void {
     </div>
 
     <!-- Inspiration + repos -->
-    <div class="flex flex-col gap-2 items-start">
+    <div class="flex flex-col gap-2 items-start min-w-[200px]">
       <button
         type="button"
         :aria-pressed="state.inspiration"
@@ -170,7 +170,7 @@ function doLongRest(): void {
     </div>
 
     <!-- Death saves (visible seulement quand HP = 0) -->
-    <div v-if="isDown" class="flex flex-col gap-2 sm:col-span-2 xl:col-span-4 border-t border-gold/30 pt-3 mt-1">
+    <div v-if="isDown" class="flex flex-col gap-2 w-full border-t border-gold/30 pt-3 mt-1">
       <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase">⚠ Jets de sauvegarde contre la mort</p>
       <div class="flex flex-wrap gap-6 items-center">
         <div class="flex items-center gap-3">
