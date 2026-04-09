@@ -9,6 +9,14 @@ defineProps<{ character: Character }>()
 
     <!-- ═══ MOBILE : carte de jeu pleine largeur ═══ -->
     <div class="lg:hidden">
+      <!-- Lien retour au-dessus de la carte -->
+      <NuxtLink
+        to="/"
+        class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase mb-2"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
+        Retour aux codex
+      </NuxtLink>
       <!-- Photo arrière-plan avec gradient -->
       <div class="relative aspect-[3/4] sm:aspect-[16/9] overflow-hidden w-screen -ml-4 sm:-ml-8 lg:-ml-10">
         <NuxtImg
