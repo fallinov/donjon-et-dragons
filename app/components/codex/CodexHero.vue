@@ -8,7 +8,7 @@ const fogRevealed = ref(false)
 
 onMounted(() => {
   // Petit délai pour que le brouillard soit visible avant la dissipation
-  setTimeout(() => { fogRevealed.value = true }, 2000)
+  setTimeout(() => { fogRevealed.value = true }, 300)
 })
 </script>
 
@@ -38,8 +38,8 @@ onMounted(() => {
 
         <!-- Brouillard multi-couches qui se dissipe -->
         <div
-          class="absolute inset-0 pointer-events-none z-10 overflow-hidden"
-          :style="{ opacity: fogRevealed ? 0 : 1, filter: fogRevealed ? 'blur(8px)' : 'blur(1px) sepia(0.3)', transition: 'opacity 10s ease-in-out 0.5s, filter 10s ease-in-out 0.5s' }"
+          class="absolute -inset-px pointer-events-none z-10 overflow-hidden"
+          :style="{ opacity: fogRevealed ? 0 : 1, filter: fogRevealed ? 'blur(6px)' : 'blur(1px) sepia(0.3)', transition: 'opacity 4s ease-in-out, filter 4s ease-in-out' }"
           aria-hidden="true"
         >
           <!-- Fond opaque pour rendre les PNG fog visibles -->
@@ -52,8 +52,8 @@ onMounted(() => {
           <div class="fog-layer fog-layer-3b" />
         </div>
 
-        <!-- Texte superposé en bas de la carte -->
-        <div class="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-4 sm:px-5 sm:pb-5 sm:pt-6">
+        <!-- Texte superposé en bas de la carte (au-dessus du brouillard) -->
+        <div class="absolute bottom-0 left-0 right-0 z-20 px-3 pb-3 pt-4 sm:px-5 sm:pb-5 sm:pt-6">
           <p class="font-display text-xs tracking-wider-5 text-parchment-dim/80 uppercase mb-1">
             {{ character.eyebrow }}
           </p>
@@ -137,55 +137,52 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* ── Brouillard dense multi-couches ── */
+/* ── Brouillard dense multi-couches (PNG avec canal alpha) ── */
 .fog-layer {
   position: absolute;
+  top: 0;
   height: 100%;
   width: 200%;
+  transform-origin: center;
+  scale: 1.2;
 }
 
-/* Couche 1 — dense, lente */
+/* Couche 1 — rapide, opacité basse */
 .fog-layer-1 {
-  background: url('/img/fog1.png') center center / cover no-repeat;
+  background: url('/img/fog1.png') repeat-x center / cover;
   left: 0;
-  opacity: 1;
-  animation: fog-drift 15s linear infinite, fog-pulse-1 10s linear infinite;
+  animation: fog-drift 15s linear infinite, fog-opacity-1 10s ease-in-out infinite;
 }
 .fog-layer-1b {
-  background: url('/img/fog1.png') center center / cover no-repeat;
+  background: url('/img/fog1.png') repeat-x center / cover;
   left: -100%;
-  opacity: 1;
-  animation: fog-drift 15s linear infinite, fog-pulse-1 10s linear infinite;
+  animation: fog-drift 15s linear infinite, fog-opacity-1 10s ease-in-out infinite;
 }
 
 /* Couche 2 — moyenne, direction opposée */
 .fog-layer-2 {
-  background: url('/img/fog2.png') center center / cover no-repeat;
+  background: url('/img/fog2.png') repeat-x center / cover;
   left: 0;
-  opacity: 0.8;
-  animation: fog-drift-reverse 20s linear infinite, fog-pulse-2 12s linear infinite;
+  animation: fog-drift-reverse 13s linear infinite, fog-opacity-2 21s ease-in-out infinite;
 }
 .fog-layer-2b {
-  background: url('/img/fog2.png') center center / cover no-repeat;
+  background: url('/img/fog2.png') repeat-x center / cover;
   left: -100%;
-  opacity: 0.8;
-  animation: fog-drift-reverse 20s linear infinite, fog-pulse-2 12s linear infinite;
+  animation: fog-drift-reverse 13s linear infinite, fog-opacity-2 21s ease-in-out infinite;
 }
 
-/* Couche 3 — fond, très lente */
+/* Couche 3 — lente, plus épaisse */
 .fog-layer-3 {
-  background: url('/img/fog1.png') center center / cover no-repeat;
+  background: url('/img/fog2.png') repeat-x center / cover;
   left: 0;
-  opacity: 0.6;
-  animation: fog-drift 25s linear infinite, fog-pulse-3 14s linear infinite;
-  transform: scaleY(1.3);
+  scale: 1.2 1.5;
+  animation: fog-drift 25s linear infinite, fog-opacity-3 17s ease-in-out infinite;
 }
 .fog-layer-3b {
-  background: url('/img/fog1.png') center center / cover no-repeat;
+  background: url('/img/fog2.png') repeat-x center / cover;
   left: -100%;
-  opacity: 0.6;
-  animation: fog-drift 25s linear infinite, fog-pulse-3 14s linear infinite;
-  transform: scaleY(1.3);
+  scale: 1.2 1.5;
+  animation: fog-drift 25s linear infinite, fog-opacity-3 17s ease-in-out infinite;
 }
 
 @keyframes fog-drift {
@@ -196,22 +193,31 @@ onMounted(() => {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-@keyframes fog-pulse-1 {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+/* Opacités basses + durées non-multiples → pas de pattern répétitif */
+@keyframes fog-opacity-1 {
+  0% { opacity: 0.1; }
+  25% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+  75% { opacity: 0.45; }
+  100% { opacity: 0.1; }
 }
-@keyframes fog-pulse-2 {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.5; }
+@keyframes fog-opacity-2 {
+  0% { opacity: 0.5; }
+  25% { opacity: 0.2; }
+  50% { opacity: 0.1; }
+  75% { opacity: 0.4; }
+  100% { opacity: 0.5; }
 }
-@keyframes fog-pulse-3 {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 0.35; }
+@keyframes fog-opacity-3 {
+  0% { opacity: 0.3; }
+  25% { opacity: 0.5; }
+  50% { opacity: 0.2; }
+  75% { opacity: 0.45; }
+  100% { opacity: 0.3; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .fog-layer { animation: none !important; }
-  .fog-container { transition: none !important; }
 }
 </style>
 

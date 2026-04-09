@@ -31,17 +31,17 @@ test.describe('Codex Donjon et Dragons', () => {
     // Sur mobile, naviguer vers l'onglet Sorts
     const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
     if (await sortsTab.isVisible()) { await sortsTab.dispatchEvent('click'); await page.waitForTimeout(500) }
-    await expect(page.locator('#slots-count')).toHaveText('3 / 3')
+    await expect(page.locator('#slots-count-1')).toHaveText('3 / 3')
 
     // Cliquer "Lancer" sur le premier sort
     const launchBtn = page.getByRole('button', { name: /Lancer/i }).first()
     await launchBtn.dispatchEvent('click')
-    await expect(page.locator('#slots-count')).toHaveText('2 / 3')
+    await expect(page.locator('#slots-count-1')).toHaveText('2 / 3')
 
     // Lancer encore 2 fois → 0/3 → boutons désactivés
     await launchBtn.dispatchEvent('click')
     await page.getByRole('button', { name: /Lancer/i }).first().dispatchEvent('click')
-    await expect(page.locator('#slots-count')).toHaveText('0 / 3')
+    await expect(page.locator('#slots-count-1')).toHaveText('0 / 3')
   })
 
   test('skip link cible le contenu principal', async ({ page }) => {

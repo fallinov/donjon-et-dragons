@@ -75,7 +75,7 @@ function costLabel(spell: Spell): string {
       <div v-for="(slotLevel, idx) in sc.slotLevels" :key="slotLevel.level" class="flex items-center justify-between">
         <p class="font-display text-xs tracking-wider-3 text-gold uppercase" aria-live="polite">
           Niv. {{ slotLevel.level }}
-          <span class="text-gold-bright ml-1">{{ slotsRemaining(idx) }} / {{ slotLevel.slots }}</span>
+          <span :id="`slots-count-${slotLevel.level}`" class="text-gold-bright ml-1">{{ slotsRemaining(idx) }} / {{ slotLevel.slots }}</span>
         </p>
         <div class="flex gap-1.5" role="group" :aria-label="`Emplacements niveau ${slotLevel.level}`">
           <span
