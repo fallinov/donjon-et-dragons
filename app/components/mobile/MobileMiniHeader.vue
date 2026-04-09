@@ -5,7 +5,7 @@ defineProps<{ character: Character }>()
 </script>
 
 <template>
-  <div class="sticky top-0 z-20 bg-charcoal/95 backdrop-blur-md px-4 py-2 flex items-center justify-between gap-3 lg:hidden">
+  <div class="sticky top-0 z-20 bg-charcoal/95 backdrop-blur-md border-b border-gold/30 -mx-4 px-4 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10 py-2 flex items-center justify-between gap-3 lg:hidden">
     <div class="flex items-center gap-3 min-w-0">
       <NuxtLink to="/" class="text-parchment-dim hover:text-gold-bright shrink-0" aria-label="Retour aux codex">
         <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
