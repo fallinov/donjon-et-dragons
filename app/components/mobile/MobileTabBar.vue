@@ -14,7 +14,7 @@ const { activeTab, tabs, setTab } = useMobileTab()
         <button
           type="button"
           :aria-current="activeTab === tab.id ? 'page' : undefined"
-          class="w-full flex flex-col items-center gap-0.5 py-2 transition-colors relative outline-none"
+          class="w-full flex flex-col items-center gap-0.5 py-2 transition-colors relative !outline-none"
           :class="activeTab === tab.id ? 'text-gold-bright' : 'text-parchment-mute hover:text-parchment'"
           @click="setTab(tab.id)"
         >
