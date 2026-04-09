@@ -69,14 +69,14 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
 
     // Cliquer 3× sur le bouton − (retirer 3 HP)
-    const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
+    const minusBtn = page.getByRole('button', { name: /Diminuer points de vie/i })
     await minusBtn.click()
     await minusBtn.click()
     await minusBtn.click()
     await expect(page.getByText('30', { exact: false }).first()).toBeVisible()
 
     // Cliquer 2× sur le bouton + (ajouter 2 HP)
-    const plusBtn = page.getByRole('button', { name: /Ajouter 1 point de vie/i })
+    const plusBtn = page.getByRole('button', { name: /Augmenter points de vie/i })
     await plusBtn.click()
     await plusBtn.click()
     await expect(page.getByText('32', { exact: false }).first()).toBeVisible()
@@ -87,8 +87,8 @@ test.describe('Codex Donjon et Dragons', () => {
     await page.waitForTimeout(800)
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
-    const addBtn = page.getByRole('button', { name: /Ajouter 1 inspiration/i })
-    const useBtn = page.getByRole('button', { name: /Utiliser 1 inspiration/i })
+    const addBtn = page.getByRole('button', { name: /Augmenter inspiration/i })
+    const useBtn = page.getByRole('button', { name: /Diminuer inspiration/i })
     await addBtn.click()
     await addBtn.click()
     await expect(page.getByText('2', { exact: true })).toBeVisible()
@@ -103,7 +103,7 @@ test.describe('Codex Donjon et Dragons', () => {
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
     // Retirer 5 HP
-    const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
+    const minusBtn = page.getByRole('button', { name: /Diminuer points de vie/i })
     for (let i = 0; i < 5; i++) await minusBtn.click()
     await expect(page.getByText('28', { exact: false }).first()).toBeVisible()
 
@@ -120,7 +120,7 @@ test.describe('Codex Donjon et Dragons', () => {
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
     // Cliquer − jusqu'à HP=0 (le bouton se disable à 0)
-    const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
+    const minusBtn = page.getByRole('button', { name: /Diminuer points de vie/i })
     while (await minusBtn.isEnabled()) {
       await minusBtn.click()
     }

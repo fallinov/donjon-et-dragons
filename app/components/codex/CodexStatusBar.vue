@@ -86,125 +86,57 @@ onUnmounted(stopRepeat)
       </p>
     </Transition>
 
-    <!-- ═══ MOBILE : flux vertical uniforme ═══ -->
+    <!-- ═══ MOBILE : flux vertical uniforme via CodexCounter ═══ -->
     <div v-if="!isDesktop" class="space-y-3">
 
       <!-- HP -->
-      <div
-        class="border border-gold/40 p-4 transition-colors"
-        :class="isDown ? 'bg-blood/30 border-ember' : 'bg-charcoal/60'"
+      <CodexCounter
+        label="Points de vie"
+        :value="`${state.hpCurrent} / ${character.maxHp}`"
+        :disable-minus="isDown"
+        :disable-plus="isFull"
+        :repeat="true"
+        :color-class="isDown ? 'text-ember-bright' : hpPercent > 50 ? 'text-gold-bright' : hpPercent > 25 ? 'text-ember-bright' : 'text-ember'"
+        @minus="damage(1)"
+        @plus="heal(1)"
       >
-        <div class="flex items-center justify-center gap-4">
-          <button
-            type="button"
-            :disabled="isDown"
-            class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none"
-            aria-label="Retirer 1 point de vie"
-            @pointerdown.prevent="startRepeat(() => damage(1))"
-            @pointerup="stopRepeat"
-            @pointerleave="stopRepeat"
-          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-
-          <div class="text-center min-w-[120px]" aria-live="polite" aria-atomic="true">
-            <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">Points de vie</p>
-            <p class="font-display tabular-nums leading-none"
-               :class="isDown ? 'text-ember-bright' : hpPercent > 50 ? 'text-gold-bright' : hpPercent > 25 ? 'text-ember-bright' : 'text-ember'">
-              <span class="text-5xl">{{ state.hpCurrent }}</span>
-              <span class="text-xl text-parchment-mute"> / {{ character.maxHp }}</span>
-            </p>
-            <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">+{{ state.hpTemp }} temp</p>
+        <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">+{{ state.hpTemp }} temp</p>
+        <template #below>
+          <!-- Barre HP -->
+          <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden mt-3" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="`${state.hpCurrent} sur ${character.maxHp} points de vie`">
+            <div class="h-full transition-all duration-300" :class="hpPercent > 50 ? 'bg-gold-bright' : hpPercent > 25 ? 'bg-ember-bright' : 'bg-ember motion-safe:animate-ember'" :style="{ width: `${hpPercent}%` }" />
           </div>
-
-          <button
-            type="button"
-            :disabled="isFull"
-            class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none"
-            aria-label="Ajouter 1 point de vie"
-            @pointerdown.prevent="startRepeat(() => heal(1))"
-            @pointerup="stopRepeat"
-            @pointerleave="stopRepeat"
-          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-        </div>
-
-        <!-- Barre HP -->
-        <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden mt-3" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="`${state.hpCurrent} sur ${character.maxHp} points de vie`">
-          <div class="h-full transition-all duration-300" :class="hpPercent > 50 ? 'bg-gold-bright' : hpPercent > 25 ? 'bg-ember-bright' : 'bg-ember motion-safe:animate-ember'" :style="{ width: `${hpPercent}%` }" />
-        </div>
-
-        <!-- Death saves -->
-        <div v-if="isDown" class="mt-3 py-3 border-t border-ember/40">
-          <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase mb-3">⚠ Sauvegardes contre la mort</p>
-          <div class="flex flex-wrap gap-6 items-center justify-center">
-            <div class="flex items-center gap-3">
-              <span class="text-sm text-parchment-dim">Succès</span>
-              <div class="flex gap-2" role="group" aria-label="Succès contre la mort">
-                <button v-for="i in 3" :key="`s-${i}`" type="button" :aria-pressed="i <= state.deathSaves.successes" :aria-label="`Succès ${i}`" class="w-11 h-11 rounded-full border-2 border-gold-bright/60 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.successes ? 'bg-gold-bright' : 'bg-transparent hover:bg-gold-bright/10'" @click="toggleDeathSaveSuccess(i - 1)"><span v-if="i <= state.deathSaves.successes" class="text-obsidian font-bold">✓</span></button>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-sm text-parchment-dim">Échecs</span>
-              <div class="flex gap-2" role="group" aria-label="Échecs contre la mort">
-                <button v-for="i in 3" :key="`f-${i}`" type="button" :aria-pressed="i <= state.deathSaves.failures" :aria-label="`Échec ${i}`" class="w-11 h-11 rounded-full border-2 border-ember-bright/70 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.failures ? 'bg-ember' : 'bg-transparent hover:bg-ember/10'" @click="toggleDeathSaveFailure(i - 1)"><span v-if="i <= state.deathSaves.failures" class="text-parchment font-bold">✗</span></button>
-              </div>
+          <!-- Death saves -->
+          <div v-if="isDown" class="mt-3 py-3 border-t border-ember/40">
+            <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase mb-3">⚠ Sauvegardes contre la mort</p>
+            <div class="flex flex-wrap gap-6 items-center justify-center">
+              <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">Succès</span><div class="flex gap-2" role="group" aria-label="Succès contre la mort"><button v-for="i in 3" :key="`s-${i}`" type="button" :aria-pressed="i <= state.deathSaves.successes" :aria-label="`Succès ${i}`" class="w-11 h-11 rounded-full border-2 border-gold-bright/60 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.successes ? 'bg-gold-bright' : 'bg-transparent hover:bg-gold-bright/10'" @click="toggleDeathSaveSuccess(i - 1)"><span v-if="i <= state.deathSaves.successes" class="text-obsidian font-bold">✓</span></button></div></div>
+              <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">Échecs</span><div class="flex gap-2" role="group" aria-label="Échecs contre la mort"><button v-for="i in 3" :key="`f-${i}`" type="button" :aria-pressed="i <= state.deathSaves.failures" :aria-label="`Échec ${i}`" class="w-11 h-11 rounded-full border-2 border-ember-bright/70 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.failures ? 'bg-ember' : 'bg-transparent hover:bg-ember/10'" @click="toggleDeathSaveFailure(i - 1)"><span v-if="i <= state.deathSaves.failures" class="text-parchment font-bold">✗</span></button></div></div>
             </div>
           </div>
-        </div>
-      </div>
+        </template>
+      </CodexCounter>
 
-      <!-- Inspiration (même style que HP) -->
-      <div class="border border-gold/40 bg-charcoal/60 p-4">
-        <div class="flex items-center justify-center gap-4">
-          <button
-            type="button"
-            :disabled="state.inspiration === 0"
-            class="h-14 w-14 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
-            aria-label="Utiliser 1 inspiration"
-            @click="useInspiration"
-          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+      <!-- Inspiration -->
+      <CodexCounter
+        label="Inspiration"
+        :value="state.inspiration"
+        :disable-minus="state.inspiration === 0"
+        :color-class="state.inspiration > 0 ? 'text-gold-bright drop-shadow-[0_0_8px_rgba(242,208,122,0.5)]' : 'text-gold-bright'"
+        @minus="useInspiration"
+        @plus="addInspiration"
+      />
 
-          <div class="text-center min-w-[120px]">
-            <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">Inspiration</p>
-            <p class="font-display text-5xl tabular-nums text-gold-bright leading-none" :class="state.inspiration > 0 ? 'drop-shadow-[0_0_8px_rgba(242,208,122,0.5)]' : ''">
-              {{ state.inspiration }}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            class="h-14 w-14 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 transition-colors select-none"
-            aria-label="Ajouter 1 inspiration"
-            @click="addInspiration"
-          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-        </div>
-      </div>
-
-      <!-- Dés de vie (même style que HP) -->
-      <div class="border border-gold/40 bg-charcoal/60 p-4">
-        <div class="flex items-center justify-center gap-4">
-          <button
-            type="button"
-            :disabled="hitDiceRemaining === 0"
-            class="h-14 w-14 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
-            aria-label="Dépenser 1 dé de vie"
-            @click="spendHitDie"
-          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-
-          <div class="text-center min-w-[120px]">
-            <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">Dés de vie</p>
-            <p class="font-display text-5xl tabular-nums text-gold-bright leading-none">
-              {{ hitDiceRemaining }}<span class="text-parchment-mute text-2xl">d{{ character.hitDice.die }}</span>
-            </p>
-          </div>
-
-          <button
-            type="button"
-            :disabled="hitDiceRemaining >= character.hitDice.total"
-            class="h-14 w-14 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
-            aria-label="Récupérer 1 dé de vie"
-            @click="restoreHitDie"
-          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-        </div>
-      </div>
+      <!-- Dés de vie -->
+      <CodexCounter
+        label="Dés de vie"
+        :value="hitDiceRemaining"
+        :suffix="`d${character.hitDice.die}`"
+        :disable-minus="hitDiceRemaining === 0"
+        :disable-plus="hitDiceRemaining >= character.hitDice.total"
+        @minus="spendHitDie"
+        @plus="restoreHitDie"
+      />
 
       <!-- Sens + Repos sur une ligne -->
       <div class="flex gap-3">
@@ -229,7 +161,7 @@ onUnmounted(stopRepeat)
       <!-- Bloc HP desktop -->
       <div class="border border-gold/40 p-5 transition-colors" :class="isDown ? 'bg-blood/30 border-ember' : 'bg-charcoal/60'">
         <div class="flex items-center justify-center gap-4 mb-3">
-          <button type="button" :disabled="isDown" class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none" aria-label="Retirer 1 point de vie" @pointerdown.prevent="startRepeat(() => damage(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          <button type="button" :disabled="isDown" class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none" aria-label="Diminuer points de vie" @pointerdown.prevent="startRepeat(() => damage(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           <div class="text-center min-w-[120px]" aria-live="polite" aria-atomic="true">
             <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">Points de vie</p>
             <p class="font-display tabular-nums leading-none" :class="isDown ? 'text-ember-bright' : hpPercent > 50 ? 'text-gold-bright' : hpPercent > 25 ? 'text-ember-bright' : 'text-ember'">
@@ -237,7 +169,7 @@ onUnmounted(stopRepeat)
             </p>
             <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">+{{ state.hpTemp }} temp</p>
           </div>
-          <button type="button" :disabled="isFull" class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none" aria-label="Ajouter 1 point de vie" @pointerdown.prevent="startRepeat(() => heal(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          <button type="button" :disabled="isFull" class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none" aria-label="Augmenter points de vie" @pointerdown.prevent="startRepeat(() => heal(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
         </div>
         <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="`${state.hpCurrent} sur ${character.maxHp} points de vie`">
           <div class="h-full transition-all duration-300" :class="hpPercent > 50 ? 'bg-gold-bright' : hpPercent > 25 ? 'bg-ember-bright' : 'bg-ember motion-safe:animate-ember'" :style="{ width: `${hpPercent}%` }" />
@@ -257,17 +189,17 @@ onUnmounted(stopRepeat)
         <div>
           <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">Inspiration</p>
           <div class="flex items-center justify-center gap-3">
-            <button type="button" :disabled="state.inspiration === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Utiliser 1 inspiration" @click="useInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" :disabled="state.inspiration === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Diminuer inspiration" @click="useInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
             <p class="font-display text-3xl text-gold-bright tabular-nums min-w-[2ch] text-center" :class="state.inspiration > 0 ? 'drop-shadow-[0_0_8px_rgba(242,208,122,0.5)]' : ''">{{ state.inspiration }}</p>
-            <button type="button" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 transition-colors select-none" aria-label="Ajouter 1 inspiration" @click="addInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 transition-colors select-none" aria-label="Augmenter inspiration" @click="addInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           </div>
         </div>
         <div>
           <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">Dés de vie</p>
           <div class="flex items-center justify-center gap-3">
-            <button type="button" :disabled="hitDiceRemaining === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Dépenser 1 dé de vie" @click="spendHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" :disabled="hitDiceRemaining === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Diminuer dés de vie" @click="spendHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
             <p class="font-display text-3xl text-gold-bright tabular-nums min-w-[2ch] text-center">{{ hitDiceRemaining }}<span class="text-parchment-mute text-base">d{{ character.hitDice.die }}</span></p>
-            <button type="button" :disabled="hitDiceRemaining >= character.hitDice.total" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Récupérer 1 dé de vie" @click="restoreHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" :disabled="hitDiceRemaining >= character.hitDice.total" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Augmenter dés de vie" @click="restoreHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           </div>
         </div>
       </div>
