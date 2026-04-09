@@ -163,7 +163,8 @@ export function useCharacterState(character: Character) {
     if (spell.cost === 'cantrip') return true
     if (spell.cost === 'daily') return useDailySpell(spell.title)
     if (spell.cost === 'slot') {
-      const levelIndex = spell.level - 1
+      const levels = character.spellcasting?.slotLevels ?? []
+      const levelIndex = levels.findIndex(sl => sl.level === spell.level)
       return consumeSlot(levelIndex)
     }
     return false

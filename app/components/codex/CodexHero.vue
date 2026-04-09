@@ -35,14 +35,19 @@ onMounted(() => {
         <!-- Gradient bas : noir vers transparent -->
         <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/50 via-40% to-transparent to-75%" />
 
-        <!-- Brouillard qui se dissipe à l'ouverture -->
+        <!-- Brouillard multi-couches qui se dissipe -->
         <div
-          class="motion-safe:fog-overlay absolute inset-0 pointer-events-none z-10 transition-all duration-[2000ms] ease-out"
-          :class="fogRevealed ? 'opacity-0 scale-110 blur-xl' : 'opacity-100 scale-100 blur-none'"
+          class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-[3000ms] ease-in-out overflow-hidden"
+          :class="fogRevealed ? 'opacity-0' : 'opacity-100'"
+          :style="{ filter: fogRevealed ? 'blur(8px)' : 'blur(1px) grayscale(0.2) saturate(1.2) sepia(0.2)', transition: 'opacity 3s ease-in-out, filter 3s ease-in-out' }"
           aria-hidden="true"
         >
-          <div class="absolute inset-0 bg-obsidian/80" />
-          <div class="absolute inset-0 mix-blend-soft-light opacity-60" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 400 400%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22f%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.015%22 numOctaves=%224%22 seed=%2242%22/%3E%3CfeDisplacementMap in=%22SourceGraphic%22 scale=%2280%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23f)%22 fill=%22%23b09d72%22 opacity=%220.3%22/%3E%3C/svg%3E')" />
+          <div class="fog-layer fog-layer-1" />
+          <div class="fog-layer fog-layer-1b" />
+          <div class="fog-layer fog-layer-2" />
+          <div class="fog-layer fog-layer-2b" />
+          <div class="fog-layer fog-layer-3" />
+          <div class="fog-layer fog-layer-3b" />
         </div>
 
         <!-- Texte superposé en bas de la carte -->
@@ -128,3 +133,74 @@ onMounted(() => {
 
   </header>
 </template>
+
+<style scoped>
+/* Couches de brouillard animées (images locales, souveraineté CEJEF) */
+.fog-layer {
+  position: absolute;
+  height: 100%;
+  width: 200%;
+}
+.fog-layer-1 {
+  background: url('/img/fog1.png') center center / cover no-repeat transparent;
+  width: 200%;
+  left: 0;
+  animation: fog-move 15s linear infinite, fog-opacity-1 10s linear infinite;
+}
+.fog-layer-1b {
+  background: url('/img/fog1.png') center center / cover no-repeat transparent;
+  width: 200%;
+  left: -100%;
+  animation: fog-move 15s linear infinite, fog-opacity-1 10s linear infinite;
+}
+.fog-layer-2 {
+  background: url('/img/fog2.png') center center / cover no-repeat transparent;
+  width: 200%;
+  left: 0;
+  opacity: 0.6;
+  animation: fog-move 20s linear infinite, fog-opacity-2 12s linear infinite;
+}
+.fog-layer-2b {
+  background: url('/img/fog2.png') center center / cover no-repeat transparent;
+  width: 200%;
+  left: -100%;
+  opacity: 0.6;
+  animation: fog-move 20s linear infinite, fog-opacity-2 12s linear infinite;
+}
+.fog-layer-3 {
+  background: url('/img/fog1.png') center center / cover no-repeat transparent;
+  width: 200%;
+  left: 0;
+  opacity: 0.4;
+  animation: fog-move 25s linear infinite, fog-opacity-3 14s linear infinite;
+}
+.fog-layer-3b {
+  background: url('/img/fog1.png') center center / cover no-repeat transparent;
+  width: 200%;
+  left: -100%;
+  opacity: 0.4;
+  animation: fog-move 25s linear infinite, fog-opacity-3 14s linear infinite;
+}
+
+@keyframes fog-move {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+@keyframes fog-opacity-1 {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes fog-opacity-2 {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.3; }
+}
+@keyframes fog-opacity-3 {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fog-layer { animation: none !important; }
+}
+</style>
+

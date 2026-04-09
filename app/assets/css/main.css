@@ -65,12 +65,16 @@ body::before {
 }
 
 /* ── Focus visible custom (a11y WCAG 2.4.7) ──────────── */
-:focus:not(:focus-visible) {
+*:focus {
   outline: none;
 }
 :focus-visible {
   outline: 2px solid var(--color-gold-bright);
   outline-offset: 3px;
+}
+/* Supprime le flash tactile iOS/Android */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ── Skip link ───────────────────────────────────────── */
