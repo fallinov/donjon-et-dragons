@@ -1,12 +1,12 @@
 import type { Character } from '~~/shared/types/character'
 
-export const viboisThaera: Character = {
-  slug: 'vibois-thaera',
+export const maeraVifbois: Character = {
+  slug: 'maera-vifbois',
   player: 'Sandra',
-  firstName: 'Vibois',
-  lastName: 'Thaera',
-  eyebrow: 'Codex du Conquérant',
-  race: 'Humain',
+  firstName: 'Maera',
+  lastName: 'Vifbois',
+  eyebrow: 'Codex de la Conquérante',
+  race: 'Humaine',
   className: 'Paladin',
   level: 4,
   background: 'Exilé',
@@ -17,8 +17,8 @@ export const viboisThaera: Character = {
   hitDice: { die: 10, total: 4 },
 
   portrait: {
-    src: '/img/vibois-thaera.png',
-    alt: 'Portrait de Vibois Thaera, paladin humain en cotte de maille, bouclier et marteau de guerre, regard déterminé',
+    src: '/img/maera-vifbois.png',
+    alt: 'Portrait de Maera Vifbois, paladine humaine en cotte de maille, bouclier et marteau de guerre, regard déterminé',
   },
 
   vitals: [
@@ -137,5 +137,5 @@ export const viboisThaera: Character = {
     },
   ],
 
-  colophon: "Gravé au fer blanc — Codex du conquérant Thaera. Tant que son marteau portera le poids de la justice, aucune terre ne restera aux mains du mal.",
+  colophon: "Gravé au fer blanc — Codex de la conquérante Vifbois. Tant que son marteau portera le poids de la justice, aucune terre ne restera aux mains du mal.",
 }

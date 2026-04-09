@@ -37,9 +37,8 @@ onMounted(() => {
 
         <!-- Brouillard multi-couches qui se dissipe -->
         <div
-          class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-[6000ms] ease-in-out overflow-hidden"
-          :class="fogRevealed ? 'opacity-0' : 'opacity-100'"
-          :style="{ filter: fogRevealed ? 'blur(8px)' : 'blur(1px) grayscale(0.2) saturate(1.2) sepia(0.2)', transition: 'opacity 6s ease-in-out, filter 6s ease-in-out' }"
+          class="absolute inset-0 pointer-events-none z-10 overflow-hidden fog-container"
+          :class="fogRevealed ? 'fog-dissipate' : ''"
           aria-hidden="true"
         >
           <div class="fog-layer fog-layer-1" />
@@ -135,72 +134,96 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Couches de brouillard animées (images locales, souveraineté CEJEF) */
+/* ── Brouillard dense multi-couches, dissipation radiale du centre ── */
+.fog-container {
+  filter: blur(1px) grayscale(0.2) saturate(1.2) sepia(0.3);
+  /* Masque radial : opaque partout au départ */
+  mask-image: radial-gradient(ellipse at center, black 0%, black 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, black 100%);
+  transition: mask-image 6s ease-in-out, -webkit-mask-image 6s ease-in-out, opacity 6s ease-in-out, filter 6s ease-in-out;
+}
+.fog-dissipate {
+  opacity: 0;
+  filter: blur(6px);
+  /* Le trou s'ouvre du centre vers les bords */
+  mask-image: radial-gradient(ellipse at center, transparent 0%, transparent 60%, black 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 0%, transparent 60%, black 100%);
+}
+
 .fog-layer {
   position: absolute;
   height: 100%;
   width: 200%;
 }
+
+/* Couche 1 — dense, lente */
 .fog-layer-1 {
-  background: url('/img/fog1.png') center center / cover no-repeat transparent;
-  width: 200%;
+  background: url('/img/fog1.png') center center / cover no-repeat;
   left: 0;
-  animation: fog-move 15s linear infinite, fog-opacity-1 10s linear infinite;
+  opacity: 1;
+  animation: fog-drift 15s linear infinite, fog-pulse-1 10s linear infinite;
 }
 .fog-layer-1b {
-  background: url('/img/fog1.png') center center / cover no-repeat transparent;
-  width: 200%;
+  background: url('/img/fog1.png') center center / cover no-repeat;
   left: -100%;
-  animation: fog-move 15s linear infinite, fog-opacity-1 10s linear infinite;
-}
-.fog-layer-2 {
-  background: url('/img/fog2.png') center center / cover no-repeat transparent;
-  width: 200%;
-  left: 0;
-  opacity: 0.6;
-  animation: fog-move 20s linear infinite, fog-opacity-2 12s linear infinite;
-}
-.fog-layer-2b {
-  background: url('/img/fog2.png') center center / cover no-repeat transparent;
-  width: 200%;
-  left: -100%;
-  opacity: 0.6;
-  animation: fog-move 20s linear infinite, fog-opacity-2 12s linear infinite;
-}
-.fog-layer-3 {
-  background: url('/img/fog1.png') center center / cover no-repeat transparent;
-  width: 200%;
-  left: 0;
-  opacity: 0.4;
-  animation: fog-move 25s linear infinite, fog-opacity-3 14s linear infinite;
-}
-.fog-layer-3b {
-  background: url('/img/fog1.png') center center / cover no-repeat transparent;
-  width: 200%;
-  left: -100%;
-  opacity: 0.4;
-  animation: fog-move 25s linear infinite, fog-opacity-3 14s linear infinite;
+  opacity: 1;
+  animation: fog-drift 15s linear infinite, fog-pulse-1 10s linear infinite;
 }
 
-@keyframes fog-move {
+/* Couche 2 — moyenne, direction opposée */
+.fog-layer-2 {
+  background: url('/img/fog2.png') center center / cover no-repeat;
+  left: 0;
+  opacity: 0.8;
+  animation: fog-drift-reverse 20s linear infinite, fog-pulse-2 12s linear infinite;
+}
+.fog-layer-2b {
+  background: url('/img/fog2.png') center center / cover no-repeat;
+  left: -100%;
+  opacity: 0.8;
+  animation: fog-drift-reverse 20s linear infinite, fog-pulse-2 12s linear infinite;
+}
+
+/* Couche 3 — fond, très lente */
+.fog-layer-3 {
+  background: url('/img/fog1.png') center center / cover no-repeat;
+  left: 0;
+  opacity: 0.6;
+  animation: fog-drift 25s linear infinite, fog-pulse-3 14s linear infinite;
+  transform: scaleY(1.3);
+}
+.fog-layer-3b {
+  background: url('/img/fog1.png') center center / cover no-repeat;
+  left: -100%;
+  opacity: 0.6;
+  animation: fog-drift 25s linear infinite, fog-pulse-3 14s linear infinite;
+  transform: scaleY(1.3);
+}
+
+@keyframes fog-drift {
   0% { transform: translateX(0); }
   100% { transform: translateX(50%); }
 }
-@keyframes fog-opacity-1 {
+@keyframes fog-drift-reverse {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes fog-pulse-1 {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.7; }
 }
-@keyframes fog-opacity-2 {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.3; }
+@keyframes fog-pulse-2 {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.5; }
 }
-@keyframes fog-opacity-3 {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.2; }
+@keyframes fog-pulse-3 {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.35; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .fog-layer { animation: none !important; }
+  .fog-container { transition: none !important; }
 }
 </style>
 
