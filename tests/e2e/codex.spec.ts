@@ -30,7 +30,7 @@ test.describe('Codex Donjon et Dragons', () => {
     await page.waitForTimeout(800)
     // Sur mobile, naviguer vers l'onglet Sorts d'abord
     const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
-    if (await sortsTab.isVisible()) await sortsTab.click()
+    if (await sortsTab.isVisible()) { await sortsTab.dispatchEvent('click'); await page.waitForTimeout(500) }
     await expect(page.locator('#slots-count')).toHaveText('3 / 3')
 
     const slots = page.locator('[data-slot]')
@@ -61,6 +61,9 @@ test.describe('Codex Donjon et Dragons', () => {
   test('HP tracker permet les dégâts et les soins via boutons −/+', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
+    // Sur mobile, naviguer vers l'onglet Combat
+    const combatTab = page.getByRole('button', { name: /^Combat$/i })
+    if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
     // HP initial = 33
     await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
@@ -82,6 +85,8 @@ test.describe('Codex Donjon et Dragons', () => {
   test('Inspiration +/−', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
+    const combatTab = page.getByRole('button', { name: /^Combat$/i })
+    if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
     const addBtn = page.getByRole('button', { name: /Ajouter 1 inspiration/i })
     const useBtn = page.getByRole('button', { name: /Utiliser 1 inspiration/i })
     await addBtn.click()
@@ -94,6 +99,8 @@ test.describe('Codex Donjon et Dragons', () => {
   test('Long rest restaure les HP au maximum', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
+    const combatTab = page.getByRole('button', { name: /^Combat$/i })
+    if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
     // Retirer 5 HP
     const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })
@@ -107,8 +114,10 @@ test.describe('Codex Donjon et Dragons', () => {
   })
 
   test('Jets de sauvegarde contre la mort apparaissent quand HP = 0', async ({ page }) => {
-    await page.goto('/personnages/dareth-brumeval')
-    await page.waitForTimeout(500)
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await page.waitForTimeout(800)
+    const combatTab = page.getByRole('button', { name: /^Combat$/i })
+    if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
     // Cliquer − jusqu'à HP=0 (le bouton se disable à 0)
     const minusBtn = page.getByRole('button', { name: /Retirer 1 point de vie/i })

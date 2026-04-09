@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 export type TabId = 'perso' | 'traits' | 'combat' | 'sorts' | 'stats'
 
@@ -16,10 +16,10 @@ const TABS_RIGHT: Tab[] = [
   { id: 'stats', label: 'Stats', icon: 'chart' },
 ]
 
-const activeTab = ref<TabId>('perso')
-const leftHanded = ref(false)
-
 export function useMobileTab() {
+  const activeTab = useState<TabId>('mobile-tab', () => 'perso')
+  const leftHanded = useState<boolean>('left-handed', () => false)
+
   // Charge la préférence depuis localStorage côté client
   if (typeof window !== 'undefined') {
     const stored = window.localStorage.getItem('codex:left-handed')
