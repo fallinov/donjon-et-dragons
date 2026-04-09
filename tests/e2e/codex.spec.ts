@@ -77,13 +77,16 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.getByText('32', { exact: false }).first()).toBeVisible()
   })
 
-  test('Inspiration toggle', async ({ page }) => {
+  test('Inspiration +/−', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
-    const btn = page.getByRole('button', { name: /Inspiration/i })
-    await expect(btn).toHaveAttribute('aria-pressed', 'false')
-    await btn.click()
-    await expect(btn).toHaveAttribute('aria-pressed', 'true')
+    const addBtn = page.getByRole('button', { name: /Ajouter 1 inspiration/i })
+    const useBtn = page.getByRole('button', { name: /Utiliser 1 inspiration/i })
+    await addBtn.click()
+    await addBtn.click()
+    await expect(page.getByText('2', { exact: true })).toBeVisible()
+    await useBtn.click()
+    await expect(page.getByText('1', { exact: true })).toBeVisible()
   })
 
   test('Long rest restaure les HP au maximum', async ({ page }) => {

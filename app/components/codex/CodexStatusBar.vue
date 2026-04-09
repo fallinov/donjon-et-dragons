@@ -9,8 +9,10 @@ const {
   state,
   damage,
   heal,
-  toggleInspiration,
+  addInspiration,
+  useInspiration,
   spendHitDie,
+  restoreHitDie,
   toggleDeathSaveSuccess,
   toggleDeathSaveFailure,
   shortRest,
@@ -178,35 +180,54 @@ onUnmounted(stopRepeat)
       </div>
 
       <!-- ═══ BLOC 2 — Ressources de combat ═══ -->
-      <div class="border border-gold/30 bg-charcoal/40 p-4 flex flex-col gap-4">
+      <div class="border border-gold/30 bg-charcoal/40 p-4 flex flex-col gap-5">
         <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase">Combat</p>
 
-        <button
-          type="button"
-          :aria-pressed="state.inspiration"
-          class="w-full min-h-12 inline-flex items-center justify-center gap-2 border-2 px-4 py-2.5 font-display text-base tracking-wider-3 uppercase transition-all"
-          :class="state.inspiration
-            ? 'border-gold-bright bg-gold-bright text-obsidian shadow-[0_0_16px_rgba(242,208,122,0.4)]'
-            : 'border-gold-bright/40 text-gold-bright hover:bg-gold-bright/10'"
-          @click="toggleInspiration"
-        >
-          <span class="text-lg">{{ state.inspiration ? '★' : '☆' }}</span>
-          Inspiration
-        </button>
+        <!-- Inspiration : − | nombre | + -->
+        <div>
+          <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">Inspiration</p>
+          <div class="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              :disabled="state.inspiration === 0"
+              class="h-10 w-10 rounded-full border-2 border-gold/40 text-gold-bright flex items-center justify-center hover:bg-gold/10 active:bg-gold/20 disabled:opacity-30 transition-colors select-none"
+              aria-label="Utiliser 1 inspiration"
+              @click="useInspiration"
+            ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <p class="font-display text-3xl text-gold-bright tabular-nums min-w-[2ch] text-center" :class="state.inspiration > 0 ? 'drop-shadow-[0_0_8px_rgba(242,208,122,0.5)]' : ''">
+              {{ state.inspiration }}
+            </p>
+            <button
+              type="button"
+              class="h-10 w-10 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 transition-colors select-none"
+              aria-label="Ajouter 1 inspiration"
+              @click="addInspiration"
+            ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          </div>
+        </div>
 
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase">Dés de vie</p>
-            <p class="font-display text-2xl text-gold-bright tabular-nums">
+        <!-- Dés de vie : − | nombre | + -->
+        <div>
+          <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">Dés de vie</p>
+          <div class="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              :disabled="hitDiceRemaining === 0"
+              class="h-10 w-10 rounded-full border-2 border-gold/40 text-gold-bright flex items-center justify-center hover:bg-gold/10 active:bg-gold/20 disabled:opacity-30 transition-colors select-none"
+              aria-label="Dépenser 1 dé de vie"
+              @click="spendHitDie"
+            ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <p class="font-display text-3xl text-gold-bright tabular-nums min-w-[2ch] text-center">
               {{ hitDiceRemaining }}<span class="text-parchment-mute text-base">d{{ character.hitDice.die }}</span>
             </p>
+            <button
+              type="button"
+              :disabled="hitDiceRemaining >= character.hitDice.total"
+              class="h-10 w-10 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none"
+              aria-label="Récupérer 1 dé de vie"
+              @click="restoreHitDie"
+            ><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           </div>
-          <button
-            type="button"
-            :disabled="hitDiceRemaining === 0"
-            class="min-h-11 border border-gold/40 bg-charcoal text-parchment-dim hover:text-gold-bright font-display text-sm uppercase px-3 py-2 disabled:opacity-30 transition-colors"
-            @click="spendHitDie"
-          >Dépenser</button>
         </div>
       </div>
 

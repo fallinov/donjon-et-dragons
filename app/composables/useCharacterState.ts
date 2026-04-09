@@ -11,7 +11,7 @@ const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
 export interface CharacterState {
   hpCurrent: number
   hpTemp: number
-  inspiration: boolean
+  inspiration: number
   hitDiceUsed: number
   deathSaves: { successes: number, failures: number }
   spellSlotsUsed: number
@@ -25,7 +25,7 @@ function defaultState(character: Character): CharacterState {
   return {
     hpCurrent: character.maxHp,
     hpTemp: 0,
-    inspiration: false,
+    inspiration: 0,
     hitDiceUsed: 0,
     deathSaves: { successes: 0, failures: 0 },
     spellSlotsUsed: 0,
@@ -38,7 +38,7 @@ function isValidState(value: unknown): value is CharacterState {
   return (
     typeof s.hpCurrent === 'number'
     && typeof s.hpTemp === 'number'
-    && typeof s.inspiration === 'boolean'
+    && typeof s.inspiration === 'number'
     && typeof s.hitDiceUsed === 'number'
     && typeof s.spellSlotsUsed === 'number'
     && typeof s.deathSaves === 'object'
@@ -116,13 +116,23 @@ export function useCharacterState(character: Character) {
     state.value.hpTemp = Math.max(0, Math.floor(amount))
   }
 
-  function toggleInspiration(): void {
-    state.value.inspiration = !state.value.inspiration
+  function addInspiration(): void {
+    state.value.inspiration += 1
+  }
+
+  function useInspiration(): void {
+    if (state.value.inspiration > 0) state.value.inspiration -= 1
   }
 
   function spendHitDie(): void {
     if (state.value.hitDiceUsed < character.hitDice.total) {
       state.value.hitDiceUsed += 1
+    }
+  }
+
+  function restoreHitDie(): void {
+    if (state.value.hitDiceUsed > 0) {
+      state.value.hitDiceUsed -= 1
     }
   }
 
@@ -187,8 +197,10 @@ export function useCharacterState(character: Character) {
     damage,
     heal,
     setTempHp,
-    toggleInspiration,
+    addInspiration,
+    useInspiration,
     spendHitDie,
+    restoreHitDie,
     consumeSpellSlot,
     restoreSpellSlot,
     toggleDeathSaveSuccess,

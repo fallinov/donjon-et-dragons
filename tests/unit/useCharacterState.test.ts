@@ -128,13 +128,20 @@ describe('useCharacterState — inspiration', () => {
     if (typeof window !== 'undefined') window.localStorage.clear()
   })
 
-  it('toggle l\'inspiration', () => {
-    const { state, toggleInspiration } = useCharacterState(darethBrumeval)
-    expect(state.value.inspiration).toBe(false)
-    toggleInspiration()
-    expect(state.value.inspiration).toBe(true)
-    toggleInspiration()
-    expect(state.value.inspiration).toBe(false)
+  it('commence à 0 et s\'incrémente/décrémente', () => {
+    const { state, addInspiration, useInspiration } = useCharacterState(darethBrumeval)
+    expect(state.value.inspiration).toBe(0)
+    addInspiration()
+    addInspiration()
+    expect(state.value.inspiration).toBe(2)
+    useInspiration()
+    expect(state.value.inspiration).toBe(1)
+  })
+
+  it('ne descend pas sous 0', () => {
+    const { state, useInspiration } = useCharacterState(darethBrumeval)
+    useInspiration()
+    expect(state.value.inspiration).toBe(0)
   })
 })
 
