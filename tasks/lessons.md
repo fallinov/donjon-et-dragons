@@ -55,3 +55,15 @@ Pattern utilisé :
 **Correction** : migrer manuellement vibois-thaera.ts et thunon.ts vers le nouveau format `Spellcasting`.
 
 **Règle** : lors d'une migration de type, **vérifier tous les fichiers de données**, pas seulement ceux qui existaient avant. Lancer `grep -r 'ancienne propriété' app/data/` pour détecter les retardataires.
+
+---
+
+## 2026-04-09 — Index slotLevels : ne pas présumer level-1 = array index
+
+**Contexte** : `canCast()` et `castSpell()` utilisaient `spell.level - 1` comme index dans `slotLevels[]`.
+
+**Erreur** : pour Zanna (occultiste), `slotLevels` est `[{ level: 2, slots: 2 }]` — un seul élément à l'index 0. Un sort niv. 2 calculait `2 - 1 = 1` → index inexistant → bouton Lancer toujours désactivé.
+
+**Correction** : remplacer `spell.level - 1` par `slotLevels.findIndex(sl => sl.level === spell.level)` dans `CodexSpells.vue` et `useCharacterState.ts`.
+
+**Règle** : **ne jamais supposer que l'index d'un tableau correspond au niveau du sort**. Les occultistes et certaines classes n'ont pas de slots à chaque niveau. Toujours faire un `findIndex` par `level`.

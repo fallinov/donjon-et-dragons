@@ -11,7 +11,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 | [`dareth-brumeval`](https://donjon-et-dragons.vercel.app/personnages/dareth-brumeval) | Dareth Brumeval | Steve | Demi-elfe · Rôdeur niveau 4 |
 | [`skamos-aurum`](https://donjon-et-dragons.vercel.app/personnages/skamos-aurum) | Skamos Aurum | Normand | Tieffelin · Ensorceleur niveau 4 |
 | [`zanna`](https://donjon-et-dragons.vercel.app/personnages/zanna) | Zanna | Myriam | Gnome des forêts · Occultiste niveau 3 |
-| [`vibois-thaera`](https://donjon-et-dragons.vercel.app/personnages/vibois-thaera) | Vibois Thaera | Sandra | Humain · Paladin (Conquête) niveau 4 |
+| [`maera-vifbois`](https://donjon-et-dragons.vercel.app/personnages/maera-vifbois) | Maera Vifbois | Sandra | Humaine · Paladin (Conquête) niveau 4 |
 | [`thunon`](https://donjon-et-dragons.vercel.app/personnages/thunon) | Thunon | Juan | Haut-elfe · Magicien (Évocation) niveau 4 |
 | [`kael-draven`](https://donjon-et-dragons.vercel.app/personnages/kael-draven) | Kael Draven | Jérôme | Humain · Roublard (Voleur) niveau 4 |
 
@@ -54,7 +54,7 @@ donjon-et-dragons/
 │   │   ├── dareth-brumeval.ts
 │   │   ├── skamos-aurum.ts
 │   │   ├── zanna.ts
-│   │   ├── vibois-thaera.ts
+│   │   ├── maera-vifbois.ts
 │   │   ├── thunon.ts
 │   │   └── kael-draven.ts
 │   └── pages/

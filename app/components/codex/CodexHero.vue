@@ -7,7 +7,8 @@ defineProps<{ character: Character }>()
 const fogRevealed = ref(false)
 
 onMounted(() => {
-  requestAnimationFrame(() => { fogRevealed.value = true })
+  // Petit délai pour que le brouillard soit visible avant la dissipation
+  setTimeout(() => { fogRevealed.value = true }, 2000)
 })
 </script>
 
@@ -37,10 +38,12 @@ onMounted(() => {
 
         <!-- Brouillard multi-couches qui se dissipe -->
         <div
-          class="absolute inset-0 pointer-events-none z-10 overflow-hidden fog-container"
-          :class="fogRevealed ? 'fog-dissipate' : ''"
+          class="absolute inset-0 pointer-events-none z-10 overflow-hidden"
+          :style="{ opacity: fogRevealed ? 0 : 1, filter: fogRevealed ? 'blur(8px)' : 'blur(1px) sepia(0.3)', transition: 'opacity 10s ease-in-out 0.5s, filter 10s ease-in-out 0.5s' }"
           aria-hidden="true"
         >
+          <!-- Fond opaque pour rendre les PNG fog visibles -->
+          <div class="absolute inset-0 bg-obsidian" />
           <div class="fog-layer fog-layer-1" />
           <div class="fog-layer fog-layer-1b" />
           <div class="fog-layer fog-layer-2" />
@@ -134,22 +137,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* ── Brouillard dense multi-couches, dissipation radiale du centre ── */
-.fog-container {
-  filter: blur(1px) grayscale(0.2) saturate(1.2) sepia(0.3);
-  /* Masque radial : opaque partout au départ */
-  mask-image: radial-gradient(ellipse at center, black 0%, black 100%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, black 100%);
-  transition: mask-image 10s ease-in-out, -webkit-mask-image 10s ease-in-out, opacity 10s ease-in-out, filter 10s ease-in-out;
-}
-.fog-dissipate {
-  opacity: 0;
-  filter: blur(6px);
-  /* Le trou s'ouvre du centre vers les bords */
-  mask-image: radial-gradient(ellipse at center, transparent 0%, transparent 60%, black 100%);
-  -webkit-mask-image: radial-gradient(ellipse at center, transparent 0%, transparent 60%, black 100%);
-}
-
+/* ── Brouillard dense multi-couches ── */
 .fog-layer {
   position: absolute;
   height: 100%;

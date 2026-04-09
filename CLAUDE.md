@@ -8,7 +8,7 @@
 - Tests : Vitest (unit) + Playwright (e2e)
 
 ## Personnages (6)
-Steve (Dareth Brumeval), Normand (Skamos Aurum), Myriam (Zanna), Sandra (Vibois Thaera), Juan (Thunon), Jérôme (Kael Draven).
+Steve (Dareth Brumeval), Normand (Skamos Aurum), Myriam (Zanna), Sandra (Maera Vifbois), Juan (Thunon), Jérôme (Kael Draven).
 
 ## Modèle de données
 
