@@ -94,12 +94,12 @@ onUnmounted(stopRepeat)
           <button
             type="button"
             :disabled="isDown"
-            class="min-h-14 min-w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright text-2xl font-bold flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none"
+            class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none"
             aria-label="Retirer 1 point de vie"
             @pointerdown.prevent="startRepeat(() => damage(1))"
             @pointerup="stopRepeat"
             @pointerleave="stopRepeat"
-          >−</button>
+          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
 
           <!-- Nombre HP central (Krug : scannable, Fitts : cible la plus grande) -->
           <div class="text-center min-w-[120px]" aria-live="polite" aria-atomic="true">
@@ -118,12 +118,12 @@ onUnmounted(stopRepeat)
           <button
             type="button"
             :disabled="isFull"
-            class="min-h-14 min-w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright text-2xl font-bold flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none"
+            class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none"
             aria-label="Ajouter 1 point de vie"
             @pointerdown.prevent="startRepeat(() => heal(1))"
             @pointerup="stopRepeat"
             @pointerleave="stopRepeat"
-          >+</button>
+          ><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
         </div>
 
         <!-- Barre de progression HP -->
