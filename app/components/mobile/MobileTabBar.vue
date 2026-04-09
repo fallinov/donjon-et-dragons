@@ -47,11 +47,11 @@ const { activeTab, tabs, setTab } = useMobileTab()
               <path d="M17 6l-2.5 2.5" /><path d="M14 8l-1.5 1.5" />
               <path d="M7 18l2.5-2.5" /><path d="M3.5 14.5l.5-.5" />
             </template>
-            <!-- Combat : bouclier + épée -->
+            <!-- Combat : épée -->
             <template v-else-if="tab.icon === 'sword'">
-              <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="none" />
-              <line x1="12" y1="8" x2="12" y2="16" />
-              <line x1="9" y1="10" x2="15" y2="10" />
+              <path d="M14.5 3.5L20.5 9.5L18 12L15 9L12 12L9 15L6 12L9 9L12 6L14.5 3.5Z" />
+              <path d="M6 12L3.5 14.5L5.5 16.5L3 19L5 21L7.5 18.5L9.5 20.5L12 18" />
+              <line x1="9" y1="9" x2="6" y2="12" />
             </template>
             <!-- Sorts : étincelles -->
             <template v-else-if="tab.icon === 'sparkles'">
