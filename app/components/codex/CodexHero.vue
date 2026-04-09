@@ -140,7 +140,7 @@ onMounted(() => {
   /* Masque radial : opaque partout au départ */
   mask-image: radial-gradient(ellipse at center, black 0%, black 100%);
   -webkit-mask-image: radial-gradient(ellipse at center, black 0%, black 100%);
-  transition: mask-image 6s ease-in-out, -webkit-mask-image 6s ease-in-out, opacity 6s ease-in-out, filter 6s ease-in-out;
+  transition: mask-image 10s ease-in-out, -webkit-mask-image 10s ease-in-out, opacity 10s ease-in-out, filter 10s ease-in-out;
 }
 .fog-dissipate {
   opacity: 0;
