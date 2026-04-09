@@ -102,6 +102,8 @@ export const skamosAurum: Character = {
     ],
   },
 
+  darkvision: 18,
+
   languages: [
     { name: 'Commun' },
     { name: 'Infernal' },

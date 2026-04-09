@@ -92,6 +92,8 @@ export const darethBrumeval: Character = {
     ],
   },
 
+  darkvision: 18,
+
   languages: [
     { name: 'Commun' },
     { name: 'Elfique' },

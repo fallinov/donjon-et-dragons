@@ -92,6 +92,7 @@ export interface Character {
   personality: Personality
   attacks: Attack[]
   spellcasting?: SpellLevel
+  darkvision?: number
   languages: { name: string, rare?: boolean }[]
   rituals: Ritual[]
   colophon: string

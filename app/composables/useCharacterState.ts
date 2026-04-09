@@ -211,11 +211,29 @@ export function useCharacterState(character: Character) {
 }
 
 /**
- * Calcule la Sagesse passive (Perception) selon les règles D&D 5e.
+ * Calcule un sens passif selon les règles D&D 5e : 10 + mod carac + bonus maîtrise.
  */
+function computePassiveSkill(character: Character, skillName: string): number {
+  const skill = character.skills.find(s => s.name === skillName)
+  if (!skill) return 10
+  const abilityMap: Record<string, keyof typeof character.abilities> = {
+    For: 'strength', Dex: 'dexterity', Con: 'constitution',
+    Int: 'intelligence', Sag: 'wisdom', Cha: 'charisma',
+  }
+  const abilityKey = abilityMap[skill.ability] ?? 'wisdom'
+  const mod = character.abilities[abilityKey].modifier
+  const profBonus = skill.proficient ? character.proficiencyBonus : 0
+  return 10 + mod + profBonus
+}
+
 export function computePassivePerception(character: Character): number {
-  const wisModifier = character.abilities.wisdom.modifier
-  const perception = character.skills.find(s => s.name === 'Perception')
-  const profBonus = perception?.proficient ? character.proficiencyBonus : 0
-  return 10 + wisModifier + profBonus
+  return computePassiveSkill(character, 'Perception')
+}
+
+export function computePassiveInvestigation(character: Character): number {
+  return computePassiveSkill(character, 'Investigation')
+}
+
+export function computePassiveInsight(character: Character): number {
+  return computePassiveSkill(character, 'Perspicacité') || computePassiveSkill(character, 'Intuition')
 }

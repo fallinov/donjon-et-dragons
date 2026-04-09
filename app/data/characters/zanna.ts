@@ -103,6 +103,8 @@ export const zanna: Character = {
     ],
   },
 
+  darkvision: 18,
+
   languages: [
     { name: 'Commun' },
     { name: 'Gnome' },

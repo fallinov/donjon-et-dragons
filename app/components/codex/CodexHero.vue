@@ -35,19 +35,23 @@ defineProps<{ character: Character }>()
             <span>{{ character.alignment }}</span>
           </p>
 
-          <!-- Vitals : 3 cases glassmorphism -->
-          <dl class="mt-3 grid grid-cols-3 gap-2">
-            <div class="backdrop-blur-md border border-gold/40 px-2 py-2 text-center">
-              <dd class="font-display text-xl text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === "Classe d'armure")?.value }}</dd>
-              <dt class="font-display text-[10px] tracking-wider-3 text-gold/70 uppercase mt-1">Armure</dt>
+          <!-- Vitals : 4 cases glassmorphism -->
+          <dl class="mt-3 grid grid-cols-4 gap-1.5">
+            <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === "Classe d'armure")?.value }}</dd>
+              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">Armure</dt>
             </div>
-            <div class="backdrop-blur-md border border-gold/40 px-2 py-2 text-center">
-              <dd class="font-display text-xl text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Initiative')?.value }}</dd>
-              <dt class="font-display text-[10px] tracking-wider-3 text-gold/70 uppercase mt-1">Initiative</dt>
+            <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Initiative')?.value }}</dd>
+              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">Init.</dt>
             </div>
-            <div class="backdrop-blur-md border border-gold/40 px-2 py-2 text-center">
-              <dd class="font-display text-xl text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Vitesse')?.value }}<span class="text-xs text-parchment-mute">{{ character.vitals.find(v => v.label === 'Vitesse')?.unit }}</span></dd>
-              <dt class="font-display text-[10px] tracking-wider-3 text-gold/70 uppercase mt-1">Vitesse</dt>
+            <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
+              <dd class="font-display text-lg text-gold-bright tabular-nums leading-none">+{{ character.proficiencyBonus }}</dd>
+              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">Maîtr.</dt>
+            </div>
+            <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Vitesse')?.value }}<span class="text-[9px] text-parchment-mute">{{ character.vitals.find(v => v.label === 'Vitesse')?.unit }}</span></dd>
+              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">Vitesse</dt>
             </div>
           </dl>
         </div>

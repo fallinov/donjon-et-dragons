@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import type { Character } from '~~/shared/types/character'
-import { useCharacterState, computePassivePerception } from '~/composables/useCharacterState'
+import { useCharacterState, computePassivePerception, computePassiveInvestigation } from '~/composables/useCharacterState'
 
 const props = defineProps<{ character: Character }>()
 
@@ -20,6 +20,7 @@ const {
 } = useCharacterState(props.character)
 
 const passivePerception = computed(() => computePassivePerception(props.character))
+const passiveInvestigation = computed(() => computePassiveInvestigation(props.character))
 const hitDiceRemaining = computed(() => props.character.hitDice.total - state.value.hitDiceUsed)
 const isDown = computed(() => state.value.hpCurrent === 0)
 const hpPercent = computed(() => Math.min(100, (state.value.hpCurrent / props.character.maxHp) * 100))
@@ -231,16 +232,20 @@ onUnmounted(stopRepeat)
         </div>
       </div>
 
-      <!-- ═══ BLOC 3 — Stats passives (lecture seule) ═══ -->
+      <!-- ═══ BLOC 3 — Sens passifs (lecture seule) ═══ -->
       <div class="border border-gold/20 bg-charcoal/30 p-4 flex flex-col gap-3">
-        <p class="font-display text-sm tracking-wider-4 text-gold/50 uppercase">Passif</p>
-        <div>
-          <p class="text-xs text-parchment-mute uppercase tracking-wider-3">Maîtrise</p>
-          <p class="font-display text-xl text-parchment">{{ fmtBonus(character.proficiencyBonus) }}</p>
-        </div>
+        <p class="font-display text-sm tracking-wider-4 text-gold/50 uppercase">Sens</p>
         <div>
           <p class="text-xs text-parchment-mute uppercase tracking-wider-3">Perception</p>
           <p class="font-display text-xl text-parchment">{{ passivePerception }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-parchment-mute uppercase tracking-wider-3">Investigation</p>
+          <p class="font-display text-xl text-parchment">{{ passiveInvestigation }}</p>
+        </div>
+        <div v-if="character.darkvision">
+          <p class="text-xs text-parchment-mute uppercase tracking-wider-3">Vision nocturne</p>
+          <p class="font-display text-xl text-parchment">{{ character.darkvision }}<span class="text-xs text-parchment-mute ml-0.5">m</span></p>
         </div>
       </div>
 
