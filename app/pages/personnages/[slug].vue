@@ -35,8 +35,8 @@ const isDesktop = useIsDesktop()
       id="contenu"
       class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-3 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto pb-24 lg:pb-16"
     >
-      <!-- Breadcrumb (desktop + mobile) -->
-      <nav aria-label="Fil d'Ariane" class="no-print mb-2 lg:mb-6">
+      <!-- Breadcrumb (desktop uniquement, mobile = dans mini-header) -->
+      <nav v-if="isDesktop" aria-label="Fil d'Ariane" class="no-print mb-6">
         <NuxtLink
           to="/"
           class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
@@ -46,13 +46,15 @@ const isDesktop = useIsDesktop()
         </NuxtLink>
       </nav>
 
-      <!-- Hero (toujours visible) -->
-      <CodexHero :character="character" />
-
       <!-- ═══════════════════════════════════════════════════════ -->
-      <!-- MOBILE : navigation par onglets + swipe (< xl)         -->
+      <!-- MOBILE : carte plein écran sur Perso, mini-header sinon -->
       <!-- ═══════════════════════════════════════════════════════ -->
       <div v-if="!isDesktop">
+        <!-- Carte plein écran seulement sur l'onglet Perso -->
+        <CodexHero v-if="activeTab === 'perso'" :character="character" />
+        <!-- Mini-header sticky sur les autres onglets -->
+        <MobileMiniHeader v-else :character="character" />
+
         <MobileSwipeContainer>
           <!-- Onglet Combat -->
           <div v-if="activeTab === 'combat'" class="space-y-6">
@@ -103,9 +105,10 @@ const isDesktop = useIsDesktop()
       </div>
 
       <!-- ═══════════════════════════════════════════════════════ -->
-      <!-- DESKTOP : layout 3 colonnes classique (>= xl)          -->
+      <!-- DESKTOP : layout 3 colonnes classique (>= lg)           -->
       <!-- ═══════════════════════════════════════════════════════ -->
       <div v-if="isDesktop">
+        <CodexHero :character="character" />
         <CodexStatusBar :character="character" />
 
         <div class="print-body-grid grid grid-cols-[260px_1fr_1fr] gap-10 motion-safe:animate-rise">
