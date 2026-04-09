@@ -11,7 +11,7 @@ export const thunon: Character = {
   alignment: 'Chaotique bon',
 
   proficiencyBonus: 2,
-  maxHp: 26,
+  maxHp: 23,
   hitDice: { die: 6, total: 4 },
 
   portrait: {
@@ -20,7 +20,7 @@ export const thunon: Character = {
   },
 
   vitals: [
-    { label: 'Points de vie', value: '26', unit: '/ 26' },
+    { label: 'Points de vie', value: '23', unit: '/ 23' },
     { label: "Classe d'armure", value: '13' },
     { label: 'Initiative', value: '+3' },
     { label: 'Vitesse', value: '9', unit: 'm' },
@@ -60,6 +60,14 @@ export const thunon: Character = {
       description: "Lors d'un repos court, récupère des emplacements de sorts dont le total ne dépasse pas la moitié du niveau (2 niveaux max).",
     },
     {
+      title: 'Évocation · Façonnage de sorts',
+      description: "Quand un sort d'évocation affecte des alliés, peut choisir 1 + niveau du sort créatures qui réussissent automatiquement leur sauvegarde et ne subissent aucun dégât.",
+    },
+    {
+      title: 'Évocation · Savant',
+      description: "Le temps et l'or nécessaires pour copier un sort d'évocation dans le grimoire sont divisés par deux.",
+    },
+    {
       title: 'Maîtrise · Alchimie',
       description: "Maîtrise du matériel d'alchimiste. Peut identifier des potions et créer des substances alchimiques.",
     },
@@ -70,13 +78,13 @@ export const thunon: Character = {
     ideal: "La beauté se cache dans tout ce qui existe.",
     idealLabel: 'Beauté',
     bond: "Je préserve une bibliothèque à laquelle je tiens plus qu'à ma vie.",
-    flaw: "Je colore sans cesse mes propos — le goût des tons vermeils teinte chacun de mes mots.",
+    flaw: "Je parle sans vraiment penser mes mots.",
   },
 
   attacks: [
     { name: 'Trait de feu',      note: 'sort, 36 m',          attackBonus: '1d20+6', damage: '1d10',  damageType: 'feu'   },
+    { name: 'Aspersion acide',   note: 'sort, 18 m, DD 14',   attackBonus: 'DD 14',  damage: '1d6',   damageType: 'acide' },
     { name: 'Bâton',             note: 'versatile (1d8)',      attackBonus: '1d20+2', damage: '1d6',   damageType: 'cont.' },
-    { name: 'Arbalète légère',   note: '24 m / 96 m',         attackBonus: '1d20+5', damage: '1d8+3', damageType: 'perf.' },
   ],
 
   spellcasting: {
@@ -84,16 +92,18 @@ export const thunon: Character = {
     slots: 3,
     saveDc: 14,
     spells: [
-      { title: 'Trait de feu',        description: "Sort mineur. 1d10 dégâts de feu à 36 m. L'attaque de prédilection du magicien." },
-      { title: 'Lumière',             description: 'Sort mineur. Illumine un objet pendant 1 heure. Pas de concentration.' },
-      { title: 'Main du mage',        description: 'Sort mineur. Crée une main spectrale capable de manipuler des objets à 9 m.' },
-      { title: 'Prestidigitation',    description: 'Sort mineur. Effets magiques mineurs : allumer une flamme, nettoyer, colorer, etc.' },
-      { title: 'Projectile magique',  description: 'Niv. 1. 3 projectiles de 1d4+1 force. Touche automatique, pas de jet.' },
-      { title: 'Bouclier',            description: 'Niv. 1, réaction. +5 CA jusqu\'au prochain tour, y compris contre l\'attaque déclencheuse.' },
-      { title: 'Armure du mage',      description: 'Niv. 1, 8 heures. CA = 13 + DEX (+3) = 16. Pas de concentration.' },
-      { title: 'Détection de la magie', description: 'Niv. 1, rituel, concentration. Détecte la magie dans un rayon de 9 m pendant 10 min.' },
-      { title: "Toile d'araignée",    description: 'Niv. 2, concentration. Zone de 6 m de toiles. DD 14 DEX ou entravé. Inflammable.' },
-      { title: 'Invisibilité',        description: 'Niv. 2, concentration. La cible touchée devient invisible jusqu\'à ce qu\'elle attaque ou lance un sort.' },
+      { title: 'Lumière',              description: 'Sort mineur. Illumine un objet pendant 1 heure. Pas de concentration.' },
+      { title: 'Trait de feu',         description: "Sort mineur. 1d10 dégâts de feu à 36 m. L'attaque de prédilection du magicien." },
+      { title: 'Aspersion acide',      description: 'Sort mineur. 1d6 dégâts acide, DD 14 DEX, peut cibler 2 créatures adjacentes à 18 m.' },
+      { title: 'Armure du mage',       description: 'Niv. 1, 8 heures. CA = 13 + DEX (+3) = 16. Pas de concentration.' },
+      { title: 'Bouclier',             description: 'Niv. 1, réaction. +5 CA jusqu\'au prochain tour, y compris contre l\'attaque déclencheuse.' },
+      { title: 'Projectile magique',   description: 'Niv. 1, évocation. 3 projectiles de 1d4+1 force. Touche automatique, pas de jet.' },
+      { title: 'Rayon empoisonné',     description: 'Niv. 1. 1d20+6 au toucher, 2d8 poison. DD 14 CON ou empoisonné jusqu\'à la fin du prochain tour.' },
+      { title: 'Vague tonnante',       description: 'Niv. 1, évocation. Créatures dans un cube de 4,5 m : DD 14 CON ou 2d8 tonnerre + repoussées de 3 m.' },
+      { title: 'Sphère enflammée',     description: 'Niv. 2, évocation, concentration. Sphère de feu de 1,5 m : 2d6 feu, DD 14 DEX. Déplaçable en action bonus.' },
+      { title: 'Flèche acide de Melf', description: 'Niv. 2, évocation. 1d20+6, 4d4 acide immédiat + 2d4 acide à la fin du tour suivant.' },
+      { title: 'Immobilisation de personne', description: 'Niv. 2, concentration. DD 14 SAG ou paralysé. La cible retente à chaque tour.' },
+      { title: 'Boule de feu',         description: 'Niv. 3, évocation. Rayon de 6 m, DD 14 DEX : 8d6 feu. Disponible au niveau 5.' },
     ],
   },
 
@@ -124,13 +134,14 @@ export const thunon: Character = {
     },
     {
       number: 'Rite III',
-      title: 'La toile et la flamme',
+      title: "L'embrasement",
       steps: [
-        { text: 'Tour 1 · ', emphasis: "Toile d'araignée (niv. 2)" },
-        { text: 'Tour 2 · ', emphasis: 'Trait de feu (avantage sur cible entravée)' },
+        { text: 'Action · ', emphasis: 'Sphère enflammée (niv. 2)' },
+        { text: 'Action bonus · déplacer la sphère sur une cible' },
+        { text: 'Tours suivants · trait de feu + déplacement sphère' },
       ],
-      formulas: ['DD 14 DEX ⟶ entravé', '1d20 + 6 (avantage) ⟶ 1d10 feu'],
-      footnote: "La toile est inflammable — le feu s'y propage.",
+      formulas: ['DD 14 DEX ⟶ 2d6 feu (sphère)', '1d20 + 6 ⟶ 1d10 feu (trait)'],
+      footnote: 'Façonnage de sorts protège les alliés dans la zone.',
     },
   ],
 

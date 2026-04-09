@@ -2,6 +2,11 @@
 import { useMobileTab } from '~/composables/useMobileTab'
 
 const { activeTab, tabs, setTab } = useMobileTab()
+
+function selectTab(id: string): void {
+  setTab(id as import('~/composables/useMobileTab').TabId)
+  window.scrollTo({ top: 0, behavior: 'instant' })
+}
 </script>
 
 <template>
@@ -16,7 +21,7 @@ const { activeTab, tabs, setTab } = useMobileTab()
           :aria-current="activeTab === tab.id ? 'page' : undefined"
           class="w-full flex flex-col items-center gap-0.5 py-2 transition-colors relative !outline-none"
           :class="activeTab === tab.id ? 'text-gold-bright' : 'text-parchment-mute hover:text-parchment'"
-          @click="setTab(tab.id)"
+          @click="selectTab(tab.id)"
         >
           <!-- Indicateur actif -->
           <span
