@@ -138,20 +138,10 @@ onUnmounted(stopRepeat)
         @plus="restoreHitDie"
       />
 
-      <!-- Sens + Repos sur une ligne -->
-      <div class="flex gap-3">
-        <div class="flex-1 border border-gold/20 bg-charcoal/30 p-3 flex flex-col gap-2">
-          <p class="font-display text-xs tracking-wider-4 text-gold/50 uppercase">Sens</p>
-          <div class="flex gap-4">
-            <div><p class="text-[10px] text-parchment-mute uppercase">Percep.</p><p class="font-display text-lg text-parchment">{{ passivePerception }}</p></div>
-            <div><p class="text-[10px] text-parchment-mute uppercase">Invest.</p><p class="font-display text-lg text-parchment">{{ passiveInvestigation }}</p></div>
-            <div v-if="character.darkvision"><p class="text-[10px] text-parchment-mute uppercase">Nuit</p><p class="font-display text-lg text-parchment">{{ character.darkvision }}<span class="text-xs">m</span></p></div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-2 shrink-0">
-          <button type="button" class="min-h-11 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright font-display text-sm tracking-wider-2 uppercase px-4 py-2 transition-colors" @click="doShortRest">Court</button>
-          <button type="button" class="min-h-11 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase px-4 py-2 transition-colors" @click="doLongRest">Long</button>
-        </div>
+      <!-- Repos court / long : 2 boutons pleine largeur -->
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" class="min-h-12 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doShortRest">Repos court</button>
+        <button type="button" class="min-h-12 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doLongRest">Repos long</button>
       </div>
     </div>
 

@@ -26,7 +26,7 @@ defineProps<{ character: Character }>()
           class="absolute inset-0 w-full h-full object-cover object-top"
         />
         <!-- Gradient bas : noir vers transparent -->
-        <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/60 to-transparent" />
+        <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/50 via-40% to-transparent to-75%" />
 
         <!-- Texte superposé en bas de la carte -->
         <div class="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-4 sm:px-5 sm:pb-5 sm:pt-6">

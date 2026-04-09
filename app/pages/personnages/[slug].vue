@@ -2,6 +2,7 @@
 import { getCharacter } from '~/data/characters'
 import { useMobileTab } from '~/composables/useMobileTab'
 import { useIsDesktop } from '~/composables/useIsDesktop'
+import { computePassivePerception, computePassiveInvestigation } from '~/composables/useCharacterState'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
@@ -59,13 +60,20 @@ setTab('profil')
         <MobileMiniHeader v-else :character="character" />
 
         <MobileSwipeContainer>
-          <!-- Onglet Profil (ex Perso + Traits) -->
+          <!-- Onglet Profil (Capacités + Langues + Sens + Personnalité) -->
           <div v-if="activeTab === 'profil'" class="space-y-6">
             <CodexSection id="dons-title-m" title="Capacités et traits">
               <CodexFeatureList :features="character.features" />
             </CodexSection>
             <CodexSection id="langues-title-m" title="Langues">
               <CodexLanguages :languages="character.languages" />
+            </CodexSection>
+            <CodexSection id="sens-title-m" title="Sens passifs">
+              <dl class="flex flex-wrap gap-6">
+                <div><dt class="text-xs text-parchment-mute uppercase tracking-wider-3">Perception</dt><dd class="font-display text-xl text-parchment">{{ computePassivePerception(character) }}</dd></div>
+                <div><dt class="text-xs text-parchment-mute uppercase tracking-wider-3">Investigation</dt><dd class="font-display text-xl text-parchment">{{ computePassiveInvestigation(character) }}</dd></div>
+                <div v-if="character.darkvision"><dt class="text-xs text-parchment-mute uppercase tracking-wider-3">Vision nocturne</dt><dd class="font-display text-xl text-parchment">{{ character.darkvision }}<span class="text-xs text-parchment-mute ml-0.5">m</span></dd></div>
+              </dl>
             </CodexSection>
             <CodexSection id="perso-title-m" title="Personnalité">
               <CodexPersonality :personality="character.personality" />
