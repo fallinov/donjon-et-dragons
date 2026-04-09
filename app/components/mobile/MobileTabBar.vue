@@ -39,14 +39,7 @@ const { activeTab, tabs, setTab } = useMobileTab()
               <path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4" />
               <path d="M19 17V5a2 2 0 0 0-2-2H4" />
             </template>
-            <!-- Traits : ADN -->
-            <template v-else-if="tab.icon === 'dna'">
-              <path d="M2 15c6.667-6 13.333 0 20-6" />
-              <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993" />
-              <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993" />
-              <path d="M17 6l-2.5 2.5" /><path d="M14 8l-1.5 1.5" />
-              <path d="M7 18l2.5-2.5" /><path d="M3.5 14.5l.5-.5" />
-            </template>
+            <!-- (supprimé : onglet Traits fusionné dans Profil) -->
             <!-- Combat : épée -->
             <template v-else-if="tab.icon === 'sword'">
               <path d="M14.5 3.5L20.5 9.5L18 12L15 9L12 12L9 15L6 12L9 9L12 6L14.5 3.5Z" />

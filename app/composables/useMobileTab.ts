@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-export type TabId = 'perso' | 'traits' | 'combat' | 'sorts' | 'stats'
+export type TabId = 'profil' | 'combat' | 'sorts' | 'stats'
 
 export interface Tab {
   id: TabId
@@ -9,15 +9,14 @@ export interface Tab {
 }
 
 const TABS_RIGHT: Tab[] = [
-  { id: 'perso', label: 'Perso', icon: 'scroll' },
-  { id: 'traits', label: 'Traits', icon: 'dna' },
+  { id: 'profil', label: 'Profil', icon: 'scroll' },
   { id: 'combat', label: 'Combat', icon: 'sword' },
   { id: 'sorts', label: 'Sorts', icon: 'sparkles' },
   { id: 'stats', label: 'Stats', icon: 'chart' },
 ]
 
 export function useMobileTab() {
-  const activeTab = useState<TabId>('mobile-tab', () => 'perso')
+  const activeTab = useState<TabId>('mobile-tab', () => 'profil')
   const leftHanded = useState<boolean>('left-handed', () => false)
 
   // Charge la préférence depuis localStorage côté client

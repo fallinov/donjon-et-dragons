@@ -26,8 +26,8 @@ useSeoMeta({
 const { activeTab, setTab } = useMobileTab()
 const isDesktop = useIsDesktop()
 
-// Reset à l'onglet Perso à chaque ouverture de fiche
-setTab('perso')
+// Reset à l'onglet Profil à chaque ouverture de fiche
+setTab('profil')
 </script>
 
 <template>
@@ -53,18 +53,36 @@ setTab('perso')
       <!-- MOBILE : carte plein écran sur Perso, mini-header sinon -->
       <!-- ═══════════════════════════════════════════════════════ -->
       <div v-if="!isDesktop">
-        <!-- Carte plein écran seulement sur l'onglet Perso -->
-        <CodexHero v-if="activeTab === 'perso'" :character="character" />
+        <!-- Carte plein écran seulement sur l'onglet Profil -->
+        <CodexHero v-if="activeTab === 'profil'" :character="character" />
         <!-- Mini-header sticky sur les autres onglets -->
         <MobileMiniHeader v-else :character="character" />
 
         <MobileSwipeContainer>
-          <!-- Onglet Combat -->
+          <!-- Onglet Profil (ex Perso + Traits) -->
+          <div v-if="activeTab === 'profil'" class="space-y-6">
+            <CodexSection id="dons-title-m" title="Capacités et traits">
+              <CodexFeatureList :features="character.features" />
+            </CodexSection>
+            <CodexSection id="langues-title-m" title="Langues">
+              <CodexLanguages :languages="character.languages" />
+            </CodexSection>
+            <CodexSection id="perso-title-m" title="Personnalité">
+              <CodexPersonality :personality="character.personality" />
+            </CodexSection>
+            <footer class="pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
+              <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>
+              <p>{{ character.colophon }}</p>
+            </footer>
+          </div>
+
+          <!-- Onglet Combat (+ Rites) -->
           <div v-if="activeTab === 'combat'" class="space-y-6">
             <CodexStatusBar :character="character" />
             <CodexSection id="arsenal-title-m" title="Attaques et incantations">
               <CodexAttacks :attacks="character.attacks" />
             </CodexSection>
+            <CodexRituals :rituals="character.rituals" />
           </div>
 
           <!-- Onglet Sorts -->
@@ -81,28 +99,6 @@ setTab('perso')
             <CodexSection id="arts-title-m" title="Compétences">
               <CodexSkillList :skills="character.skills" />
             </CodexSection>
-          </div>
-
-          <!-- Onglet Traits -->
-          <div v-if="activeTab === 'traits'" class="space-y-6">
-            <CodexSection id="dons-title-m" title="Capacités et traits">
-              <CodexFeatureList :features="character.features" />
-            </CodexSection>
-            <CodexSection id="langues-title-m" title="Langues">
-              <CodexLanguages :languages="character.languages" />
-            </CodexSection>
-          </div>
-
-          <!-- Onglet Perso -->
-          <div v-if="activeTab === 'perso'" class="space-y-6">
-            <CodexSection id="perso-title-m" title="Personnalité">
-              <CodexPersonality :personality="character.personality" />
-            </CodexSection>
-            <CodexRituals :rituals="character.rituals" />
-            <footer class="pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
-              <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>
-              <p>{{ character.colophon }}</p>
-            </footer>
           </div>
         </MobileSwipeContainer>
       </div>
