@@ -10,7 +10,7 @@ defineProps<{ character: Character }>()
     <!-- ═══ MOBILE : carte de jeu pleine largeur ═══ -->
     <div class="xl:hidden">
       <!-- Photo arrière-plan avec gradient -->
-      <div class="relative w-full aspect-[3/4] sm:aspect-[16/9] overflow-hidden -mx-4 sm:-mx-8 lg:-mx-10 w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] lg:w-[calc(100%+5rem)]">
+      <div class="relative aspect-[3/4] sm:aspect-[16/9] overflow-hidden w-screen -ml-4 sm:-ml-8 lg:-ml-10">
         <NuxtImg
           :src="character.portrait.src"
           :alt="character.portrait.alt"
