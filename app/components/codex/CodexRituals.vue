@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { Ritual } from '~~/shared/types/character'
 
 const props = withDefaults(defineProps<{
   rituals: Ritual[]
+  /** Rappel affiché sous les rites. */
+  note?: string
   /** Affiche chaque rite en accordéon (mobile). Tous fermés au départ, plusieurs ouverts possibles. */
   collapsible?: boolean
 }>(), { collapsible: false })
+
+const COUNT_WORDS: Record<number, string> = { 1: 'une', 2: 'deux', 3: 'trois', 4: 'quatre', 5: 'cinq', 6: 'six' }
+
+const subtitle = computed(() => {
+  const n = props.rituals.length
+  const word = COUNT_WORDS[n] ?? String(n)
+  return `— ${word} séquence${n > 1 ? 's' : ''} à graver dans la mémoire du bras —`
+})
 
 const openRituals = ref<Set<string>>(new Set())
 
@@ -33,7 +43,7 @@ function panelId(index: number): string {
   >
     <header class="text-center mb-8">
       <h2 id="rites-title" class="font-display text-xl sm:text-2xl tracking-wider-3 text-gold-bright uppercase">Rites de combat</h2>
-      <p class="mt-2 text-parchment-dim italic text-sm">— trois séquences à graver dans la mémoire du bras —</p>
+      <p class="mt-2 text-parchment-dim italic text-sm">{{ subtitle }}</p>
     </header>
 
     <div
@@ -100,5 +110,13 @@ function panelId(index: number): string {
         </div>
       </article>
     </div>
+
+    <p
+      v-if="note"
+      class="mt-6 border border-ember/40 bg-blood/20 px-4 py-3 text-sm text-parchment italic"
+      data-rituals-note
+    >
+      <span class="not-italic font-display text-xs tracking-wider-3 text-ember-bright uppercase mr-2">Attention</span>{{ note }}
+    </p>
   </section>
 </template>

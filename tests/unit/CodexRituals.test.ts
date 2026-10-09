@@ -54,3 +54,19 @@ describe('CodexRituals — accordéon (mobile)', () => {
     wrapper.unmount()
   })
 })
+
+describe('CodexRituals — sous-titre et note', () => {
+  it('compte les séquences en toutes lettres', () => {
+    const wrapper = mount(CodexRituals, { props: { rituals } })
+    expect(wrapper.text()).toContain('cinq séquences')
+    const one = mount(CodexRituals, { props: { rituals: rituals.slice(0, 1) } })
+    expect(one.text()).toContain('une séquence à graver')
+  })
+
+  it('affiche la note seulement si elle existe', () => {
+    const without = mount(CodexRituals, { props: { rituals } })
+    expect(without.find('[data-rituals-note]').exists()).toBe(false)
+    const withNote = mount(CodexRituals, { props: { rituals, note: 'Un seul sort de concentration.' } })
+    expect(withNote.find('[data-rituals-note]').text()).toContain('Un seul sort de concentration.')
+  })
+})

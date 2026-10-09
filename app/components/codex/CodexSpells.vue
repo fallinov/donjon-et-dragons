@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { Character, Spell, SpellSlotLevel } from '~~/shared/types/character'
 import { useCharacterState } from '~/composables/useCharacterState'
+import CodexSpellInfo from '~/components/codex/CodexSpellInfo.vue'
 
 const props = defineProps<{ character: Character }>()
 const sc = computed(() => props.character.spellcasting!)
@@ -100,10 +101,7 @@ function costLabel(spell: Spell): string {
       <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">Sorts mineurs</p>
       <ul class="space-y-2">
         <li v-for="spell in cantrips" :key="spell.title" class="flex items-start justify-between gap-3 py-2 border-b border-gold/5 last:border-0">
-          <div class="flex-1 min-w-0">
-            <strong class="block font-display text-xs tracking-wider-3 text-gold-bright uppercase">{{ spell.title }}</strong>
-            <span class="text-parchment-dim text-sm leading-snug">{{ spell.description }}</span>
-          </div>
+          <CodexSpellInfo :spell="spell" />
           <span class="shrink-0 text-xs text-parchment-mute/50 font-display mt-0.5">∞</span>
         </li>
       </ul>
@@ -114,10 +112,7 @@ function costLabel(spell: Spell): string {
       <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">Sorts de niveau {{ slotLevel.level }}</p>
       <ul class="space-y-1">
         <li v-for="spell in spellsByLevel(slotLevel.level)" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
-          <div class="flex-1 min-w-0">
-            <strong class="block font-display text-xs tracking-wider-3 text-gold-bright uppercase">{{ spell.title }}</strong>
-            <span class="text-parchment-dim text-sm leading-snug">{{ spell.description }}</span>
-          </div>
+          <CodexSpellInfo :spell="spell" />
           <button
             type="button"
             :disabled="!canCast(spell)"
@@ -133,11 +128,11 @@ function costLabel(spell: Spell): string {
       <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">Sorts spéciaux</p>
       <ul class="space-y-1">
         <li v-for="spell in dailySpells" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
-          <div class="flex-1 min-w-0">
-            <strong class="block font-display text-xs tracking-wider-3 text-gold-bright uppercase">{{ spell.title }}</strong>
-            <span class="text-parchment-dim text-sm leading-snug">{{ spell.description }}</span>
-            <span class="text-xs text-parchment-mute ml-1">({{ costLabel(spell) }})</span>
-          </div>
+          <CodexSpellInfo :spell="spell">
+            <template #suffix>
+              <span class="text-xs text-parchment-mute ml-1">({{ costLabel(spell) }})</span>
+            </template>
+          </CodexSpellInfo>
           <button
             type="button"
             :disabled="!canCast(spell)"
