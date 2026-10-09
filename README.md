@@ -23,7 +23,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par slug
-- **Tests** : Vitest (unit, 25 tests) + Playwright (e2e, 18 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 33 tests) + Playwright (e2e, 18 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -35,6 +35,8 @@ donjon-et-dragons/
 │   ├── assets/css/main.css          # @theme Tailwind + @font-face + print A4 paysage
 │   ├── composables/
 │   │   └── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
+│   ├── utils/
+│   │   └── swipe.ts                 # logique pure du swipe mobile (verrouillage d'axe)
 │   ├── components/
 │   │   ├── PrintButton.vue
 │   │   └── codex/
@@ -92,7 +94,7 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 25 tests (composable d'état, dataset, composants)
+pnpm test             # Vitest (unit) — 33 tests (composable d'état, dataset, composants, logique de swipe)
 pnpm test:watch       # Vitest en mode watch
 pnpm test:e2e         # Playwright e2e — 18 tests (chromium desktop + mobile safari)
 ```
