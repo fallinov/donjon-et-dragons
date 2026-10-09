@@ -24,6 +24,8 @@ export interface Vital {
 export interface Trait {
   title: string
   description: string
+  /** Avantages concrets en jeu, affichés en liste sous la description. */
+  benefits?: string[]
 }
 
 export type SpellCost = 'cantrip' | 'slot' | 'daily'

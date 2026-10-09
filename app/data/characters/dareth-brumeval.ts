@@ -51,11 +51,24 @@ export const darethBrumeval: Character = {
   features: [
     {
       title: 'Ennemis jurés · Dragons, morts-vivants',
-      description: 'Avantage pour pister, connaître et démasquer les dragons et les morts-vivants. Draconique parlé comme langue maternelle, Infernal appris.',
+      description: 'Dareth a juré la perte des dragons et des morts-vivants.',
+      benefits: [
+        'Avantage aux jets de Sagesse (Survie) pour les pister.',
+        "Avantage aux jets d'Intelligence pour se souvenir d'informations à leur sujet.",
+        'Langues apprises : Draconique et Infernal.',
+      ],
     },
     {
       title: 'Explorateur né · Forêt, Outreterre',
-      description: "Sous les frondaisons comme dans les profondeurs, rien ne l'égare : maîtrise doublée en Intelligence et Sagesse liées au terrain, et le groupe n'est pas ralenti par le terrain difficile.",
+      description: "Sous les frondaisons comme dans les profondeurs, rien ne l'égare. Bonus de maîtrise doublé aux jets d'Intelligence et de Sagesse liés à ces terrains, s'il maîtrise la compétence. En voyage d'une heure ou plus sur ces terrains :",
+      benefits: [
+        'Le terrain difficile ne ralentit pas le groupe.',
+        'Le groupe ne peut pas se perdre, sauf par magie.',
+        "Il reste attentif au danger même en naviguant, pistant ou cherchant de la nourriture.",
+        'Seul, il voyage discrètement à allure normale.',
+        'En cherchant de la nourriture, il en trouve deux fois plus.',
+        'En pistant, il connaît le nombre exact, la taille et le délai de passage des créatures.',
+      ],
     },
     {
       title: 'Combat à deux armes',

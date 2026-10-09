@@ -42,6 +42,10 @@ describe('characters dataset', () => {
     expect(dareth.attacks.every(a => a.attackBonus === '1d20+7')).toBe(true)
     expect(dareth.rituals).toHaveLength(5)
     expect(dareth.languages.map(l => l.name)).toContain('Infernal')
+    const enemy = dareth.features.find(f => f.title.startsWith('Ennemis jurés'))!
+    const terrain = dareth.features.find(f => f.title.startsWith('Explorateur né'))!
+    expect(enemy.benefits).toHaveLength(3)
+    expect(terrain.benefits).toHaveLength(6)
     expect(dareth.ritualsNote).toContain('concentration')
     const concentrationSpells = dareth.spellcasting!.spells.filter(sp => sp.concentration).map(sp => sp.title)
     expect(concentrationSpells).toEqual(['Marque du chasseur', 'Passage sans trace', "Croissance d'épines"])
