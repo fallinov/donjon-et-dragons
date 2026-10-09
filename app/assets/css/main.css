@@ -49,6 +49,8 @@
 
 /* ── Fond + grain ────────────────────────────────────── */
 html, body { background: var(--color-obsidian); }
+/* Désactive le zoom au double tap (le pinch-zoom reste possible pour l'accessibilité) */
+html { touch-action: manipulation; }
 body {
   background-image:
     radial-gradient(ellipse 80% 50% at 30% 0%, rgba(194, 59, 26, 0.10), transparent 60%),
