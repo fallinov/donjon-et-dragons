@@ -30,17 +30,18 @@ describe('characters dataset', () => {
     expect(dareth.abilities.strength.proficient).toBe(false)
   })
 
-  it('Dareth est rôdeur niveau 5 avec les valeurs recalculées', () => {
+  it('Dareth est rôdeur niveau 6 avec les valeurs recalculées', () => {
     const dareth = getCharacter('dareth-brumeval')!
-    expect(dareth.level).toBe(5)
+    expect(dareth.level).toBe(6)
     expect(dareth.proficiencyBonus).toBe(3)
-    expect(dareth.maxHp).toBe(41)
-    expect(dareth.hitDice.total).toBe(5)
+    expect(dareth.maxHp).toBe(49)
+    expect(dareth.hitDice.total).toBe(6)
     expect(dareth.spellcasting?.saveDc).toBe(13)
     expect(dareth.spellcasting?.slotLevels).toEqual([{ level: 1, slots: 4 }, { level: 2, slots: 2 }])
     expect(dareth.spellcasting?.spells).toHaveLength(4)
     expect(dareth.attacks.every(a => a.attackBonus === '1d20+7')).toBe(true)
     expect(dareth.rituals).toHaveLength(5)
+    expect(dareth.languages.map(l => l.name)).toContain('Infernal')
     expect(dareth.ritualsNote).toContain('concentration')
     const concentrationSpells = dareth.spellcasting!.spells.filter(sp => sp.concentration).map(sp => sp.title)
     expect(concentrationSpells).toEqual(['Marque du chasseur', 'Passage sans trace', "Croissance d'épines"])

@@ -8,13 +8,13 @@ export const darethBrumeval: Character = {
   eyebrow: 'Codex du Chasseur',
   race: 'Demi-elfe',
   className: 'Rôdeur',
-  level: 5,
+  level: 6,
   background: 'Sauvageon',
   alignment: 'Chaotique neutre',
 
   proficiencyBonus: 3,
-  maxHp: 41,
-  hitDice: { die: 10, total: 5 },
+  maxHp: 49,
+  hitDice: { die: 10, total: 6 },
 
   portrait: {
     src: '/img/dareth-brumeval.png',
@@ -22,7 +22,7 @@ export const darethBrumeval: Character = {
   },
 
   vitals: [
-    { label: 'Points de vie', value: '41', unit: '/ 41' },
+    { label: 'Points de vie', value: '49', unit: '/ 49' },
     { label: "Classe d'armure", value: '15' },
     { label: 'Initiative', value: '+4' },
     { label: 'Vitesse', value: '9', unit: 'm' },
@@ -50,12 +50,12 @@ export const darethBrumeval: Character = {
 
   features: [
     {
-      title: 'Ennemi juré · Dragons',
-      description: 'Avantage pour pister, connaître et démasquer les dragons. Draconique parlé comme langue maternelle.',
+      title: 'Ennemis jurés · Dragons, morts-vivants',
+      description: 'Avantage pour pister, connaître et démasquer les dragons et les morts-vivants. Draconique parlé comme langue maternelle, Infernal appris.',
     },
     {
-      title: 'Explorateur né',
-      description: "Les terres sauvages ne l'égarent jamais ; il trouve pitance et chemin là où d'autres périssent.",
+      title: 'Explorateur né · Forêt, Outreterre',
+      description: "Sous les frondaisons comme dans les profondeurs, rien ne l'égare : maîtrise doublée en Intelligence et Sagesse liées au terrain, et le groupe n'est pas ralenti par le terrain difficile.",
     },
     {
       title: 'Combat à deux armes',
@@ -145,6 +145,7 @@ export const darethBrumeval: Character = {
     { name: 'Gobelin' },
     { name: 'Sylvestre' },
     { name: 'Draconique', rare: true },
+    { name: 'Infernal', rare: true },
   ],
 
   rituals: [
