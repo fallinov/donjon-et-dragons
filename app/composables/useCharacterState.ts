@@ -50,6 +50,19 @@ function isValidState(value: unknown): value is CharacterState {
   )
 }
 
+/**
+ * Aligne un état sauvegardé sur la fiche actuelle. Après une montée de niveau,
+ * le nombre de niveaux d'emplacements peut changer : on complète avec 0 et on
+ * borne chaque compteur au nouveau maximum.
+ */
+export function normalizeState(character: Character, saved: CharacterState): CharacterState {
+  const levels = character.spellcasting?.slotLevels ?? []
+  return {
+    ...saved,
+    spellSlotsUsed: levels.map((sl, i) => Math.min(saved.spellSlotsUsed[i] ?? 0, sl.slots)),
+  }
+}
+
 function loadState(character: Character): CharacterState {
   if (typeof window === 'undefined') return defaultState(character)
   try {
@@ -57,7 +70,7 @@ function loadState(character: Character): CharacterState {
     if (!raw) return defaultState(character)
     const parsed: unknown = JSON.parse(raw)
     if (!isValidState(parsed)) return defaultState(character)
-    return parsed
+    return normalizeState(character, parsed)
   }
   catch {
     return defaultState(character)

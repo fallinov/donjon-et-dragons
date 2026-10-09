@@ -31,17 +31,18 @@ test.describe('Codex Donjon et Dragons', () => {
     // Sur mobile, naviguer vers l'onglet Sorts
     const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
     if (await sortsTab.isVisible()) { await sortsTab.dispatchEvent('click'); await page.waitForTimeout(500) }
-    await expect(page.locator('#slots-count-1')).toHaveText('3 / 3')
+    await expect(page.locator('#slots-count-1')).toHaveText('4 / 4')
 
     // Cliquer "Lancer" sur le premier sort
     const launchBtn = page.getByRole('button', { name: /Lancer/i }).first()
     await launchBtn.dispatchEvent('click')
-    await expect(page.locator('#slots-count-1')).toHaveText('2 / 3')
+    await expect(page.locator('#slots-count-1')).toHaveText('3 / 4')
 
-    // Lancer encore 2 fois → 0/3 → boutons désactivés
+    // Lancer encore 3 fois → 0/4 → boutons désactivés
+    await launchBtn.dispatchEvent('click')
     await launchBtn.dispatchEvent('click')
     await page.getByRole('button', { name: /Lancer/i }).first().dispatchEvent('click')
-    await expect(page.locator('#slots-count-1')).toHaveText('0 / 3')
+    await expect(page.locator('#slots-count-1')).toHaveText('0 / 4')
   })
 
   test('skip link cible le contenu principal', async ({ page }) => {
@@ -67,21 +68,21 @@ test.describe('Codex Donjon et Dragons', () => {
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
-    // HP initial = 33
-    await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
+    // HP initial = 41
+    await expect(page.getByText('41', { exact: false }).first()).toBeVisible()
 
     // Cliquer 3× sur le bouton − (retirer 3 HP)
     const minusBtn = page.getByRole('button', { name: /Diminuer points de vie/i })
     await minusBtn.click()
     await minusBtn.click()
     await minusBtn.click()
-    await expect(page.getByText('30', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('38', { exact: false }).first()).toBeVisible()
 
     // Cliquer 2× sur le bouton + (ajouter 2 HP)
     const plusBtn = page.getByRole('button', { name: /Augmenter points de vie/i })
     await plusBtn.click()
     await plusBtn.click()
-    await expect(page.getByText('32', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('40', { exact: false }).first()).toBeVisible()
   })
 
   test('Inspiration +/−', async ({ page }) => {
@@ -107,12 +108,12 @@ test.describe('Codex Donjon et Dragons', () => {
     // Retirer 5 HP
     const minusBtn = page.getByRole('button', { name: /Diminuer points de vie/i })
     for (let i = 0; i < 5; i++) await minusBtn.click()
-    await expect(page.getByText('28', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('36', { exact: false }).first()).toBeVisible()
 
     // Repos long (confirm dialog)
     page.on('dialog', dialog => dialog.accept())
     await page.getByRole('button', { name: 'Repos long' }).first().click()
-    await expect(page.getByText('33', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('41', { exact: false }).first()).toBeVisible()
   })
 
   test('Jets de sauvegarde contre la mort apparaissent quand HP = 0', async ({ page }) => {

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useCharacterState, computePassivePerception } from '~/composables/useCharacterState'
+import { useCharacterState, computePassivePerception, normalizeState } from '~/composables/useCharacterState'
 import { darethBrumeval } from '~/data/characters/dareth-brumeval'
 import { zanna } from '~/data/characters/zanna'
 
 describe('computePassivePerception', () => {
-  it('calcule 14 pour Dareth (sag +2, Perception maîtrise, bonus +2)', () => {
-    expect(computePassivePerception(darethBrumeval)).toBe(14)
+  it('calcule 15 pour Dareth (sag +2, Perception maîtrise, bonus +3)', () => {
+    expect(computePassivePerception(darethBrumeval)).toBe(15)
   })
 
   it('calcule 10 pour Zanna (sag 0, Perception non maîtrise)', () => {
@@ -20,14 +20,14 @@ describe('useCharacterState — HP', () => {
 
   it('initialise à hpMax', () => {
     const { state } = useCharacterState(darethBrumeval)
-    expect(state.value.hpCurrent).toBe(33)
+    expect(state.value.hpCurrent).toBe(41)
     expect(state.value.hpTemp).toBe(0)
   })
 
   it('damage décrémente les HP sans passer sous zéro', () => {
     const { state, damage } = useCharacterState(darethBrumeval)
     damage(10)
-    expect(state.value.hpCurrent).toBe(23)
+    expect(state.value.hpCurrent).toBe(31)
     damage(999)
     expect(state.value.hpCurrent).toBe(0)
   })
@@ -37,17 +37,17 @@ describe('useCharacterState — HP', () => {
     setTempHp(5)
     damage(3)
     expect(state.value.hpTemp).toBe(2)
-    expect(state.value.hpCurrent).toBe(33)
+    expect(state.value.hpCurrent).toBe(41)
     damage(5)
     expect(state.value.hpTemp).toBe(0)
-    expect(state.value.hpCurrent).toBe(30)
+    expect(state.value.hpCurrent).toBe(38)
   })
 
   it('heal ne dépasse pas hpMax', () => {
     const { state, damage, heal } = useCharacterState(darethBrumeval)
     damage(10)
     heal(999)
-    expect(state.value.hpCurrent).toBe(33)
+    expect(state.value.hpCurrent).toBe(41)
   })
 
   it('heal au-dessus de 0 reset les jets de mort', () => {
@@ -90,7 +90,7 @@ describe('useCharacterState — repos', () => {
     toggleDeathSaveFailure(0)
     state.value.dailySpellsUsed = ['test']
     longRest()
-    expect(state.value.hpCurrent).toBe(33)
+    expect(state.value.hpCurrent).toBe(41)
     expect(state.value.hpTemp).toBe(0)
     expect(state.value.spellSlotsUsed[0]).toBe(0)
     expect(state.value.dailySpellsUsed).toEqual([])
@@ -104,7 +104,7 @@ describe('useCharacterState — repos', () => {
     spendHitDie()
     expect(state.value.hitDiceUsed).toBe(3)
     longRest()
-    // dareth total 4, récupère 2, 3 - 2 = 1
+    // dareth total 5, récupère 2, 3 - 2 = 1
     expect(state.value.hitDiceUsed).toBe(1)
   })
 
@@ -155,6 +155,34 @@ describe('useCharacterState — dés de vie', () => {
   it('spendHitDie incrémente le compteur sans dépasser le total', () => {
     const { state, spendHitDie } = useCharacterState(darethBrumeval)
     for (let i = 0; i < 10; i++) spendHitDie()
-    expect(state.value.hitDiceUsed).toBe(4) // Dareth a 4 dés de vie
+    expect(state.value.hitDiceUsed).toBe(5) // Dareth a 5 dés de vie
+  })
+})
+
+describe('normalizeState — état sauvegardé avant une montée de niveau', () => {
+  const saved = {
+    hpCurrent: 20,
+    hpTemp: 0,
+    inspiration: 1,
+    hitDiceUsed: 2,
+    deathSaves: { successes: 0, failures: 0 },
+    spellSlotsUsed: [3],
+    dailySpellsUsed: [],
+  }
+
+  it('ajoute un compteur à 0 pour un nouveau niveau d\'emplacements', () => {
+    expect(normalizeState(darethBrumeval, saved).spellSlotsUsed).toEqual([3, 0])
+  })
+
+  it('borne un compteur au nouveau maximum', () => {
+    const tooMany = { ...saved, spellSlotsUsed: [9, 9] }
+    expect(normalizeState(darethBrumeval, tooMany).spellSlotsUsed).toEqual([4, 2])
+  })
+
+  it('conserve le reste de l\'état', () => {
+    const result = normalizeState(darethBrumeval, saved)
+    expect(result.hpCurrent).toBe(20)
+    expect(result.inspiration).toBe(1)
+    expect(result.hitDiceUsed).toBe(2)
   })
 })
