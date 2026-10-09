@@ -85,6 +85,28 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.getByText('40', { exact: false }).first()).toBeVisible()
   })
 
+  test('Rites de combat en accordéon sur mobile, ouverts sur ordinateur', async ({ page }) => {
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await page.waitForTimeout(800)
+    const combatTab = page.getByRole('button', { name: /^Combat$/i })
+    const firstFormula = page.locator('#rite-panel-0 p').first()
+
+    if (await combatTab.isVisible()) {
+      await combatTab.dispatchEvent('click')
+      await page.waitForTimeout(500)
+      const toggle = page.getByRole('button', { name: /Rite I\b.*ouverture silencieuse/i })
+      await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+      await expect(firstFormula).toBeHidden()
+      await toggle.click()
+      await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+      await expect(firstFormula).toBeVisible()
+    }
+    else {
+      await firstFormula.scrollIntoViewIfNeeded()
+      await expect(firstFormula).toBeVisible()
+    }
+  })
+
   test('Inspiration +/−', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)

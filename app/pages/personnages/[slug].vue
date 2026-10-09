@@ -90,7 +90,7 @@ setTab('profil')
             <CodexSection id="arsenal-title-m" title="Attaques et incantations">
               <CodexAttacks :attacks="character.attacks" />
             </CodexSection>
-            <CodexRituals :rituals="character.rituals" />
+            <CodexRituals :rituals="character.rituals" collapsible />
           </div>
 
           <!-- Onglet Sorts -->
