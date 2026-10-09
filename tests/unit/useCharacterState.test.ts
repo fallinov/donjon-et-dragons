@@ -20,14 +20,14 @@ describe('useCharacterState — HP', () => {
 
   it('initialise à hpMax', () => {
     const { state } = useCharacterState(darethBrumeval)
-    expect(state.value.hpCurrent).toBe(41)
+    expect(state.value.hpCurrent).toBe(49)
     expect(state.value.hpTemp).toBe(0)
   })
 
   it('damage décrémente les HP sans passer sous zéro', () => {
     const { state, damage } = useCharacterState(darethBrumeval)
     damage(10)
-    expect(state.value.hpCurrent).toBe(31)
+    expect(state.value.hpCurrent).toBe(39)
     damage(999)
     expect(state.value.hpCurrent).toBe(0)
   })
@@ -37,17 +37,17 @@ describe('useCharacterState — HP', () => {
     setTempHp(5)
     damage(3)
     expect(state.value.hpTemp).toBe(2)
-    expect(state.value.hpCurrent).toBe(41)
+    expect(state.value.hpCurrent).toBe(49)
     damage(5)
     expect(state.value.hpTemp).toBe(0)
-    expect(state.value.hpCurrent).toBe(38)
+    expect(state.value.hpCurrent).toBe(46)
   })
 
   it('heal ne dépasse pas hpMax', () => {
     const { state, damage, heal } = useCharacterState(darethBrumeval)
     damage(10)
     heal(999)
-    expect(state.value.hpCurrent).toBe(41)
+    expect(state.value.hpCurrent).toBe(49)
   })
 
   it('heal au-dessus de 0 reset les jets de mort', () => {
@@ -90,7 +90,7 @@ describe('useCharacterState — repos', () => {
     toggleDeathSaveFailure(0)
     state.value.dailySpellsUsed = ['test']
     longRest()
-    expect(state.value.hpCurrent).toBe(41)
+    expect(state.value.hpCurrent).toBe(49)
     expect(state.value.hpTemp).toBe(0)
     expect(state.value.spellSlotsUsed[0]).toBe(0)
     expect(state.value.dailySpellsUsed).toEqual([])
@@ -99,13 +99,11 @@ describe('useCharacterState — repos', () => {
 
   it('longRest récupère la moitié des dés de vie (min 1)', () => {
     const { state, spendHitDie, longRest } = useCharacterState(darethBrumeval)
-    spendHitDie()
-    spendHitDie()
-    spendHitDie()
-    expect(state.value.hitDiceUsed).toBe(3)
+    for (let i = 0; i < 5; i++) spendHitDie()
+    expect(state.value.hitDiceUsed).toBe(5)
     longRest()
-    // dareth total 5, récupère 2, 3 - 2 = 1
-    expect(state.value.hitDiceUsed).toBe(1)
+    // dareth total 6, récupère 3, 5 - 3 = 2
+    expect(state.value.hitDiceUsed).toBe(2)
   })
 
   it('shortRest restaure les emplacements de sort pour un occultiste', () => {
@@ -155,7 +153,7 @@ describe('useCharacterState — dés de vie', () => {
   it('spendHitDie incrémente le compteur sans dépasser le total', () => {
     const { state, spendHitDie } = useCharacterState(darethBrumeval)
     for (let i = 0; i < 10; i++) spendHitDie()
-    expect(state.value.hitDiceUsed).toBe(5) // Dareth a 5 dés de vie
+    expect(state.value.hitDiceUsed).toBe(6) // Dareth a 6 dés de vie
   })
 })
 
