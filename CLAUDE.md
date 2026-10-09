@@ -14,7 +14,7 @@ Steve (Dareth Brumeval), Normand (Skamos Aurum), Myriam (Zanna), Sandra (Maera V
 
 ### Character
 Champs obligatoires : `slug`, `player`, `firstName`, `eyebrow`, `race`, `className`, `level`, `background`, `alignment`, `proficiencyBonus`, `maxHp`, `hitDice`, `portrait`, `vitals`, `abilities`, `skills`, `features`, `personality`, `attacks`, `languages`, `rituals`, `colophon`.
-Optionnels : `lastName`, `spellcasting`, `darkvision`.
+Optionnels : `lastName`, `spellcasting`, `darkvision`, `ritualsNote` (rappel affiché sous les rites).
 
 ### Spellcasting (nouveau modèle multi-niveaux)
 ```typescript
@@ -23,6 +23,7 @@ interface Spellcasting {
   attackBonus?: number
   slotLevels: SpellSlotLevel[]  // { level, slots } par niveau
   spells: Spell[]               // title, description, level, cost
+                                // + optionnels : castingTime, range, duration, concentration, check, effect
   shortRestRefresh?: boolean    // occultiste
 }
 type SpellCost = 'cantrip' | 'slot' | 'daily'

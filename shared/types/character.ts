@@ -30,9 +30,22 @@ export type SpellCost = 'cantrip' | 'slot' | 'daily'
 
 export interface Spell {
   title: string
+  /** Effet du sort, en une ou deux phrases. */
   description: string
   level: number
   cost: SpellCost
+  /** Temps d'incantation (ex. « Action bonus »). */
+  castingTime?: string
+  /** Portée (ex. « 27 m », « Contact »). */
+  range?: string
+  /** Durée hors concentration (ex. « 1 heure », « Instantanée »). */
+  duration?: string
+  /** Le sort demande de la concentration : un seul à la fois. */
+  concentration?: boolean
+  /** Jet d'attaque ou sauvegarde demandée (ex. « Sauvegarde Dex DD 13 »). */
+  check?: string
+  /** Dégâts ou soins (ex. « 2d4 perçants », « 1d8 + 2 PV »). */
+  effect?: string
 }
 
 export interface Attack {
@@ -109,5 +122,7 @@ export interface Character {
   darkvision?: number
   languages: { name: string, rare?: boolean }[]
   rituals: Ritual[]
+  /** Rappel affiché sous les rites de combat (ex. règle de concentration). */
+  ritualsNote?: string
   colophon: string
 }
