@@ -29,11 +29,11 @@ export const darethBrumeval: Character = {
   ],
 
   abilities: {
-    strength:     { label: 'Force',        score: 10, modifier:  0, saveModifier: 0, proficient: false },
+    strength:     { label: 'Force',        score: 10, modifier:  0, saveModifier: 3, proficient: true  },
     dexterity:    { label: 'Dextérité',    score: 18, modifier: +4, saveModifier: 7, proficient: true  },
     constitution: { label: 'Constitution', score: 14, modifier: +2, saveModifier: 2, proficient: false },
-    intelligence: { label: 'Intelligence', score: 13, modifier: +1, saveModifier: 1, proficient: false },
-    wisdom:       { label: 'Sagesse',      score: 15, modifier: +2, saveModifier: 5, proficient: true  },
+    intelligence: { label: 'Intelligence', score: 10, modifier:  0, saveModifier: 0, proficient: false },
+    wisdom:       { label: 'Sagesse',      score: 15, modifier: +2, saveModifier: 2, proficient: false },
     charisma:     { label: 'Charisme',     score: 12, modifier: +1, saveModifier: 1, proficient: false },
   },
 
@@ -41,10 +41,11 @@ export const darethBrumeval: Character = {
     { name: 'Discrétion',    ability: 'Dex', modifier: 7, proficient: true  },
     { name: 'Perception',    ability: 'Sag', modifier: 5, proficient: true  },
     { name: 'Survie',        ability: 'Sag', modifier: 5, proficient: true  },
-    { name: 'Nature',        ability: 'Int', modifier: 4, proficient: true  },
-    { name: 'Athlétisme',    ability: 'For', modifier: 2, proficient: false },
-    { name: 'Investigation', ability: 'Int', modifier: 1, proficient: false },
-    { name: 'Dressage',      ability: 'Sag', modifier: 2, proficient: false },
+    { name: 'Nature',        ability: 'Int', modifier: 3, proficient: true  },
+    { name: 'Athlétisme',    ability: 'For', modifier: 3, proficient: true  },
+    { name: 'Dressage',      ability: 'Sag', modifier: 5, proficient: true  },
+    { name: 'Intimidation',  ability: 'Cha', modifier: 4, proficient: true  },
+    { name: 'Investigation', ability: 'Int', modifier: 0, proficient: false },
     { name: 'Acrobaties',    ability: 'Dex', modifier: 4, proficient: false },
   ],
 
@@ -81,6 +82,18 @@ export const darethBrumeval: Character = {
     {
       title: 'Attaque supplémentaire',
       description: "Lorsqu'il utilise l'action Attaquer, il porte deux attaques au lieu d'une.",
+    },
+    {
+      title: 'Ascendance féerique',
+      description: 'Héritage elfique de Dareth.',
+      benefits: [
+        'Avantage aux jets de sauvegarde contre le charme.',
+        'La magie ne peut pas le plonger dans le sommeil.',
+      ],
+    },
+    {
+      title: 'Historique · Sauvageon',
+      description: "Excellente mémoire des cartes et des lieux. Chaque jour, il trouve nourriture et eau pour lui et jusqu'à cinq autres personnes, si la terre en offre.",
     },
   ],
 

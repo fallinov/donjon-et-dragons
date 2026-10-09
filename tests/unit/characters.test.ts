@@ -23,11 +23,13 @@ describe('characters dataset', () => {
     expect(Object.keys(dareth.abilities)).toHaveLength(6)
   })
 
-  it('Dareth a Dextérité et Sagesse en maîtrise', () => {
+  it('Dareth a Force et Dextérité en maîtrise (sauvegardes du rôdeur)', () => {
     const dareth = getCharacter('dareth-brumeval')!
     expect(dareth.abilities.dexterity.proficient).toBe(true)
-    expect(dareth.abilities.wisdom.proficient).toBe(true)
-    expect(dareth.abilities.strength.proficient).toBe(false)
+    expect(dareth.abilities.strength.proficient).toBe(true)
+    expect(dareth.abilities.wisdom.proficient).toBe(false)
+    expect(dareth.abilities.strength.saveModifier).toBe(3)
+    expect(dareth.abilities.wisdom.saveModifier).toBe(2)
   })
 
   it('Dareth est rôdeur niveau 6 avec les valeurs recalculées', () => {
@@ -42,6 +44,11 @@ describe('characters dataset', () => {
     expect(dareth.attacks.every(a => a.attackBonus === '1d20+7')).toBe(true)
     expect(dareth.rituals).toHaveLength(5)
     expect(dareth.languages.map(l => l.name)).toContain('Infernal')
+    expect(dareth.abilities.intelligence.score).toBe(10)
+    // 2 compétences de l'historique + 3 de la classe + 2 de la race
+    expect(dareth.skills.filter(sk => sk.proficient).map(sk => sk.name).sort()).toEqual(
+      ['Athlétisme', 'Discrétion', 'Dressage', 'Intimidation', 'Nature', 'Perception', 'Survie'],
+    )
     const enemy = dareth.features.find(f => f.title.startsWith('Ennemis jurés'))!
     const terrain = dareth.features.find(f => f.title.startsWith('Explorateur né'))!
     expect(enemy.benefits).toHaveLength(3)
