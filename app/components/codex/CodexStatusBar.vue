@@ -30,10 +30,6 @@ const hpPercent = computed(() => Math.min(100, (state.value.hpCurrent / props.ch
 
 const toast = ref('')
 
-function fmtBonus(n: number): string {
-  return n >= 0 ? `+${n}` : `${n}`
-}
-
 function showToast(msg: string): void {
   toast.value = msg
   setTimeout(() => { toast.value = '' }, 3000)

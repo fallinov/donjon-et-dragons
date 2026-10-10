@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Character, Spell, SpellSlotLevel } from '~~/shared/types/character'
+import type { Character, Spell } from '~~/shared/types/character'
 import { useCharacterState } from '~/composables/useCharacterState'
 import CodexSpellInfo from '~/components/codex/CodexSpellInfo.vue'
 
