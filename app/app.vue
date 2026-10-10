@@ -4,9 +4,11 @@ import { t } from '~/composables/useT'
 
 <template>
   <div>
+    <NuxtPwaManifest />
     <NuxtRouteAnnouncer />
     <a href="#contenu" class="skip-link">{{ t('common.skipLink') }}</a>
     <NuxtPage />
     <ConfirmDialog />
+    <PwaUpdateToast />
   </div>
 </template>

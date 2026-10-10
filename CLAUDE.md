@@ -8,7 +8,8 @@
 - État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort), store IndexedDB `states`
 - Sac (équipement, argent, notes) : composable `useInventory`, store IndexedDB `inventories`. Seul sac : le sac de départ des seeds y est copié au premier lancement
 - Persistance des états partagés : `persistState()` (écriture à chaque changement) ; toujours passer par `toPlain()` avant d'écrire un objet réactif dans IndexedDB
-- Tests : Vitest (unit) + Playwright (e2e)
+- Tests : Vitest (unit) + Playwright (e2e, `pnpm dev`) + Playwright PWA (`pnpm test:e2e:pwa`, build de production node-server : le service worker n'existe pas en dev)
+- PWA : `@vite-pwa/nuxt` (config `pwa` dans `nuxt.config.ts`), `registerType: 'prompt'`. Précache : JS, CSS, HTML, polices woff2, SVG, textures de brouillard — pas les portraits (copiés dans IndexedDB) ni les icônes. Icônes générées depuis `public/img/icon-512.png`
 - Éditeur de fiche : pages `personnages/nouveau.vue` et `personnages/[id]/modifier.vue`, composants `app/components/edit/`, brouillon `useCharacterDraft`, validation structurelle seulement (`validateCharacter`) — aucune borne de règle D&D avant la phase 2. Les noms servant de clé d'affichage (aptitudes, avantages, attaques, rites, sorts, compétences, langues) doivent être non vides et uniques. Le sac ne s'édite que dans l'onglet Sac de la fiche
 - Confirmations : `useConfirm()` + `<ConfirmDialog>` (jamais `confirm()` natif)
 - CA, initiative et vitesse : toujours via `findVital()` / `VITAL_LABELS` (`app/utils/vitals.ts`), jamais en comparant un libellé en dur

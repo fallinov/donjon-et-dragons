@@ -33,6 +33,8 @@ useSeoMeta({
         </p>
       </header>
 
+      <PwaInstallHint />
+
       <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <li v-for="character in characters" :key="character.id">
           <CodexCharacterCard :character="character" />
