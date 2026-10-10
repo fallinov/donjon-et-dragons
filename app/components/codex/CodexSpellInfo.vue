@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Spell } from '~~/shared/types/character'
+import { t } from '~/composables/useT'
 
 const props = defineProps<{ spell: Spell }>()
 
@@ -26,7 +27,7 @@ const meta = computed(() =>
         v-if="spell.concentration"
         class="ml-0.5 border border-ember/60 text-ember-bright px-1.5 py-px font-display tracking-wider-2 uppercase text-[10px]"
         data-spell-concentration
-      >Concentration</span>
+      >{{ t('spells.concentration') }}</span>
     </p>
     <p class="mt-1 text-parchment-dim text-sm leading-snug">
       {{ spell.description }}<slot name="suffix" />

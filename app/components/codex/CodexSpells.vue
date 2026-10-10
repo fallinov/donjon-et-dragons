@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { Character, Spell } from '~~/shared/types/character'
 import { useCharacterState } from '~/composables/useCharacterState'
 import CodexSpellInfo from '~/components/codex/CodexSpellInfo.vue'
+import { t } from '~/composables/useT'
 
 const props = defineProps<{ character: Character }>()
 const sc = computed(() => props.character.spellcasting!)
@@ -13,7 +14,7 @@ function doShortRest(): void {
 }
 
 function doLongRest(): void {
-  if (!confirm('Repos long : restaure emplacements et sorts quotidiens. Confirmer ?')) return
+  if (!confirm(t('spells.longRestConfirm'))) return
   longRest()
 }
 
@@ -53,9 +54,9 @@ function spellsByLevel(level: number): Spell[] {
 }
 
 function costLabel(spell: Spell): string {
-  if (spell.cost === 'cantrip') return 'Sort mineur'
-  if (spell.cost === 'daily') return '1 / repos long'
-  return `Niveau ${spell.level}`
+  if (spell.cost === 'cantrip') return t('spells.cost.cantrip')
+  if (spell.cost === 'daily') return t('spells.cost.daily')
+  return t('spells.cost.slot', { level: spell.level })
 }
 </script>
 
@@ -65,20 +66,20 @@ function costLabel(spell: Spell): string {
     <div class="space-y-3 bg-charcoal/30 px-4 py-4 border border-gold/10 rounded">
       <!-- Difficulté de sauvegarde -->
       <div class="flex items-baseline justify-between">
-        <p class="font-display text-xs tracking-wider-3 text-gold uppercase">Difficulté de sauvegarde</p>
+        <p class="font-display text-xs tracking-wider-3 text-gold uppercase">{{ t('spells.saveDc') }}</p>
         <div class="flex items-baseline gap-2">
           <p class="font-display text-2xl text-gold-bright">{{ sc.saveDc }}</p>
-          <p v-if="sc.attackBonus" class="text-xs text-parchment-mute">+{{ sc.attackBonus }} att.</p>
+          <p v-if="sc.attackBonus" class="text-xs text-parchment-mute">{{ t('spells.attackBonus', { value: sc.attackBonus }) }}</p>
         </div>
       </div>
 
       <!-- Emplacements par niveau -->
       <div v-for="(slotLevel, idx) in sc.slotLevels" :key="slotLevel.level" class="flex items-center justify-between">
         <p class="font-display text-xs tracking-wider-3 text-gold uppercase" aria-live="polite">
-          Niv. {{ slotLevel.level }}
+          {{ t('spells.slotLevel', { level: slotLevel.level }) }}
           <span :id="`slots-count-${slotLevel.level}`" class="text-gold-bright ml-1">{{ slotsRemaining(idx) }} / {{ slotLevel.slots }}</span>
         </p>
-        <div class="flex gap-1.5" role="group" :aria-label="`Emplacements niveau ${slotLevel.level}`">
+        <div class="flex gap-1.5" role="group" :aria-label="t('spells.slotsGroup', { level: slotLevel.level })">
           <span
             v-for="i in slotLevel.slots"
             :key="i"
@@ -91,14 +92,14 @@ function costLabel(spell: Spell): string {
 
       <!-- Boutons repos -->
       <div class="flex gap-2 pt-1">
-        <button type="button" class="flex-1 border border-gold/20 text-parchment-mute hover:text-gold-bright font-display text-xs tracking-wider-2 uppercase py-2 transition-colors" @click="doShortRest">Repos court</button>
-        <button type="button" class="flex-1 border border-gold/30 bg-gold/5 text-gold hover:text-gold-bright hover:bg-gold/15 font-display text-xs tracking-wider-2 uppercase py-2 transition-colors" @click="doLongRest">Repos long</button>
+        <button type="button" class="flex-1 border border-gold/20 text-parchment-mute hover:text-gold-bright font-display text-xs tracking-wider-2 uppercase py-2 transition-colors" @click="doShortRest">{{ t('rest.short') }}</button>
+        <button type="button" class="flex-1 border border-gold/30 bg-gold/5 text-gold hover:text-gold-bright hover:bg-gold/15 font-display text-xs tracking-wider-2 uppercase py-2 transition-colors" @click="doLongRest">{{ t('rest.long') }}</button>
       </div>
     </div>
 
     <!-- ═══ Sorts mineurs (cantrips) ═══ -->
     <div v-if="cantrips.length">
-      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">Sorts mineurs</p>
+      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">{{ t('spells.cantrips') }}</p>
       <ul class="space-y-2">
         <li v-for="spell in cantrips" :key="spell.title" class="flex items-start justify-between gap-3 py-2 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell" />
@@ -109,7 +110,7 @@ function costLabel(spell: Spell): string {
 
     <!-- ═══ Sorts par niveau (slot) ═══ -->
     <div v-for="slotLevel in sc.slotLevels" :key="`spells-${slotLevel.level}`">
-      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">Sorts de niveau {{ slotLevel.level }}</p>
+      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">{{ t('spells.levelTitle', { level: slotLevel.level }) }}</p>
       <ul class="space-y-1">
         <li v-for="spell in spellsByLevel(slotLevel.level)" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell" />
@@ -118,14 +119,14 @@ function costLabel(spell: Spell): string {
             :disabled="!canCast(spell)"
             class="shrink-0 self-center border border-gold/30 bg-charcoal text-gold-bright hover:bg-gold/10 disabled:opacity-25 disabled:hover:bg-transparent font-display text-xs tracking-wider-2 uppercase px-3 py-1.5 transition-colors"
             @click="cast(spell)"
-          >Lancer</button>
+          >{{ t('spells.cast') }}</button>
         </li>
       </ul>
     </div>
 
     <!-- ═══ Sorts daily (raciaux, etc.) ═══ -->
     <div v-if="dailySpells.length">
-      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">Sorts spéciaux</p>
+      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">{{ t('spells.special') }}</p>
       <ul class="space-y-1">
         <li v-for="spell in dailySpells" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell">
@@ -138,7 +139,7 @@ function costLabel(spell: Spell): string {
             :disabled="!canCast(spell)"
             class="shrink-0 self-center border border-gold/30 bg-charcoal text-gold-bright hover:bg-gold/10 disabled:opacity-25 disabled:hover:bg-transparent font-display text-xs tracking-wider-2 uppercase px-3 py-1.5 transition-colors"
             @click="cast(spell)"
-          >{{ isDailyUsed(spell) ? 'Utilisé' : 'Lancer' }}</button>
+          >{{ isDailyUsed(spell) ? t('spells.used') : t('spells.cast') }}</button>
         </li>
       </ul>
     </div>

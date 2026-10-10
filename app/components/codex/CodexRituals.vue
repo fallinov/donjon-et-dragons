@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { Ritual } from '~~/shared/types/character'
+import { hasMessage, t, tCount } from '~/composables/useT'
 
 const props = withDefaults(defineProps<{
   rituals: Ritual[]
@@ -10,12 +11,11 @@ const props = withDefaults(defineProps<{
   collapsible?: boolean
 }>(), { collapsible: false })
 
-const COUNT_WORDS: Record<number, string> = { 1: 'une', 2: 'deux', 3: 'trois', 4: 'quatre', 5: 'cinq', 6: 'six' }
-
 const subtitle = computed(() => {
   const n = props.rituals.length
-  const word = COUNT_WORDS[n] ?? String(n)
-  return `— ${word} séquence${n > 1 ? 's' : ''} à graver dans la mémoire du bras —`
+  const wordKey = `common.countWord.${n}`
+  const word = hasMessage(wordKey) ? t(wordKey) : String(n)
+  return tCount('rituals.subtitle', n, { word })
 })
 
 const openRituals = ref<Set<string>>(new Set())
@@ -42,7 +42,7 @@ function panelId(index: number): string {
     class="mt-16 p-6 sm:p-10 border border-gold/30 bg-gradient-to-br from-charcoal/70 to-obsidian/80 motion-safe:animate-rise"
   >
     <header class="text-center mb-8">
-      <h2 id="rites-title" class="font-display text-xl sm:text-2xl tracking-wider-3 text-gold-bright uppercase">Rites de combat</h2>
+      <h2 id="rites-title" class="font-display text-xl sm:text-2xl tracking-wider-3 text-gold-bright uppercase">{{ t('rituals.title') }}</h2>
       <p class="mt-2 text-parchment-dim italic text-sm">{{ subtitle }}</p>
     </header>
 
@@ -116,7 +116,7 @@ function panelId(index: number): string {
       class="mt-6 border border-ember/40 bg-blood/20 px-4 py-3 text-sm text-parchment italic"
       data-rituals-note
     >
-      <span class="not-italic font-display text-xs tracking-wider-3 text-ember-bright uppercase mr-2">Attention</span>{{ note }}
+      <span class="not-italic font-display text-xs tracking-wider-3 text-ember-bright uppercase mr-2">{{ t('rituals.noteLabel') }}</span>{{ note }}
     </p>
   </section>
 </template>

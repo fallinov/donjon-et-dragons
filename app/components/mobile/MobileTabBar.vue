@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMobileTab } from '~/composables/useMobileTab'
+import { t } from '~/composables/useT'
 
 const { activeTab, tabs, setTab } = useMobileTab()
 
@@ -11,7 +12,7 @@ function selectTab(id: string): void {
 
 <template>
   <nav
-    aria-label="Navigation mobile"
+    :aria-label="t('tabs.nav')"
     class="fixed bottom-0 left-0 right-0 z-30 bg-charcoal/95 backdrop-blur-md border-t border-gold/30 safe-area-bottom lg:hidden"
   >
     <ul class="flex items-end justify-around px-1">

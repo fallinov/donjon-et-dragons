@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { t } from '~/composables/useT'
 
 export type TabId = 'profil' | 'combat' | 'sorts' | 'sac' | 'stats'
 
@@ -9,11 +10,11 @@ export interface Tab {
 }
 
 const TABS_RIGHT: Tab[] = [
-  { id: 'profil', label: 'Profil', icon: 'scroll' },
-  { id: 'combat', label: 'Combat', icon: 'sword' },
-  { id: 'sorts', label: 'Sorts', icon: 'sparkles' },
-  { id: 'sac', label: 'Sac', icon: 'bag' },
-  { id: 'stats', label: 'Stats', icon: 'chart' },
+  { id: 'profil', label: t('tabs.profil'), icon: 'scroll' },
+  { id: 'combat', label: t('tabs.combat'), icon: 'sword' },
+  { id: 'sorts', label: t('tabs.sorts'), icon: 'sparkles' },
+  { id: 'sac', label: t('tabs.sac'), icon: 'bag' },
+  { id: 'stats', label: t('tabs.stats'), icon: 'chart' },
 ]
 
 export function useMobileTab() {

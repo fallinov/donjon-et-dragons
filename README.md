@@ -38,7 +38,10 @@ donjon-et-dragons/
 │   │   ├── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
 │   │   ├── useInventory.ts          # sac : équipement, argent, notes + localStorage
 │   │   ├── useMobileTab.ts          # onglet actif mobile (Profil, Combat, Sorts, Sac, Stats)
+│   │   ├── useT.ts                  # t() / tCount() : textes de l'interface
 │   │   └── useIsDesktop.ts          # détecte le viewport >= lg
+│   ├── i18n/
+│   │   └── fr.ts                    # catalogue des textes de l'interface (clés plates)
 │   ├── utils/
 │   │   └── swipe.ts                 # logique pure du swipe mobile (verrouillage d'axe)
 │   ├── components/
@@ -166,6 +169,7 @@ Le projet est lié via `.vercel/project.json` (org `steves-projects-7a849401`, p
 - **Branches** : `feat/`, `fix/`, `docs/`, `chore/`
 - **Release** : `feat/` → minor, `fix/` → patch, `chore/` → patch, `docs/` → pas de release
 - **Terminologie D&D** : alignée sur la fiche WotC officielle française (Compétences, Capacités et traits, Attaques et incantations, DD de sauvegarde des sorts…)
+- **Textes de l'interface** : jamais en dur dans les composants. Ajouter la clé dans `app/i18n/fr.ts` et l'afficher avec `t('cle', { param })` ; pluriels via les paires `cle.one` / `cle.other` et `tCount('cle', n)`
 - **Souveraineté** : aucun CDN externe, tout self-hosted (libs, fonts, images)
 
 ## Documentation

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { Character } from '~~/shared/types/character'
+import { t } from '~/composables/useT'
 
 defineProps<{ character: Character }>()
 
@@ -67,7 +68,7 @@ onBeforeUnmount(() => { observer?.disconnect() })
           {{ character.firstName }}{{ character.lastName ? ` ${character.lastName}` : '' }}
         </h2>
         <p class="mt-1 text-sm text-parchment-dim">
-          {{ character.race }} · {{ character.className }} niv. {{ character.level }}
+          {{ character.race }} · {{ t('character.levelShort', { className: character.className, level: character.level }) }}
         </p>
       </div>
     </figure>
