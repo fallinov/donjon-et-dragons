@@ -23,6 +23,13 @@ describe('migrateDocument', () => {
     expect(migrateDocument({ ...darethBrumeval, id: '' })).toBeNull()
   })
 
+  it('v1 → v2 : retire le sac de départ de la fiche', () => {
+    const v1 = { ...darethBrumeval, schemaVersion: 1, inventory: { equipment: [], coins: { cp: 0, sp: 0, ep: 0, gp: 1, pp: 0 } } }
+    const migrated = migrateDocument(v1)
+    expect(migrated?.schemaVersion).toBe(2)
+    expect(migrated).not.toHaveProperty('inventory')
+  })
+
   it('enchaîne les migrations jusqu\'à la version cible', () => {
     const v1 = { ...darethBrumeval, schemaVersion: 1, nickname: 'Dar' }
     const steps = {

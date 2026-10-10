@@ -23,9 +23,9 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
 - **Fiches stockées sur l'appareil** : IndexedDB (lib `idb`), rendu 100 % client (`ssr: false`, page d'accueil pré-rendue). Les 6 fiches de `app/data/characters/` sont importées au premier lancement
-- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par fiche
-- **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et sauvegardé dans le navigateur
-- **Tests** : Vitest (unit, 97 tests) + Playwright (e2e, 26 tests, chromium desktop + mobile safari)
+- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
+- **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
+- **Tests** : Vitest (unit, 119 tests) + Playwright (e2e, 30 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -36,8 +36,9 @@ donjon-et-dragons/
 │   ├── app.vue                      # layout racine + skip link
 │   ├── assets/css/main.css          # @theme Tailwind + @font-face + print A4 paysage
 │   ├── composables/
-│   │   ├── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
-│   │   ├── useInventory.ts          # sac : équipement, argent, notes + localStorage
+│   │   ├── useCharacterState.ts     # état mutable + repos D&D 5e, enregistré dans IndexedDB
+│   │   ├── useInventory.ts          # sac : équipement, argent, notes, enregistré dans IndexedDB
+│   │   ├── persistState.ts          # synchronise un état partagé avec IndexedDB (chargement unique, écriture à chaque changement)
 │   │   ├── useCharacters.ts         # useCharacterList(), useCharacter(id) depuis IndexedDB
 │   │   ├── useObjectUrl.ts          # URL blob: d'un portrait, révoquée automatiquement
 │   │   ├── useMobileTab.ts          # onglet actif mobile (Profil, Combat, Sorts, Sac, Stats)
@@ -47,12 +48,14 @@ donjon-et-dragons/
 │   │   ├── schema.ts                # base IndexedDB `codex` : stores characters, states, inventories, meta
 │   │   ├── characterRepository.ts   # lecture, écriture, suppression atomique des fiches
 │   │   ├── migrations.ts            # migration des documents selon `schemaVersion`
-│   │   └── seed.ts                  # import des fiches de départ au premier lancement
+│   │   ├── seed.ts                  # import des fiches de départ (et de leur sac) au premier lancement
+│   │   └── legacy.ts                # reprise des données des versions précédentes (localStorage, format v1)
 │   ├── plugins/
 │   │   └── db.client.ts             # seed + demande de stockage persistant avant le premier rendu
 │   ├── i18n/
 │   │   └── fr.ts                    # catalogue des textes de l'interface (clés plates)
 │   ├── utils/
+│   │   ├── toPlain.ts               # copie sans proxy réactif (avant écriture IndexedDB)
 │   │   └── swipe.ts                 # logique pure du swipe mobile (verrouillage d'axe)
 │   ├── components/
 │   │   ├── PrintButton.vue
@@ -117,9 +120,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 97 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 119 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 26 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 30 tests (chromium desktop + mobile safari)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt et fournit une base IndexedDB neuve à chaque test (`fake-indexeddb`). `tests/helpers/characters.ts` construit des fiches stockées à partir des seeds.
@@ -128,7 +131,7 @@ Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un d
 
 Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharacterState.ts) expose l'état mutable de chaque personnage (HP courant/temp, inspiration, dés de vie utilisés, jets de mort, emplacements de sort consommés) avec :
 
-- **Persistance** : `localStorage` par fiche, clé `codex:<id>:state`
+- **Persistance** : store IndexedDB `states`, clé = identifiant de la fiche. Écriture à chaque changement : une écriture différée serait perdue si l'app se ferme juste après
 - **Singleton** : via `useState` Nuxt pour que `CodexStatusBar` et `CodexSpells` partagent le même state
 - **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
 
@@ -136,8 +139,8 @@ Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharac
 
 Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.ts) gère l'équipement, les cinq pièces et les notes :
 
-- **Point de départ** : champ optionnel `inventory` de la fiche (`equipment`, `coins`, `notes`). Absent, le sac démarre vide.
-- **Persistance** : `localStorage` par fiche, clé `codex:<id>:inventory`. Propre à chaque appareil, non synchronisé.
+- **Point de départ** : champ optionnel `inventory` des fiches de départ (`equipment`, `coins`, `notes`), copié dans le sac au premier lancement. Une fiche créée sur l'appareil démarre avec un sac vide.
+- **Persistance** : store IndexedDB `inventories`, clé = identifiant de la fiche. Propre à chaque appareil, non synchronisé.
 - **Affichage** : cinquième onglet « Sac » sur mobile, section sous les rites sur ordinateur. Non imprimé.
 - **Robustesse** : une sauvegarde abîmée est nettoyée, une quantité à 0 retire l'objet.
 - **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée

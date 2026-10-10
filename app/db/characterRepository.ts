@@ -1,4 +1,6 @@
 import type { StoredCharacter } from '~~/shared/types/character'
+import type { CharacterState } from '~/composables/useCharacterState'
+import type { InventoryState } from '~/composables/useInventory'
 import { openCodexDB } from '~/db/schema'
 import { migrateDocument } from '~/db/migrations'
 
@@ -30,4 +32,26 @@ export async function deleteCharacter(id: string): Promise<void> {
     tx.objectStore('inventories').delete(id),
     tx.done,
   ])
+}
+
+/** État de jeu enregistré, à valider par l'appelant (`isValidState`). */
+export async function getState(id: string): Promise<unknown> {
+  const db = await openCodexDB()
+  return db.get('states', id)
+}
+
+export async function putState(id: string, state: CharacterState): Promise<void> {
+  const db = await openCodexDB()
+  await db.put('states', state, id)
+}
+
+/** Sac enregistré, à valider par l'appelant (`parseInventory`). */
+export async function getInventory(id: string): Promise<unknown> {
+  const db = await openCodexDB()
+  return db.get('inventories', id)
+}
+
+export async function putInventory(id: string, inventory: InventoryState): Promise<void> {
+  const db = await openCodexDB()
+  await db.put('inventories', inventory, id)
 }

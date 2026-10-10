@@ -113,7 +113,7 @@ export interface EquipmentItem {
   quantity: number
 }
 
-/** Contenu de départ du sac, modifiable ensuite sur l'appareil du joueur. */
+/** Contenu de départ du sac d'une fiche livrée avec l'app. */
 export interface StartingInventory {
   equipment: EquipmentItem[]
   coins: Coins
@@ -121,7 +121,7 @@ export interface StartingInventory {
 }
 
 /** Version du format de fiche. À incrémenter à chaque évolution du modèle, avec une migration. */
-export const CHARACTER_SCHEMA_VERSION = 1
+export const CHARACTER_SCHEMA_VERSION = 2
 
 /**
  * Portrait embarqué dans la fiche. Octets bruts plutôt que Blob : clonables partout
@@ -159,8 +159,6 @@ interface CharacterFields {
   rituals: Ritual[]
   /** Rappel affiché sous les rites de combat (ex. règle de concentration). */
   ritualsNote?: string
-  /** Équipement, argent et notes de départ. Absent : sac vide. */
-  inventory?: StartingInventory
   colophon: string
 }
 
@@ -186,4 +184,6 @@ export interface StoredCharacter extends Character {
 export interface CharacterSeed extends CharacterFields {
   slug: string
   portrait: { src: string, alt: string }
+  /** Équipement, argent et notes de départ, copiés dans le sac au premier lancement. Absent : sac vide. */
+  inventory?: StartingInventory
 }

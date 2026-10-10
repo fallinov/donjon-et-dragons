@@ -5,9 +5,12 @@ type Migration = (doc: RawDocument) => RawDocument
 
 /**
  * Migrations du format de fiche : la clé N transforme un document de version N
- * en version N + 1. Vide tant que le format n'a pas évolué.
+ * en version N + 1.
  */
-export const migrations: Record<number, Migration> = {}
+export const migrations: Record<number, Migration> = {
+  // v2 : le sac de départ quitte la fiche, il vit dans le store `inventories`
+  1: ({ inventory: _startingInventory, ...doc }) => doc,
+}
 
 function isRecord(value: unknown): value is RawDocument {
   return typeof value === 'object' && value !== null && !Array.isArray(value)

@@ -15,3 +15,19 @@ export function storedFromSeed(seed: CharacterSeed, createdAt = '2026-10-10T10:0
 
 export const darethBrumeval = storedFromSeed(darethSeed)
 export const zanna = storedFromSeed(zannaSeed)
+
+/** Laisse passer les promesses et requêtes IndexedDB en cours. */
+export async function settle(): Promise<void> {
+  for (let i = 0; i < 10; i++) await new Promise(resolve => setTimeout(resolve, 0))
+}
+
+/** Attend qu'une condition devienne vraie (écritures regroupées, IndexedDB). */
+export async function waitFor(condition: () => boolean | Promise<boolean>, timeout = 1000): Promise<void> {
+  const start = Date.now()
+  while (!(await condition())) {
+    if (Date.now() - start > timeout) throw new Error('waitFor : délai dépassé')
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+}
+
+export { darethSeed, zannaSeed }

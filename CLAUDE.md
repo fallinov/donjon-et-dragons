@@ -5,8 +5,9 @@
 - Fiches stockées sur l'appareil dans IndexedDB (`app/db/`, lib `idb`), rendu client uniquement (`ssr: false`)
 - Fiches de départ (seeds) en fichiers TypeScript typés (`app/data/characters/`), importées au premier lancement par `app/plugins/db.client.ts`. Une fiche supprimée ne revient pas
 - Types partagés dans `shared/types/character.ts`
-- État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort)
-- Sac (équipement, argent, notes) : composable `useInventory`, modifiable et sauvegardé dans le navigateur (clé `codex:{id}:inventory`)
+- État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort), store IndexedDB `states`
+- Sac (équipement, argent, notes) : composable `useInventory`, store IndexedDB `inventories`. Seul sac : le sac de départ des seeds y est copié au premier lancement
+- Persistance des états partagés : `persistState()` (écriture à chaque changement) ; toujours passer par `toPlain()` avant d'écrire un objet réactif dans IndexedDB
 - Tests : Vitest (unit) + Playwright (e2e)
 - Textes de l'interface : catalogue `app/i18n/fr.ts` + `t()` / `tCount()` (`app/composables/useT.ts`), jamais de texte en dur dans un composant
 
@@ -22,7 +23,7 @@ Steve (Dareth Brumeval), Normand (Skamos Aurum), Myriam (Zanna), Sandra (Maera V
 - Toute évolution du modèle : incrémenter `CHARACTER_SCHEMA_VERSION` et ajouter une migration dans `app/db/migrations.ts`.
 
 Champs obligatoires : `id`, `player`, `firstName`, `eyebrow`, `race`, `className`, `level`, `background`, `alignment`, `proficiencyBonus`, `maxHp`, `hitDice`, `portrait`, `vitals`, `abilities`, `skills`, `features`, `personality`, `attacks`, `languages`, `rituals`, `colophon`.
-Optionnels : `lastName`, `spellcasting`, `darkvision`, `ritualsNote` (rappel affiché sous les rites), `inventory` (sac de départ : `equipment`, `coins`, `notes`).
+Optionnels : `lastName`, `spellcasting`, `darkvision`, `ritualsNote` (rappel affiché sous les rites). `inventory` (sac de départ : `equipment`, `coins`, `notes`) n'existe que sur `CharacterSeed`.
 
 ### Spellcasting (nouveau modèle multi-niveaux)
 ```typescript
