@@ -101,7 +101,7 @@ export const darethBrumeval: Character = {
     trait: 'La forêt est sa seule cathédrale.',
     ideal: 'Nul seigneur, nul dieu, nulle chaîne.',
     idealLabel: 'Liberté',
-    bond: "Un dragon a réduit son village en cendres. Il n'oublie pas.",
+    bond: 'Gundren Traqueroche, avec qui il commerce régulièrement.',
     flaw: 'Méfie-toi de quiconque porte un titre.',
   },
 
