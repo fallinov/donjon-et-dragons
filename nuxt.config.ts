@@ -9,6 +9,43 @@ export default defineNuxtConfig({
   ssr: false,
   spaLoadingTemplate: true,
 
+  modules: ['@vite-pwa/nuxt'],
+
+  // Application installable et utilisable hors ligne (service worker Workbox)
+  pwa: {
+    // Mise à jour proposée par un bandeau, jamais imposée en pleine partie
+    registerType: 'prompt',
+    manifest: {
+      name: 'Codex — Donjon et Dragons',
+      short_name: 'Codex D&D',
+      description: 'Fiches de personnages D&D 5e, enregistrées sur l\'appareil.',
+      lang: 'fr',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      orientation: 'portrait',
+      theme_color: '#0b0907',
+      background_color: '#0b0907',
+      icons: [
+        { src: '/img/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/img/icon-512.png', sizes: '512x512', type: 'image/png' },
+        { src: '/img/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      ],
+    },
+    workbox: {
+      // Coquille de l'app : la page pré-rendue sert toutes les routes hors ligne
+      navigateFallback: '/',
+      // Exclus : portraits (copiés dans IndexedDB au premier lancement), icônes et favicons (gardés par le système)
+      globPatterns: ['**/*.{js,css,html,woff2,svg}', 'img/fog*.png'],
+      cleanupOutdatedCaches: true,
+    },
+    client: {
+      // Intercepte beforeinstallprompt (Android/Chrome) pour proposer notre bouton
+      installPrompt: 'codex:install-dismissed',
+    },
+    devOptions: { enabled: false },
+  },
+
   css: ['~/assets/css/main.css'],
 
   vite: {
@@ -30,7 +67,7 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/img/favicon-32.png' },
         { rel: 'icon', type: 'image/png', sizes: '48x48', href: '/img/favicon-48.png' },
         { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/img/favicon-96.png' },
-        { rel: 'apple-touch-icon', sizes: '180x180', href: '/img/favicon-180.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/img/apple-touch-icon.png' },
       ],
     },
   },

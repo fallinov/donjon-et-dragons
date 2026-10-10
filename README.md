@@ -22,6 +22,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **TypeScript strict** (zéro `any`)
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
+- **Application installable (PWA)** : `@vite-pwa/nuxt`, manifeste « Codex D&D », service worker Workbox (mise à jour proposée par un bandeau), utilisable hors ligne, aide à l'installation (bouton sur Android, instructions sur iPhone)
 - **Fiches stockées sur l'appareil** : IndexedDB (lib `idb`), rendu 100 % client (`ssr: false`, page d'accueil pré-rendue). Les 6 fiches de `app/data/characters/` sont importées au premier lancement
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
@@ -66,6 +67,7 @@ donjon-et-dragons/
 │   ├── components/
 │   │   ├── PrintButton.vue
 │   │   ├── ConfirmDialog.vue        # boîte de confirmation du codex (useConfirm), remplace confirm()
+│   │   ├── pwa/                     # PwaUpdateToast (nouvelle version), PwaInstallHint (installation)
 │   │   ├── edit/                    # éditeur : EditForm, sections (EditIdentity, EditStats, EditAbilities…), champs (EditText, EditNumber, EditList…)
 │   │   ├── mobile/
 │   │   │   ├── MobileMiniHeader.vue
@@ -135,6 +137,7 @@ pnpm typecheck        # vérification TS stricte
 pnpm test             # Vitest (unit) — 159 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
 pnpm test:e2e         # Playwright e2e — 44 tests (chromium desktop + mobile safari)
+pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne (port 3211)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt et fournit une base IndexedDB neuve à chaque test (`fake-indexeddb`). `tests/helpers/characters.ts` construit des fiches stockées à partir des seeds.
