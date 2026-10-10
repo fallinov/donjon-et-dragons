@@ -9,6 +9,10 @@
 - Sac (équipement, argent, notes) : composable `useInventory`, store IndexedDB `inventories`. Seul sac : le sac de départ des seeds y est copié au premier lancement
 - Persistance des états partagés : `persistState()` (écriture à chaque changement) ; toujours passer par `toPlain()` avant d'écrire un objet réactif dans IndexedDB
 - Tests : Vitest (unit) + Playwright (e2e)
+- Éditeur de fiche : pages `personnages/nouveau.vue` et `personnages/[id]/modifier.vue`, composants `app/components/edit/`, brouillon `useCharacterDraft`, validation structurelle seulement (`validateCharacter`) — aucune borne de règle D&D avant la phase 2
+- Confirmations : `useConfirm()` + `<ConfirmDialog>` (jamais `confirm()` natif)
+- CA, initiative et vitesse : toujours via `findVital()` / `VITAL_LABELS` (`app/utils/vitals.ts`), jamais en comparant un libellé en dur
+- Composants auto-importés : Nuxt préfixe par le dossier (`edit/EditForm.vue` → `EditForm`, `codex/CodexActions.vue` → `CodexActions`). Nommer les fichiers avec ce préfixe
 - Textes de l'interface : catalogue `app/i18n/fr.ts` + `t()` / `tCount()` (`app/composables/useT.ts`), jamais de texte en dur dans un composant
 
 ## Personnages (6)

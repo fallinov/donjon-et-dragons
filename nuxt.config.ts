@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NUXT_E2E !== 'true' },
 
   // Les fiches vivent dans IndexedDB, côté client uniquement : pas de rendu serveur
   ssr: false,

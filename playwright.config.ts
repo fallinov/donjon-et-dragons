@@ -20,6 +20,8 @@ export default defineConfig({
     url: 'http://localhost:3210',
     reuseExistingServer: false,
     timeout: 180_000,
+    // Sans le bouton flottant des devtools Nuxt, qui recouvre la barre fixe de l'éditeur sur mobile
+    env: { NUXT_E2E: 'true' },
   },
   outputDir: 'playwright/results',
 })

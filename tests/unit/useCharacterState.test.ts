@@ -176,6 +176,12 @@ describe('normalizeState — état sauvegardé avant une montée de niveau', () 
     expect(normalizeState(darethBrumeval, tooMany).spellSlotsUsed).toEqual([4, 2])
   })
 
+  it('borne les PV et les dés de vie utilisés aux nouveaux maximums', () => {
+    const result = normalizeState({ ...darethBrumeval, maxHp: 10, hitDice: { die: 10, total: 1 } }, saved)
+    expect(result.hpCurrent).toBe(10)
+    expect(result.hitDiceUsed).toBe(1)
+  })
+
   it('conserve le reste de l\'état', () => {
     const result = normalizeState(darethBrumeval, saved)
     expect(result.hpCurrent).toBe(20)

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import type { Character } from '~~/shared/types/character'
 import { useObjectUrl } from '~/composables/useObjectUrl'
+import { findVital } from '~/utils/vitals'
 import { t } from '~/composables/useT'
 
 const props = defineProps<{ character: Character }>()
@@ -20,14 +21,17 @@ onMounted(() => {
 
     <!-- ═══ MOBILE : carte de jeu pleine largeur ═══ -->
     <div class="lg:hidden" ref="mobileCard">
-      <!-- Lien retour au-dessus de la carte -->
+      <!-- Lien retour et actions au-dessus de la carte -->
+      <div class="flex items-center justify-between gap-3 mb-2">
       <NuxtLink
         to="/"
-        class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase mb-2"
+        class="inline-flex min-h-11 items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
       >
         <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
         {{ t('common.back') }}
       </NuxtLink>
+      <slot name="actions" />
+      </div>
       <!-- Photo arrière-plan avec gradient -->
       <div class="relative aspect-[3/4] sm:aspect-[16/9] overflow-hidden w-screen -ml-4 sm:-ml-8 lg:-ml-10">
         <img
@@ -72,11 +76,11 @@ onMounted(() => {
           <!-- Vitals : 4 cases glassmorphism -->
           <dl class="mt-3 grid grid-cols-4 gap-1.5">
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
-              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === "Classe d'armure")?.value }}</dd>
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'armorClass')?.value }}</dd>
               <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.armor') }}</dt>
             </div>
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
-              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Initiative')?.value }}</dd>
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'initiative')?.value }}</dd>
               <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.initiative') }}</dt>
             </div>
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
@@ -84,7 +88,7 @@ onMounted(() => {
               <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.mastery') }}</dt>
             </div>
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
-              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Vitesse')?.value }}<span class="text-[9px] text-parchment-mute">{{ character.vitals.find(v => v.label === 'Vitesse')?.unit }}</span></dd>
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'speed')?.value }}<span class="text-[9px] text-parchment-mute">{{ findVital(character, 'speed')?.unit }}</span></dd>
               <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.speed') }}</dt>
             </div>
           </dl>
