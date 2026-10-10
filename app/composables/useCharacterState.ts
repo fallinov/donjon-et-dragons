@@ -2,7 +2,7 @@ import { watch, onMounted, ref, getCurrentInstance, type Ref } from 'vue'
 import type { Character } from '~~/shared/types/character'
 
 // Fallback si useState Nuxt n'est pas dispo (contexte test pur)
-const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
+export const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
   const nuxtUseState = (globalThis as unknown as { useState?: <U>(key: string, factory: () => U) => Ref<U> }).useState
   if (nuxtUseState) return nuxtUseState<T>(key, factory)
   return ref(factory()) as Ref<T>

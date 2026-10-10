@@ -57,6 +57,12 @@ function selectTab(id: string): void {
               <path d="M5 3v4" /><path d="M3 5h4" />
               <path d="M19 17v4" /><path d="M17 19h4" />
             </template>
+            <!-- Sac : besace -->
+            <template v-else-if="tab.icon === 'bag'">
+              <path d="M6 8h12l-1 12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 8Z" />
+              <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+              <path d="M9 13h6" />
+            </template>
             <!-- Stats : barres -->
             <template v-else-if="tab.icon === 'chart'">
               <path d="M3 3v18h18" />

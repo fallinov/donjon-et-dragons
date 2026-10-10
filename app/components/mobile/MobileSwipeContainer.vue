@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMobileTab } from '~/composables/useMobileTab'
-import { detectAxis, resolveSwipe, type SwipeAxis } from '~/utils/swipe'
+import { detectAxis, isEditableTarget, resolveSwipe, type SwipeAxis } from '~/utils/swipe'
 
 const { swipeLeft, swipeRight } = useMobileTab()
 
@@ -20,8 +20,8 @@ function reset(): void {
 }
 
 function onTouchStart(e: TouchEvent): void {
-  // Geste multi-doigts (pinch) : pas un swipe
-  if (e.touches.length !== 1) {
+  // Geste multi-doigts (pinch) ou dans un champ de saisie : pas un swipe
+  if (e.touches.length !== 1 || isEditableTarget(e.target)) {
     reset()
     return
   }

@@ -23,7 +23,8 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par slug
-- **Tests** : Vitest (unit, 33 tests) + Playwright (e2e, 18 tests, chromium desktop + mobile safari)
+- **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et sauvegardé dans le navigateur
+- **Tests** : Vitest (unit, 66 tests) + Playwright (e2e, 22 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -34,11 +35,18 @@ donjon-et-dragons/
 │   ├── app.vue                      # layout racine + skip link
 │   ├── assets/css/main.css          # @theme Tailwind + @font-face + print A4 paysage
 │   ├── composables/
-│   │   └── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
+│   │   ├── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
+│   │   ├── useInventory.ts          # sac : équipement, argent, notes + localStorage
+│   │   ├── useMobileTab.ts          # onglet actif mobile (Profil, Combat, Sorts, Sac, Stats)
+│   │   └── useIsDesktop.ts          # détecte le viewport >= lg
 │   ├── utils/
 │   │   └── swipe.ts                 # logique pure du swipe mobile (verrouillage d'axe)
 │   ├── components/
 │   │   ├── PrintButton.vue
+│   │   ├── mobile/
+│   │   │   ├── MobileMiniHeader.vue
+│   │   │   ├── MobileSwipeContainer.vue # swipe horizontal entre onglets
+│   │   │   └── MobileTabBar.vue
 │   │   └── codex/
 │   │       ├── CodexCharacterCard.vue # carte accueil avec brouillard au scroll
 │   │       ├── CodexCounter.vue     # compteur +/− générique
@@ -46,12 +54,14 @@ donjon-et-dragons/
 │   │       ├── CodexStatusBar.vue   # HP tracker + inspiration + repos + jets de mort
 │   │       ├── CodexAbilityScores.vue
 │   │       ├── CodexSkillList.vue
-│   │       ├── CodexFeatureList.vue
+│   │       ├── CodexFeatureList.vue # capacités + liste d'avantages
+│   │       ├── CodexInventory.vue   # argent, équipement, notes éditables
 │   │       ├── CodexPersonality.vue
 │   │       ├── CodexAttacks.vue
 │   │       ├── CodexSpells.vue      # slots interactifs aria-pressed, consomme useCharacterState
+│   │       ├── CodexSpellInfo.vue   # détails d'un sort : incantation, portée, durée, concentration
 │   │       ├── CodexLanguages.vue
-│   │       ├── CodexRituals.vue
+│   │       ├── CodexRituals.vue     # rites de combat, accordéon sur mobile
 │   │       └── CodexSection.vue
 │   ├── data/characters/
 │   │   ├── index.ts                 # agrégation + getCharacter(slug)
@@ -94,9 +104,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 33 tests (composable d'état, dataset, composants, logique de swipe)
+pnpm test             # Vitest (unit) — 66 tests (composables d'état et de sac, dataset, composants, logique de swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 18 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 22 tests (chromium desktop + mobile safari)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt pour permettre de tester le composable hors d'un contexte Nuxt.
@@ -108,6 +118,15 @@ Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharac
 - **Persistance** : `localStorage` par slug, clé `codex:<slug>:state`
 - **Singleton** : via `useState` Nuxt pour que `CodexStatusBar` et `CodexSpells` partagent le même state
 - **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
+
+### Sac du personnage
+
+Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.ts) gère l'équipement, les cinq pièces et les notes :
+
+- **Point de départ** : champ optionnel `inventory` de la fiche (`equipment`, `coins`, `notes`). Absent, le sac démarre vide.
+- **Persistance** : `localStorage` par slug, clé `codex:<slug>:inventory`. Propre à chaque appareil, non synchronisé.
+- **Affichage** : cinquième onglet « Sac » sur mobile, section sous les rites sur ordinateur. Non imprimé.
+- **Robustesse** : une sauvegarde abîmée est nettoyée, une quantité à 0 retire l'objet.
 - **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée
 
 ## Déploiement

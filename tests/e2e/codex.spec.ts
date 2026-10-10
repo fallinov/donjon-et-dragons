@@ -1,9 +1,14 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Codex Donjon et Dragons', () => {
-  // Reset localStorage avant chaque test pour éviter la pollution d'état
+  // Reset localStorage au premier chargement de chaque test pour éviter la pollution d'état.
+  // Le marqueur en sessionStorage évite de tout effacer lors d'un rechargement dans le test.
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => window.localStorage.clear())
+    await page.addInitScript(() => {
+      if (window.sessionStorage.getItem('e2e-storage-cleared')) return
+      window.localStorage.clear()
+      window.sessionStorage.setItem('e2e-storage-cleared', '1')
+    })
   })
   test('liste des personnages affiche Dareth', async ({ page }) => {
     const errors: string[] = []
@@ -107,6 +112,31 @@ test.describe('Codex Donjon et Dragons', () => {
     }
   })
 
+  test('Sac : ajout d\'un objet, argent et notes conservés après rechargement', async ({ page }) => {
+    const openSac = async () => {
+      await page.waitForTimeout(800)
+      const sacTab = page.getByRole('button', { name: /^Sac$/i })
+      if (await sacTab.isVisible()) { await sacTab.dispatchEvent('click'); await page.waitForTimeout(500) }
+    }
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await openSac()
+
+    await page.getByLabel("Nom de l'objet").fill('Lanterne sourde')
+    await page.getByRole('button', { name: 'Ajouter' }).click()
+    await expect(page.getByText('Lanterne sourde')).toBeVisible()
+
+    const gold = page.getByLabel(/Pièces d'or/)
+    await gold.fill('400')
+    await gold.blur()
+    await page.getByLabel('Notes').fill('Rendez-vous avec Gundren à Phandaline.')
+
+    await page.reload({ waitUntil: 'networkidle' })
+    await openSac()
+    await expect(page.getByText('Lanterne sourde')).toBeVisible()
+    await expect(page.getByLabel(/Pièces d'or/)).toHaveValue('400')
+    await expect(page.getByLabel('Notes')).toHaveValue(/Gundren/)
+  })
+
   test('Inspiration +/−', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await page.waitForTimeout(800)
@@ -114,11 +144,13 @@ test.describe('Codex Donjon et Dragons', () => {
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
     const addBtn = page.getByRole('button', { name: /Augmenter inspiration/i })
     const useBtn = page.getByRole('button', { name: /Diminuer inspiration/i })
+    // Cherche la valeur dans le compteur seulement (la page contient d'autres chiffres)
+    const counter = useBtn.locator('xpath=..')
     await addBtn.click()
     await addBtn.click()
-    await expect(page.getByText('2', { exact: true })).toBeVisible()
+    await expect(counter.getByText('2', { exact: true })).toBeVisible()
     await useBtn.click()
-    await expect(page.getByText('1', { exact: true })).toBeVisible()
+    await expect(counter.getByText('1', { exact: true })).toBeVisible()
   })
 
   test('Long rest restaure les HP au maximum', async ({ page }) => {

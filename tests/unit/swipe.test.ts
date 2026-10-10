@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detectAxis, resolveSwipe } from '~/utils/swipe'
+import { detectAxis, isEditableTarget, resolveSwipe } from '~/utils/swipe'
 
 describe('detectAxis', () => {
   it('ne tranche pas tant que le mouvement est trop court', () => {
@@ -35,5 +35,27 @@ describe('resolveSwipe', () => {
 
   it('détecte un swipe vers la gauche', () => {
     expect(resolveSwipe('x', -80, 10)).toBe('left')
+  })
+})
+
+describe('isEditableTarget', () => {
+  it('détecte un geste commencé dans un champ de saisie', () => {
+    const textarea = document.createElement('textarea')
+    const input = document.createElement('input')
+    expect(isEditableTarget(textarea)).toBe(true)
+    expect(isEditableTarget(input)).toBe(true)
+  })
+
+  it('détecte un élément à l\'intérieur d\'une zone éditable', () => {
+    const zone = document.createElement('div')
+    zone.setAttribute('contenteditable', 'true')
+    const span = document.createElement('span')
+    zone.appendChild(span)
+    expect(isEditableTarget(span)).toBe(true)
+  })
+
+  it('laisse passer un geste sur du texte normal', () => {
+    expect(isEditableTarget(document.createElement('p'))).toBe(false)
+    expect(isEditableTarget(null)).toBe(false)
   })
 })

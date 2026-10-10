@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-export type TabId = 'profil' | 'combat' | 'sorts' | 'stats'
+export type TabId = 'profil' | 'combat' | 'sorts' | 'sac' | 'stats'
 
 export interface Tab {
   id: TabId
@@ -12,6 +12,7 @@ const TABS_RIGHT: Tab[] = [
   { id: 'profil', label: 'Profil', icon: 'scroll' },
   { id: 'combat', label: 'Combat', icon: 'sword' },
   { id: 'sorts', label: 'Sorts', icon: 'sparkles' },
+  { id: 'sac', label: 'Sac', icon: 'bag' },
   { id: 'stats', label: 'Stats', icon: 'chart' },
 ]
 
