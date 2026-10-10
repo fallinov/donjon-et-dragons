@@ -214,5 +214,29 @@ export const darethBrumeval: Character = {
 
   ritualsNote: "Marque du chasseur, Passage sans trace et Croissance d'épines demandent tous de la concentration. Dareth ne peut en maintenir qu'un seul à la fois.",
 
+  inventory: {
+    coins: { cp: 24, sp: 75, ep: 7, gp: 360, pp: 0 },
+    equipment: [
+      { name: 'Armure de cuir', quantity: 1 },
+      { name: 'Épée courte', quantity: 2 },
+      { name: 'Arc long', quantity: 1 },
+      { name: 'Carquois de 20 flèches', quantity: 2 },
+      { name: "Sac d'explorateur", quantity: 1 },
+      { name: 'Sac de couchage', quantity: 1 },
+      { name: 'Amadou', quantity: 1 },
+      { name: 'Gamelle', quantity: 1 },
+      { name: 'Torche', quantity: 10 },
+      { name: 'Ration', quantity: 10 },
+      { name: 'Gourde', quantity: 1 },
+      { name: 'Corde (15 m)', quantity: 1 },
+      { name: 'Piège à loup', quantity: 1 },
+      { name: 'Griffe de dragon', quantity: 1 },
+      { name: 'Flûte', quantity: 1 },
+      { name: 'Parfum', quantity: 1 },
+      { name: 'Potion de soins', quantity: 1 },
+    ],
+    notes: 'Membre des Zhentarim.',
+  },
+
   colophon: "Consigné sur vélin d'ombre — Codex du chasseur Brumeval. Que nul dragon ne dorme tranquille tant que ses flèches auront des plumes.",
 }

@@ -99,6 +99,27 @@ export interface Ritual {
   footnote?: string
 }
 
+/** Pièces de monnaie D&D : cuivre, argent, électrum, or, platine. */
+export interface Coins {
+  cp: number
+  sp: number
+  ep: number
+  gp: number
+  pp: number
+}
+
+export interface EquipmentItem {
+  name: string
+  quantity: number
+}
+
+/** Contenu de départ du sac, modifiable ensuite sur l'appareil du joueur. */
+export interface StartingInventory {
+  equipment: EquipmentItem[]
+  coins: Coins
+  notes?: string
+}
+
 export interface Character {
   slug: string
   player: string
@@ -126,5 +147,7 @@ export interface Character {
   rituals: Ritual[]
   /** Rappel affiché sous les rites de combat (ex. règle de concentration). */
   ritualsNote?: string
+  /** Équipement, argent et notes de départ. Absent : sac vide. */
+  inventory?: StartingInventory
   colophon: string
 }

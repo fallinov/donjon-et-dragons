@@ -7,6 +7,15 @@ export const AXIS_LOCK_DISTANCE = 10
 export const SWIPE_THRESHOLD = 50
 
 /**
+ * Un geste commencé dans un champ de saisie sert à sélectionner ou déplacer
+ * le curseur : il ne doit jamais changer d'onglet.
+ */
+export function isEditableTarget(target: EventTarget | null): boolean {
+  if (!target || typeof (target as Element).closest !== 'function') return false
+  return (target as Element).closest('input, textarea, select, [contenteditable="true"]') !== null
+}
+
+/**
  * Détermine l'axe dominant d'un geste une fois qu'il a assez bougé.
  * Retourne null tant que le mouvement est trop court pour trancher.
  */

@@ -99,6 +99,13 @@ setTab('profil')
             <p v-else class="text-parchment-mute italic text-center py-8">Aucun sort connu.</p>
           </div>
 
+          <!-- Onglet Sac -->
+          <div v-if="activeTab === 'sac'" class="space-y-6">
+            <CodexSection id="sac-title-m" title="Sac" class="no-print">
+              <CodexInventory :character="character" />
+            </CodexSection>
+          </div>
+
           <!-- Onglet Stats -->
           <div v-if="activeTab === 'stats'" class="space-y-6">
             <CodexAbilityScores :abilities="character.abilities" />
@@ -145,6 +152,10 @@ setTab('profil')
         </div>
 
         <CodexRituals :rituals="character.rituals" :note="character.ritualsNote" />
+
+        <CodexSection id="sac-title" title="Sac" class="no-print mt-16">
+          <CodexInventory :character="character" />
+        </CodexSection>
 
         <footer class="mt-16 pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">
           <p class="text-gold not-italic text-lg mb-4" aria-hidden="true">☩</p>

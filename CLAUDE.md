@@ -5,6 +5,7 @@
 - Données des personnages en fichiers TypeScript typés (`app/data/characters/`)
 - Types partagés dans `shared/types/character.ts`
 - État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort)
+- Sac (équipement, argent, notes) : composable `useInventory`, modifiable et sauvegardé dans le navigateur (clé `codex:{slug}:inventory`)
 - Tests : Vitest (unit) + Playwright (e2e)
 
 ## Personnages (6)
@@ -14,7 +15,7 @@ Steve (Dareth Brumeval), Normand (Skamos Aurum), Myriam (Zanna), Sandra (Maera V
 
 ### Character
 Champs obligatoires : `slug`, `player`, `firstName`, `eyebrow`, `race`, `className`, `level`, `background`, `alignment`, `proficiencyBonus`, `maxHp`, `hitDice`, `portrait`, `vitals`, `abilities`, `skills`, `features`, `personality`, `attacks`, `languages`, `rituals`, `colophon`.
-Optionnels : `lastName`, `spellcasting`, `darkvision`, `ritualsNote` (rappel affiché sous les rites).
+Optionnels : `lastName`, `spellcasting`, `darkvision`, `ritualsNote` (rappel affiché sous les rites), `inventory` (sac de départ : `equipment`, `coins`, `notes`).
 
 ### Spellcasting (nouveau modèle multi-niveaux)
 ```typescript
