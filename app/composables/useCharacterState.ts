@@ -20,8 +20,8 @@ export interface CharacterState {
   dailySpellsUsed: string[]
 }
 
-function storageKey(slug: string): string {
-  return `codex:${slug}:state`
+function storageKey(id: string): string {
+  return `codex:${id}:state`
 }
 
 function defaultState(character: Character): CharacterState {
@@ -66,7 +66,7 @@ export function normalizeState(character: Character, saved: CharacterState): Cha
 function loadState(character: Character): CharacterState {
   if (typeof window === 'undefined') return defaultState(character)
   try {
-    const raw = window.localStorage.getItem(storageKey(character.slug))
+    const raw = window.localStorage.getItem(storageKey(character.id))
     if (!raw) return defaultState(character)
     const parsed: unknown = JSON.parse(raw)
     if (!isValidState(parsed)) return defaultState(character)
@@ -78,12 +78,12 @@ function loadState(character: Character): CharacterState {
 }
 
 /**
- * État mutable d'un personnage, partagé via `useState` Nuxt (singleton par slug),
+ * État mutable d'un personnage, partagé via `useState` Nuxt (singleton par fiche),
  * persisté côté client dans `localStorage`.
  */
 export function useCharacterState(character: Character) {
   const state = useStateSafe<CharacterState>(
-    `character-state:${character.slug}`,
+    `character-state:${character.id}`,
     () => defaultState(character),
   )
 
@@ -98,7 +98,7 @@ export function useCharacterState(character: Character) {
       (next) => {
         if (typeof window === 'undefined') return
         try {
-          window.localStorage.setItem(storageKey(character.slug), JSON.stringify(next))
+          window.localStorage.setItem(storageKey(character.id), JSON.stringify(next))
         }
         catch {
           // quota ou navigation privée — fail silencieusement

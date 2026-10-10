@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import { getCharacter } from '~/data/characters'
 import { useMobileTab } from '~/composables/useMobileTab'
 import { useIsDesktop } from '~/composables/useIsDesktop'
+import { useCharacter } from '~/composables/useCharacters'
 import { computePassivePerception, computePassiveInvestigation } from '~/composables/useCharacterState'
 import { t } from '~/composables/useT'
 
 const route = useRoute()
-const slug = computed(() => route.params.slug as string)
-const character = computed(() => getCharacter(slug.value))
+const id = computed(() => route.params.id as string)
+const { character, status } = useCharacter(id)
 
-if (!character.value) {
-  throw createError({ statusCode: 404, statusMessage: t('character.notFound'), fatal: true })
-}
+const fullName = computed(() => {
+  const c = character.value
+  if (!c) return ''
+  return `${c.firstName}${c.lastName ? ` ${c.lastName}` : ''}`
+})
 
 useSeoMeta({
-  title: () => {
-    const c = character.value!
-    return t('character.seo.title', { name: `${c.firstName}${c.lastName ? ` ${c.lastName}` : ''}` })
-  },
+  title: () => character.value ? t('character.seo.title', { name: fullName.value }) : t('home.seo.title'),
   description: () => {
-    const c = character.value!
-    const fullName = `${c.firstName}${c.lastName ? ` ${c.lastName}` : ''}`
-    return t('character.seo.description', { name: fullName, race: c.race, className: c.className, level: c.level })
+    const c = character.value
+    if (!c) return t('home.seo.description')
+    return t('character.seo.description', { name: fullName.value, race: c.race, className: c.className, level: c.level })
   },
 })
 
@@ -33,7 +32,20 @@ setTab('profil')
 </script>
 
 <template>
-  <div v-if="character">
+  <main
+    v-if="status === 'missing' || status === 'error'"
+    id="contenu"
+    class="font-body text-parchment min-h-screen px-4 py-16 text-center relative z-10"
+  >
+    <p class="font-display text-xl text-gold-bright uppercase tracking-wider-2 mb-6">
+      {{ t(status === 'missing' ? 'character.notFound' : 'character.loadError') }}
+    </p>
+    <NuxtLink to="/" class="font-display text-sm tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase">
+      {{ t('common.back') }}
+    </NuxtLink>
+  </main>
+
+  <div v-else-if="character">
     <PrintButton />
 
     <main

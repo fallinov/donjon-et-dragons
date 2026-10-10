@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { characters } from '~/data/characters'
+import { useCharacterList } from '~/composables/useCharacters'
 import { t, tCount } from '~/composables/useT'
+
+const { characters, status } = useCharacterList()
 
 useSeoMeta({
   title: t('home.seo.title'),
@@ -16,13 +18,16 @@ useSeoMeta({
         <h1 class="font-display uppercase tracking-wider-2 font-normal text-gold-bright text-[clamp(2rem,6vw,3.5rem)]">
           {{ t('home.title') }}
         </h1>
-        <p class="mt-4 text-parchment-dim italic">
+        <p v-if="status === 'ready'" class="mt-4 text-parchment-dim italic">
           {{ tCount('home.count', characters.length) }}
+        </p>
+        <p v-else-if="status === 'error'" class="mt-4 text-ember-bright italic" role="alert">
+          {{ t('home.loadError') }}
         </p>
       </header>
 
       <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <li v-for="character in characters" :key="character.slug">
+        <li v-for="character in characters" :key="character.id">
           <CodexCharacterCard :character="character" />
         </li>
       </ul>

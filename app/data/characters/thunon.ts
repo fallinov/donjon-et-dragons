@@ -1,6 +1,6 @@
-import type { Character } from '~~/shared/types/character'
+import type { CharacterSeed } from '~~/shared/types/character'
 
-export const thunon: Character = {
+export const thunon: CharacterSeed = {
   slug: 'thunon',
   player: 'Juan',
   firstName: 'Thunon',
@@ -16,12 +16,11 @@ export const thunon: Character = {
   hitDice: { die: 6, total: 4 },
 
   portrait: {
-    src: '/img/thunon.png',
+    src: '/img/thunon.jpg',
     alt: "Portrait de Thunon, haut-elfe magicien en robes sombres, grimoire à la main, regard perçant et traits elfiques anguleux",
   },
 
   vitals: [
-    { label: 'Points de vie', value: '23', unit: '/ 23' },
     { label: "Classe d'armure", value: '13' },
     { label: 'Initiative', value: '+3' },
     { label: 'Vitesse', value: '9', unit: 'm' },

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import CodexSpells from '~/components/codex/CodexSpells.vue'
-import { darethBrumeval } from '~/data/characters/dareth-brumeval'
+import { darethBrumeval } from '../helpers/characters'
 
 describe('CodexSpells', () => {
   beforeEach(() => {

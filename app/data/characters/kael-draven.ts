@@ -1,6 +1,6 @@
-import type { Character } from '~~/shared/types/character'
+import type { CharacterSeed } from '~~/shared/types/character'
 
-export const kaelDraven: Character = {
+export const kaelDraven: CharacterSeed = {
   slug: 'kael-draven',
   player: 'Jérôme',
   firstName: 'Kael',
@@ -17,12 +17,11 @@ export const kaelDraven: Character = {
   hitDice: { die: 8, total: 4 },
 
   portrait: {
-    src: '/img/kael-draven.png',
+    src: '/img/kael-draven.jpg',
     alt: "Portrait de Kael Draven, humain roublard en armure de cuir sombre, capuche relevée, rapière au côté, regard furtif",
   },
 
   vitals: [
-    { label: 'Points de vie', value: '27', unit: '/ 27' },
     { label: "Classe d'armure", value: '15' },
     { label: 'Initiative', value: '+4' },
     { label: 'Vitesse', value: '9', unit: 'm' },

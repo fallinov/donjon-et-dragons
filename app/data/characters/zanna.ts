@@ -1,6 +1,6 @@
-import type { Character } from '~~/shared/types/character'
+import type { CharacterSeed } from '~~/shared/types/character'
 
-export const zanna: Character = {
+export const zanna: CharacterSeed = {
   slug: 'zanna',
   player: 'Myriam',
   firstName: 'Zanna',
@@ -17,12 +17,11 @@ export const zanna: Character = {
   hitDice: { die: 8, total: 3 },
 
   portrait: {
-    src: '/img/zanna.png',
+    src: '/img/zanna.jpg',
     alt: "Portrait peint de Zanna, jolie gnome des forêts occultiste, cheveux châtain ornés de feuilles, yeux lumineux, robe de sage brodée, grimoire et familier",
   },
 
   vitals: [
-    { label: 'Points de vie', value: '19', unit: '/ 19' },
     { label: "Classe d'armure", value: '12' },
     { label: 'Initiative', value: '+1' },
     { label: 'Vitesse', value: '7,5', unit: 'm' },

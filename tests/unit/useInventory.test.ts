@@ -2,8 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   addItem, defaultInventory, parseInventory, removeItem, setCoins, setItemQuantity,
 } from '~/composables/useInventory'
-import { darethBrumeval } from '~/data/characters/dareth-brumeval'
-import { zanna } from '~/data/characters/zanna'
+import { darethBrumeval, zanna } from '../helpers/characters'
 
 describe('defaultInventory', () => {
   it('reprend le sac de départ de Dareth', () => {

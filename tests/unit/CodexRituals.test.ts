@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import CodexRituals from '~/components/codex/CodexRituals.vue'
-import { darethBrumeval } from '~/data/characters/dareth-brumeval'
+import { darethBrumeval } from '../helpers/characters'
 
 const rituals = darethBrumeval.rituals
 

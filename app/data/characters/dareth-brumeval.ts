@@ -1,6 +1,6 @@
-import type { Character } from '~~/shared/types/character'
+import type { CharacterSeed } from '~~/shared/types/character'
 
-export const darethBrumeval: Character = {
+export const darethBrumeval: CharacterSeed = {
   slug: 'dareth-brumeval',
   player: 'Steve',
   firstName: 'Dareth',
@@ -17,12 +17,11 @@ export const darethBrumeval: Character = {
   hitDice: { die: 10, total: 6 },
 
   portrait: {
-    src: '/img/dareth-brumeval.png',
+    src: '/img/dareth-brumeval.jpg',
     alt: 'Portrait peint de Dareth Brumeval, demi-elfe rôdeur encapuchonné, arc dans le dos, dans une forêt brumeuse',
   },
 
   vitals: [
-    { label: 'Points de vie', value: '49', unit: '/ 49' },
     { label: "Classe d'armure", value: '15' },
     { label: 'Initiative', value: '+4' },
     { label: 'Vitesse', value: '9', unit: 'm' },

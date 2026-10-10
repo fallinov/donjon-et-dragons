@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { Character } from '~~/shared/types/character'
+import { useObjectUrl } from '~/composables/useObjectUrl'
 import { t } from '~/composables/useT'
 
-defineProps<{ character: Character }>()
+const props = defineProps<{ character: Character }>()
+const portraitUrl = useObjectUrl(() => props.character.portrait)
 
 const cardRef = ref<HTMLElement>()
 const fogAnimating = ref(false)
@@ -32,15 +34,13 @@ onBeforeUnmount(() => { observer?.disconnect() })
 <template>
   <NuxtLink
     ref="cardRef"
-    :to="`/personnages/${character.slug}`"
+    :to="`/personnages/${character.id}`"
     class="block border border-gold/30 bg-charcoal/50 hover:bg-charcoal/70 hover:border-gold transition-colors group overflow-hidden"
   >
     <figure class="relative aspect-[3/4] overflow-hidden">
-      <NuxtImg
-        :src="character.portrait.src"
+      <img
+        :src="portraitUrl"
         :alt="character.portrait.alt"
-        loading="lazy"
-        sizes="320px sm:280px lg:300px"
         class="w-full h-full object-cover saturate-90 group-hover:saturate-100 transition"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/40 via-30% to-transparent to-60%" />

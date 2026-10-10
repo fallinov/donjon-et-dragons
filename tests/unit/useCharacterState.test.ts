@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useCharacterState, computePassivePerception, normalizeState } from '~/composables/useCharacterState'
-import { darethBrumeval } from '~/data/characters/dareth-brumeval'
-import { zanna } from '~/data/characters/zanna'
+import { darethBrumeval, zanna } from '../helpers/characters'
 
 describe('computePassivePerception', () => {
   it('calcule 15 pour Dareth (sag +2, Perception maîtrise, bonus +3)', () => {

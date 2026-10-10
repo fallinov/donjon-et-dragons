@@ -5,7 +5,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@nuxt/image'],
+  // Les fiches vivent dans IndexedDB, côté client uniquement : pas de rendu serveur
+  ssr: false,
+  spaLoadingTemplate: true,
 
   css: ['~/assets/css/main.css'],
 
@@ -40,5 +42,7 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'vercel',
+    // Coquille SPA statique, servie aussi hors ligne par le service worker
+    prerender: { routes: ['/'] },
   },
 })

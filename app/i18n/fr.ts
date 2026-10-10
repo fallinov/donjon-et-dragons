@@ -26,9 +26,11 @@ export const fr = {
   'home.title': 'Donjon & Dragons',
   'home.count.one': '{count} personnage consigné',
   'home.count.other': '{count} personnages consignés',
+  'home.loadError': 'Impossible de lire les fiches enregistrées sur cet appareil.',
 
   // Fiche
   'character.notFound': 'Personnage introuvable',
+  'character.loadError': 'Impossible de lire cette fiche sur cet appareil.',
   'character.seo.title': 'Codex — {name}',
   'character.seo.description': 'Fiche de personnage D&D 5e : {name}, {race} {className} niveau {level}.',
   'character.levelShort': '{className} niv. {level}',

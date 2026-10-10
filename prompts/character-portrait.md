@@ -56,7 +56,7 @@ Background setting: enchanted forest, ferns, warm dappled light
 
 ## Contraintes techniques
 
-- Format : PNG
+- Format : PNG généré, puis converti en JPEG qualité 85 (`sips -s format jpeg -s formatOptions 85`)
 - Dimensions : environ 600x800 ou ratio similaire (portrait vertical)
-- Destination : `public/img/{slug}.png`
+- Destination : `public/img/{slug}.jpg`
 - Le nom du fichier doit correspondre au `slug` du personnage

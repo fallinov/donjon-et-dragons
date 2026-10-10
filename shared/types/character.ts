@@ -120,8 +120,21 @@ export interface StartingInventory {
   notes?: string
 }
 
-export interface Character {
-  slug: string
+/** Version du format de fiche. À incrémenter à chaque évolution du modèle, avec une migration. */
+export const CHARACTER_SCHEMA_VERSION = 1
+
+/**
+ * Portrait embarqué dans la fiche. Octets bruts plutôt que Blob : clonables partout
+ * (IndexedDB, Vitest) et convertibles en base64 pour l'export.
+ */
+export interface Portrait {
+  data: ArrayBuffer
+  mime: string
+  alt: string
+}
+
+/** Champs communs aux fiches stockées et aux fiches de départ. */
+interface CharacterFields {
   player: string
   firstName: string
   lastName?: string
@@ -134,7 +147,6 @@ export interface Character {
   proficiencyBonus: number
   maxHp: number
   hitDice: HitDice
-  portrait: { src: string, alt: string }
   vitals: Vital[]
   abilities: Record<AbilityKey, Ability>
   skills: Skill[]
@@ -150,4 +162,28 @@ export interface Character {
   /** Équipement, argent et notes de départ. Absent : sac vide. */
   inventory?: StartingInventory
   colophon: string
+}
+
+export interface Character extends CharacterFields {
+  /** Slug pour les fiches intégrées, UUID pour les fiches créées sur l'appareil. */
+  id: string
+  portrait: Portrait
+}
+
+/** Provenance d'une fiche stockée sur l'appareil. */
+export type CharacterOrigin = 'builtin' | 'user' | 'import'
+
+/** Fiche telle qu'enregistrée dans IndexedDB. */
+export interface StoredCharacter extends Character {
+  schemaVersion: number
+  origin: CharacterOrigin
+  /** Dates ISO 8601. */
+  createdAt: string
+  updatedAt: string
+}
+
+/** Fiche de départ livrée avec l'app (`app/data/characters`), importée au premier lancement. */
+export interface CharacterSeed extends CharacterFields {
+  slug: string
+  portrait: { src: string, alt: string }
 }
