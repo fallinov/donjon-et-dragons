@@ -33,7 +33,7 @@ function onNotesInput(event: Event): void {
   setNotes((event.target as HTMLTextAreaElement).value)
 }
 
-const inputId = (suffix: string): string => `${props.character.slug}-${suffix}`
+const inputId = (suffix: string): string => `${props.character.id}-${suffix}`
 </script>
 
 <template>

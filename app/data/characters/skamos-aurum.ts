@@ -1,6 +1,6 @@
-import type { Character } from '~~/shared/types/character'
+import type { CharacterSeed } from '~~/shared/types/character'
 
-export const skamosAurum: Character = {
+export const skamosAurum: CharacterSeed = {
   slug: 'skamos-aurum',
   player: 'Normand',
   firstName: 'Skamos',
@@ -17,12 +17,11 @@ export const skamosAurum: Character = {
   hitDice: { die: 6, total: 4 },
 
   portrait: {
-    src: '/img/skamos-aurum.png',
+    src: '/img/skamos-aurum.jpg',
     alt: "Portrait peint de Skamos Aurum, tieffelin ensorceleur à la peau rouge, cornes sombres courbées vers l'arrière, yeux dorés luminescents, cape à capuche",
   },
 
   vitals: [
-    { label: 'Points de vie', value: '33', unit: '/ 33' },
     { label: "Classe d'armure", value: '15' },
     { label: 'Initiative', value: '+2' },
     { label: 'Vitesse', value: '9', unit: 'm' },

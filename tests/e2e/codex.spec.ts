@@ -22,6 +22,24 @@ test.describe('Codex Donjon et Dragons', () => {
     expect(errors).toEqual([])
   })
 
+  test('premier lancement : les 6 fiches sont importées avec leur portrait', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByText('6 personnages consignés')).toBeVisible()
+    const portraits = page.locator('main ul img')
+    await expect(portraits).toHaveCount(6)
+    for (const img of await portraits.all()) {
+      await expect(img).toHaveAttribute('src', /^blob:/)
+      await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
+    }
+  })
+
+  test('identifiant inconnu : message et lien de retour', async ({ page }) => {
+    await page.goto('/personnages/inexistant')
+    await expect(page.getByText('Personnage introuvable')).toBeVisible()
+    await page.getByRole('link', { name: 'Retour aux codex' }).click()
+    await expect(page).toHaveURL(/\/$/)
+  })
+
   test('navigation vers la fiche Dareth', async ({ page }) => {
     await page.goto('/')
     await page.locator('a[href="/personnages/dareth-brumeval"]').click({ force: true })
@@ -32,7 +50,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('lancer un sort consomme un emplacement', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     // Sur mobile, naviguer vers l'onglet Sorts
     const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
     if (await sortsTab.isVisible()) { await sortsTab.dispatchEvent('click'); await page.waitForTimeout(500) }
@@ -68,7 +86,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('HP tracker permet les dégâts et les soins via boutons −/+', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     // Sur mobile, naviguer vers l'onglet Combat
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
@@ -92,7 +110,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('Rites de combat en accordéon sur mobile, ouverts sur ordinateur', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     const firstFormula = page.locator('#rite-panel-0 p').first()
 
@@ -114,7 +132,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('Sac : ajout d\'un objet, argent et notes conservés après rechargement', async ({ page }) => {
     const openSac = async () => {
-      await page.waitForTimeout(800)
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
       const sacTab = page.getByRole('button', { name: /^Sac$/i })
       if (await sacTab.isVisible()) { await sacTab.dispatchEvent('click'); await page.waitForTimeout(500) }
     }
@@ -139,7 +157,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('Inspiration +/−', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
     const addBtn = page.getByRole('button', { name: /Augmenter inspiration/i })
@@ -155,7 +173,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('Long rest restaure les HP au maximum', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 
@@ -172,7 +190,7 @@ test.describe('Codex Donjon et Dragons', () => {
 
   test('Jets de sauvegarde contre la mort apparaissent quand HP = 0', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(800)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     const combatTab = page.getByRole('button', { name: /^Combat$/i })
     if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
 

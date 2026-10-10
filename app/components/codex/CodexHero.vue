@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { Character } from '~~/shared/types/character'
+import { useObjectUrl } from '~/composables/useObjectUrl'
 import { t } from '~/composables/useT'
 
-defineProps<{ character: Character }>()
+const props = defineProps<{ character: Character }>()
+const portraitUrl = useObjectUrl(() => props.character.portrait)
 
 const fogRevealed = ref(false)
 
@@ -28,10 +30,9 @@ onMounted(() => {
       </NuxtLink>
       <!-- Photo arrière-plan avec gradient -->
       <div class="relative aspect-[3/4] sm:aspect-[16/9] overflow-hidden w-screen -ml-4 sm:-ml-8 lg:-ml-10">
-        <NuxtImg
-          :src="character.portrait.src"
+        <img
+          :src="portraitUrl"
           :alt="character.portrait.alt"
-          loading="eager"
           class="absolute inset-0 w-full h-full object-cover object-top"
         />
         <!-- Gradient bas : noir vers transparent -->
@@ -95,11 +96,9 @@ onMounted(() => {
     <!-- ═══ DESKTOP : layout 3 colonnes classique ═══ -->
     <div class="hidden xl:grid xl:grid-cols-[auto_1fr_auto] items-center gap-10 pb-10 border-b border-gold/35 divider-fleuron">
       <figure class="justify-self-end relative w-48 h-64 rounded border border-gold/80 overflow-hidden shadow-[0_0_30px_rgba(201,162,74,0.25),inset_0_0_40px_rgba(0,0,0,0.5)]">
-        <NuxtImg
-          :src="character.portrait.src"
+        <img
+          :src="portraitUrl"
           :alt="character.portrait.alt"
-          loading="lazy"
-          sizes="192px"
           class="block w-full h-full object-cover saturate-90 contrast-105"
         />
       </figure>
@@ -122,7 +121,7 @@ onMounted(() => {
 
       <dl class="justify-self-end grid grid-cols-2 gap-4 text-left">
         <div
-          v-for="vital in character.vitals.filter(v => v.label !== 'Points de vie')"
+          v-for="vital in character.vitals"
           :key="vital.label"
           class="border border-gold/40 bg-charcoal/60 px-3 py-2 min-w-[80px]"
         >

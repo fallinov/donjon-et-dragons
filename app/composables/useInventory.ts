@@ -24,8 +24,8 @@ function newId(): string {
   return `item-${Date.now().toString(36)}-${idCounter}`
 }
 
-function storageKey(slug: string): string {
-  return `codex:${slug}:inventory`
+function storageKey(id: string): string {
+  return `codex:${id}:inventory`
 }
 
 /** Entier positif ou nul, sinon 0. */
@@ -95,7 +95,7 @@ export function setCoins(state: InventoryState, type: CoinType, amount: number):
 function loadInventory(character: Character): InventoryState {
   if (typeof window === 'undefined') return defaultInventory(character)
   try {
-    const raw = window.localStorage.getItem(storageKey(character.slug))
+    const raw = window.localStorage.getItem(storageKey(character.id))
     if (!raw) return defaultInventory(character)
     return parseInventory(JSON.parse(raw)) ?? defaultInventory(character)
   }
@@ -109,7 +109,7 @@ function loadInventory(character: Character): InventoryState {
  * et persisté dans `localStorage` sur l'appareil du joueur.
  */
 export function useInventory(character: Character) {
-  const state = useStateSafe<InventoryState>(`inventory:${character.slug}`, () => defaultInventory(character))
+  const state = useStateSafe<InventoryState>(`inventory:${character.id}`, () => defaultInventory(character))
 
   if (getCurrentInstance()) {
     onMounted(() => {
@@ -120,7 +120,7 @@ export function useInventory(character: Character) {
       (next) => {
         if (typeof window === 'undefined') return
         try {
-          window.localStorage.setItem(storageKey(character.slug), JSON.stringify(next))
+          window.localStorage.setItem(storageKey(character.id), JSON.stringify(next))
         }
         catch {
           // quota ou navigation privée — échec silencieux

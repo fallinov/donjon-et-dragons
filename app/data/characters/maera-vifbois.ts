@@ -1,6 +1,6 @@
-import type { Character } from '~~/shared/types/character'
+import type { CharacterSeed } from '~~/shared/types/character'
 
-export const maeraVifbois: Character = {
+export const maeraVifbois: CharacterSeed = {
   slug: 'maera-vifbois',
   player: 'Sandra',
   firstName: 'Maera',
@@ -17,12 +17,11 @@ export const maeraVifbois: Character = {
   hitDice: { die: 10, total: 4 },
 
   portrait: {
-    src: '/img/maera-vifbois.png',
+    src: '/img/maera-vifbois.jpg',
     alt: 'Portrait de Maera Vifbois, paladine humaine en cotte de maille, bouclier et marteau de guerre, regard déterminé',
   },
 
   vitals: [
-    { label: 'Points de vie', value: '44', unit: '/ 44' },
     { label: "Classe d'armure", value: '18' },
     { label: 'Initiative', value: '+2' },
     { label: 'Vitesse', value: '9', unit: 'm' },

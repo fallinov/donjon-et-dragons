@@ -22,9 +22,10 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **TypeScript strict** (zéro `any`)
 - **Polices auto-hébergées** : Cinzel (display) + EB Garamond (body) dans `public/fonts/` (souveraineté CEJEF, aucun CDN externe)
 - **Portraits générés via Nano Banana** (Gemini Flash Image), style painterly medieval oil
-- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par slug
+- **Fiches stockées sur l'appareil** : IndexedDB (lib `idb`), rendu 100 % client (`ssr: false`, page d'accueil pré-rendue). Les 6 fiches de `app/data/characters/` sont importées au premier lancement
+- **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt + `localStorage` par fiche
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et sauvegardé dans le navigateur
-- **Tests** : Vitest (unit, 66 tests) + Playwright (e2e, 22 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 97 tests) + Playwright (e2e, 26 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -37,9 +38,18 @@ donjon-et-dragons/
 │   ├── composables/
 │   │   ├── useCharacterState.ts     # état mutable + localStorage + repos D&D 5e
 │   │   ├── useInventory.ts          # sac : équipement, argent, notes + localStorage
+│   │   ├── useCharacters.ts         # useCharacterList(), useCharacter(id) depuis IndexedDB
+│   │   ├── useObjectUrl.ts          # URL blob: d'un portrait, révoquée automatiquement
 │   │   ├── useMobileTab.ts          # onglet actif mobile (Profil, Combat, Sorts, Sac, Stats)
 │   │   ├── useT.ts                  # t() / tCount() : textes de l'interface
 │   │   └── useIsDesktop.ts          # détecte le viewport >= lg
+│   ├── db/
+│   │   ├── schema.ts                # base IndexedDB `codex` : stores characters, states, inventories, meta
+│   │   ├── characterRepository.ts   # lecture, écriture, suppression atomique des fiches
+│   │   ├── migrations.ts            # migration des documents selon `schemaVersion`
+│   │   └── seed.ts                  # import des fiches de départ au premier lancement
+│   ├── plugins/
+│   │   └── db.client.ts             # seed + demande de stockage persistant avant le premier rendu
 │   ├── i18n/
 │   │   └── fr.ts                    # catalogue des textes de l'interface (clés plates)
 │   ├── utils/
@@ -67,7 +77,7 @@ donjon-et-dragons/
 │   │       ├── CodexRituals.vue     # rites de combat, accordéon sur mobile
 │   │       └── CodexSection.vue
 │   ├── data/characters/
-│   │   ├── index.ts                 # agrégation + getCharacter(slug)
+│   │   ├── index.ts                 # fiches de départ : seeds + getSeed(slug)
 │   │   ├── dareth-brumeval.ts
 │   │   ├── skamos-aurum.ts
 │   │   ├── zanna.ts
@@ -76,13 +86,13 @@ donjon-et-dragons/
 │   │   └── kael-draven.ts
 │   └── pages/
 │       ├── index.vue                # liste des codex
-│       └── personnages/[slug].vue   # fiche dynamique
+│       └── personnages/[id]/index.vue # fiche dynamique (lue dans IndexedDB)
 ├── shared/types/character.ts        # interface Character (abilities, skills, attacks, spellcasting, rituals, personality)
 ├── prompts/
 │   └── character-portrait.md        # template prompt pour la génération des portraits (Gemini)
 ├── public/
 │   ├── fonts/                       # Cinzel, EB Garamond (.ttf)
-│   └── img/                         # portraits (6) + fog textures (fog1/fog2.png) + favicons
+│   └── img/                         # portraits JPEG (6) + fog textures (fog1/fog2.png) + favicons
 ├── tests/
 │   ├── unit/                        # Vitest
 │   └── e2e/                         # Playwright
@@ -107,18 +117,18 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 66 tests (composables d'état et de sac, dataset, composants, logique de swipe)
+pnpm test             # Vitest (unit) — 97 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 22 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 26 tests (chromium desktop + mobile safari)
 ```
 
-Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt pour permettre de tester le composable hors d'un contexte Nuxt.
+Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt et fournit une base IndexedDB neuve à chaque test (`fake-indexeddb`). `tests/helpers/characters.ts` construit des fiches stockées à partir des seeds.
 
 ### État mutable interactif
 
 Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharacterState.ts) expose l'état mutable de chaque personnage (HP courant/temp, inspiration, dés de vie utilisés, jets de mort, emplacements de sort consommés) avec :
 
-- **Persistance** : `localStorage` par slug, clé `codex:<slug>:state`
+- **Persistance** : `localStorage` par fiche, clé `codex:<id>:state`
 - **Singleton** : via `useState` Nuxt pour que `CodexStatusBar` et `CodexSpells` partagent le même state
 - **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
 
@@ -127,7 +137,7 @@ Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharac
 Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.ts) gère l'équipement, les cinq pièces et les notes :
 
 - **Point de départ** : champ optionnel `inventory` de la fiche (`equipment`, `coins`, `notes`). Absent, le sac démarre vide.
-- **Persistance** : `localStorage` par slug, clé `codex:<slug>:inventory`. Propre à chaque appareil, non synchronisé.
+- **Persistance** : `localStorage` par fiche, clé `codex:<id>:inventory`. Propre à chaque appareil, non synchronisé.
 - **Affichage** : cinquième onglet « Sac » sur mobile, section sous les rites sur ordinateur. Non imprimé.
 - **Robustesse** : une sauvegarde abîmée est nettoyée, une quantité à 0 retire l'objet.
 - **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée
@@ -145,11 +155,15 @@ Le projet est lié via `.vercel/project.json` (org `steves-projects-7a849401`, p
 
 ## Ajouter un personnage
 
-1. Créer `app/data/characters/<slug>.ts` exportant un `Character` typé depuis `~~/shared/types/character` (ne pas oublier le champ `player`)
-2. L'importer dans `app/data/characters/index.ts` et l'ajouter au tableau `characters`
-3. Générer le portrait avec le template `prompts/character-portrait.md` et le sauvegarder dans `public/img/<slug>.png` (3:4, style painterly medieval oil)
-4. La fiche est automatiquement accessible sur `/personnages/<slug>`
+Fiche de départ livrée avec l'app (importée au premier lancement sur chaque appareil) :
+
+1. Créer `app/data/characters/<slug>.ts` exportant un `CharacterSeed` typé depuis `~~/shared/types/character` (ne pas oublier le champ `player`)
+2. L'importer dans `app/data/characters/index.ts` et l'ajouter au tableau `seeds`
+3. Générer le portrait avec le template `prompts/character-portrait.md`, le convertir en JPEG (`sips -s format jpeg -s formatOptions 85 <slug>.png --out public/img/<slug>.jpg`)
+4. La fiche est accessible sur `/personnages/<slug>`
 5. Tester : `pnpm test && pnpm test:e2e`
+
+⚠️ Un appareil déjà initialisé n'importe pas les nouvelles fiches de départ (l'import ne tourne qu'une fois) ni les modifications des fichiers existants.
 
 ## Accessibilité (WCAG 2.2 AA)
 
