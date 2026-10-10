@@ -79,3 +79,15 @@ Pattern utilisé :
 **Correction** : remplacer les PNG par des textures avec **canal alpha** (source : [CSS_FOG_ANIMATION](https://github.com/danielstuart14/CSS_FOG_ANIMATION)). Les volutes se fondent naturellement vers le transparent. Ajout de `scale: 1.2` sur les layers pour pousser les derniers bords hors de l'`overflow: hidden`.
 
 **Règle** : pour un effet de brouillard CSS en couches, **toujours utiliser des textures PNG RGBA** dont les bords se fondent progressivement vers le transparent. Ne jamais utiliser de textures avec un fond opaque, même avec des masques CSS — le résultat est toujours inférieur.
+
+---
+
+## 2026-10-10 — Vitest : un `vi.fn` configuré pour échouer laisse un rejet non géré
+
+**Contexte** : test de `EditPortrait`, avec un mock de `resizePortrait` qui rejette (`mockRejectedValue`, puis `mockImplementation(async () => { throw … })`).
+
+**Erreur** : le test échouait avec l'erreur du mock, alors que le composant l'attrapait bien (vérifié par une sonde : message affiché, `errorHandler` de Vue jamais appelé). Le suivi des résultats de l'espion produit une promesse dérivée qui rejette sans gestionnaire, et Vitest l'attribue au test.
+
+**Correction** : une simple fonction interchangeable (`let impl = async () => …`), réaffectée dans chaque test, appelée par la fabrique de `vi.mock`.
+
+**Règle** : pour simuler un **échec asynchrone**, ne pas passer par un `vi.fn` reconfiguré ; utiliser une fonction ordinaire. Garder `vi.fn` pour compter les appels des cas qui réussissent.
