@@ -101,32 +101,32 @@ function costLabel(spell: Spell): string {
 
       <!-- Boutons repos -->
       <div class="flex gap-2 pt-1">
-        <button type="button" class="flex-1 border border-gold/20 text-parchment-mute hover:text-gold-bright font-display text-xs tracking-wider-2 uppercase py-2 transition-colors" @click="doShortRest">{{ t('rest.short') }}</button>
-        <button type="button" class="flex-1 border border-gold/30 bg-gold/5 text-gold hover:text-gold-bright hover:bg-gold/15 font-display text-xs tracking-wider-2 uppercase py-2 transition-colors" @click="doLongRest">{{ t('rest.long') }}</button>
+        <button type="button" class="flex-1 border border-gold/20 text-parchment-mute hover:text-gold-bright font-display text-sm tracking-wider-2 uppercase min-h-11 transition-colors" @click="doShortRest">{{ t('rest.short') }}</button>
+        <button type="button" class="flex-1 border border-gold/30 bg-gold/5 text-gold hover:text-gold-bright hover:bg-gold/15 font-display text-sm tracking-wider-2 uppercase min-h-11 transition-colors" @click="doLongRest">{{ t('rest.long') }}</button>
       </div>
     </div>
 
     <!-- ═══ Sorts mineurs (cantrips) ═══ -->
     <div v-if="cantrips.length">
-      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">{{ t('spells.cantrips') }}</p>
+      <p class="font-display text-xs tracking-wider-3 text-gold uppercase mb-2">{{ t('spells.cantrips') }}</p>
       <ul class="space-y-2">
         <li v-for="spell in cantrips" :key="spell.title" class="flex items-start justify-between gap-3 py-2 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell" />
-          <span class="shrink-0 text-xs text-parchment-mute/50 font-display mt-0.5">∞</span>
+          <span class="shrink-0 text-xs text-parchment-mute font-display mt-0.5">∞</span>
         </li>
       </ul>
     </div>
 
     <!-- ═══ Sorts par niveau (slot) ═══ -->
     <div v-for="slotLevel in sc.slotLevels" :key="`spells-${slotLevel.level}`">
-      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">{{ t('spells.levelTitle', { level: slotLevel.level }) }}</p>
+      <p class="font-display text-xs tracking-wider-3 text-gold uppercase mb-2">{{ t('spells.levelTitle', { level: slotLevel.level }) }}</p>
       <ul class="space-y-1">
         <li v-for="spell in spellsByLevel(slotLevel.level)" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell" />
           <button
             type="button"
             :disabled="!canCast(spell)"
-            class="shrink-0 self-center border border-gold/30 bg-charcoal text-gold-bright hover:bg-gold/10 disabled:opacity-25 disabled:hover:bg-transparent font-display text-xs tracking-wider-2 uppercase px-3 py-1.5 transition-colors"
+            class="shrink-0 self-center border border-gold/30 bg-charcoal text-gold-bright hover:bg-gold/10 disabled:opacity-25 disabled:hover:bg-transparent font-display text-sm tracking-wider-2 uppercase min-h-11 px-4 transition-colors"
             @click="cast(spell)"
           >{{ t('spells.cast') }}</button>
         </li>
@@ -135,7 +135,7 @@ function costLabel(spell: Spell): string {
 
     <!-- ═══ Sorts daily (raciaux, etc.) ═══ -->
     <div v-if="dailySpells.length">
-      <p class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-2">{{ t('spells.special') }}</p>
+      <p class="font-display text-xs tracking-wider-3 text-gold uppercase mb-2">{{ t('spells.special') }}</p>
       <ul class="space-y-1">
         <li v-for="spell in dailySpells" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell">
@@ -146,7 +146,7 @@ function costLabel(spell: Spell): string {
           <button
             type="button"
             :disabled="!canCast(spell)"
-            class="shrink-0 self-center border border-gold/30 bg-charcoal text-gold-bright hover:bg-gold/10 disabled:opacity-25 disabled:hover:bg-transparent font-display text-xs tracking-wider-2 uppercase px-3 py-1.5 transition-colors"
+            class="shrink-0 self-center border border-gold/30 bg-charcoal text-gold-bright hover:bg-gold/10 disabled:opacity-25 disabled:hover:bg-transparent font-display text-sm tracking-wider-2 uppercase min-h-11 px-4 transition-colors"
             @click="cast(spell)"
           >{{ isDailyUsed(spell) ? t('spells.used') : t('spells.cast') }}</button>
         </li>

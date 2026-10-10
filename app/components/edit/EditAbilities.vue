@@ -14,10 +14,10 @@ const character = defineModel<Character>({ required: true })
       <fieldset
         v-for="key in ABILITY_KEYS"
         :key="key"
-        class="border border-gold/25 bg-charcoal/40 p-3"
+        class="border-l-2 border-gold/40 bg-charcoal/30 py-2 pl-3 pr-1"
         :data-ability="key"
       >
-        <legend class="px-1 font-display text-sm tracking-wider-3 text-gold-bright uppercase">{{ character.abilities[key].label }}</legend>
+        <legend class="font-display text-base tracking-wider-3 text-gold-bright uppercase">{{ character.abilities[key].label }}</legend>
         <div class="grid grid-cols-3 gap-2">
           <EditNumber v-model="character.abilities[key].score" :label="t('field.score')" :error="errorFor(errors, `abilities.${key}.score`)" />
           <EditNumber v-model="character.abilities[key].modifier" signed :label="t('field.modifier')" :short="t('field.modifierShort')" :error="errorFor(errors, `abilities.${key}.modifier`)" />

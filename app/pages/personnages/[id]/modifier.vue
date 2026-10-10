@@ -46,7 +46,7 @@ async function save(): Promise<void> {
 </script>
 
 <template>
-  <main id="contenu" class="font-body text-parchment min-h-screen px-4 py-6 sm:px-8 relative z-10 max-w-4xl mx-auto">
+  <main id="contenu" class="font-body text-parchment min-h-screen px-4 pt-2 pb-6 sm:px-8 sm:py-6 relative z-10 max-w-4xl mx-auto">
     <NuxtLink :to="`/personnages/${id}`" class="inline-flex min-h-11 items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase mb-4">
       <span aria-hidden="true">←</span> {{ fullName || t('common.back') }}
     </NuxtLink>

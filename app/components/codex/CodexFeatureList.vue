@@ -7,7 +7,7 @@ defineProps<{ features: Trait[] }>()
 <template>
   <ul class="space-y-4">
     <li v-for="feature in features" :key="feature.title">
-      <strong class="block font-display text-xs tracking-wider-3 text-gold-bright uppercase mb-1">
+      <strong class="block font-display text-sm tracking-wider-2 text-gold-bright uppercase mb-1">
         — {{ feature.title }}
       </strong>
       <span class="text-parchment-dim">{{ feature.description }}</span>
@@ -17,7 +17,7 @@ defineProps<{ features: Trait[] }>()
           :key="benefit"
           class="flex gap-2 text-sm text-parchment-dim leading-snug"
         >
-          <span class="text-ember shrink-0" aria-hidden="true">◆</span>
+          <span class="text-ember-light shrink-0" aria-hidden="true">◆</span>
           <span>{{ benefit }}</span>
         </li>
       </ul>

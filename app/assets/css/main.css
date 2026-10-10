@@ -24,6 +24,8 @@
 
   --color-ember: #c23b1a;
   --color-ember-bright: #e8652a;
+  /* Texte rouge-orangé : ≥ 7:1 sur tous les fonds du codex (WCAG AAA) */
+  --color-ember-light: #f39a70;
   --color-blood: #6a1310;
 
   --font-display: 'Cinzel', 'Trajan Pro', serif;
@@ -83,7 +85,7 @@ button, a, [role="button"] {
 .skip-link {
   position: absolute; left: -9999px; top: 12px;
   background: var(--color-gold-bright); color: var(--color-obsidian);
-  padding: 8px 14px; font-weight: 600;
+  padding: 12px 16px; font-weight: 600; min-height: 44px;
   border-radius: 4px; z-index: 100;
 }
 .skip-link:focus { left: 12px; }
@@ -253,11 +255,30 @@ button, a, [role="button"] {
 }
 
 /* ── Champs de l'éditeur de fiche ────────────────────── */
+/* Un fieldset s'élargit par défaut à son contenu (min-inline-size: min-content) */
+fieldset { min-width: 0; }
+/* Un champ a une largeur intrinsèque (~20 caractères) : sans min-width 0, il élargit
+   sa colonne de grille et provoque un défilement horizontal sur petit écran */
+.edit-field { min-width: 0; }
 .edit-input {
+  min-width: 0;
+  max-width: 100%;
   background: var(--color-charcoal);
   border: 1px solid color-mix(in srgb, var(--color-gold) 65%, transparent);
   color: var(--color-parchment);
   font-size: 1rem; /* 16 px : pas de zoom automatique sur iOS */
 }
 .edit-input:focus { border-color: var(--color-gold-bright); }
-.edit-input[aria-invalid="true"] { border-color: var(--color-ember-bright); }
+.edit-input[aria-invalid="true"] { border-color: var(--color-ember-light); }
+
+/* Menu déroulant : WebKit ignore min-height sur l'apparence native (26 px mesurés) */
+select.edit-input {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 44px;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23c9a24a'%3E%3Cpath d='M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 1.25rem;
+}

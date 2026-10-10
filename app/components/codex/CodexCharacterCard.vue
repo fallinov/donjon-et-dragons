@@ -61,7 +61,7 @@ onBeforeUnmount(() => { observer?.disconnect() })
       </div>
 
       <div class="absolute bottom-0 left-0 right-0 z-20 p-4">
-        <p class="font-display text-xs tracking-wider-4 text-gold/80 uppercase mb-1">
+        <p class="font-display text-xs tracking-wider-4 text-gold uppercase mb-1">
           {{ character.eyebrow }}
         </p>
         <h2 class="font-display text-2xl text-gold-bright uppercase tracking-wider-2 leading-tight drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">

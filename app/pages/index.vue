@@ -28,7 +28,7 @@ useSeoMeta({
         >
           <span aria-hidden="true">+</span> {{ t('actions.newCharacter') }}
         </NuxtLink>
-        <p v-else-if="status === 'error'" class="mt-4 text-ember-bright italic" role="alert">
+        <p v-else-if="status === 'error'" class="mt-4 text-ember-light italic" role="alert">
           {{ t('home.loadError') }}
         </p>
       </header>

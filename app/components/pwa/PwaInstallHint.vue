@@ -59,8 +59,8 @@ function dismiss(): void {
     <p class="text-sm text-parchment-dim">{{ t('pwa.installText') }}</p>
     <p v-if="iosHint && !installable" class="mt-2 text-sm text-parchment">{{ t('pwa.iosText') }}</p>
     <div class="mt-3 flex justify-end gap-2">
-      <button type="button" class="min-h-11 px-3 font-display text-xs tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright" @click="dismiss">{{ t('pwa.dismiss') }}</button>
-      <button v-if="installable" type="button" class="min-h-11 border border-gold/60 bg-gold/15 px-4 font-display text-xs tracking-wider-2 uppercase text-gold-bright hover:bg-gold/25" @click="install">{{ t('pwa.install') }}</button>
+      <button type="button" class="min-h-11 px-3 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright" @click="dismiss">{{ t('pwa.dismiss') }}</button>
+      <button v-if="installable" type="button" class="min-h-11 border border-gold/60 bg-gold/15 px-4 font-display text-sm tracking-wider-2 uppercase text-gold-bright hover:bg-gold/25" @click="install">{{ t('pwa.install') }}</button>
     </div>
   </aside>
 </template>

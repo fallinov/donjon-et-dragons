@@ -30,9 +30,9 @@ const inputmode = computed(() => props.signed ? undefined : 'numeric')
 
 <template>
   <div class="edit-field">
-    <label :for="id" class="block font-display text-xs tracking-wider-3 text-gold uppercase mb-1">
+    <label :for="id" class="block font-display text-sm tracking-wider-2 text-gold uppercase mb-1">
       <template v-if="short"><span aria-hidden="true">{{ short }}</span><span class="sr-only">{{ label }}</span></template>
-      <template v-else>{{ label }}</template><span v-if="required" class="text-ember-bright" aria-hidden="true"> *</span>
+      <template v-else>{{ label }}</template><span v-if="required" class="text-ember-light" aria-hidden="true"> *</span>
     </label>
     <input
       :id="id"
@@ -45,7 +45,7 @@ const inputmode = computed(() => props.signed ? undefined : 'numeric')
       :aria-describedby="[hint ? `${id}-hint` : '', error ? `${id}-error` : ''].join(' ').trim() || undefined"
       class="edit-input w-full min-h-11 px-3 tabular-nums"
     >
-    <p v-if="hint" :id="`${id}-hint`" class="mt-1 text-xs text-parchment-mute italic">{{ hint }}</p>
-    <p v-if="error" :id="`${id}-error`" class="mt-1 text-sm text-ember-bright" data-field-error>{{ t(error) }}</p>
+    <p v-if="hint" :id="`${id}-hint`" class="mt-1 text-sm text-parchment-mute italic">{{ hint }}</p>
+    <p v-if="error" :id="`${id}-error`" class="mt-1 text-sm text-ember-light" data-field-error>{{ t(error) }}</p>
   </div>
 </template>

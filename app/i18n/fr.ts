@@ -248,6 +248,7 @@ export const fr = {
   'field.proficient': 'Maîtrise',
   'field.skillName': 'Compétence',
   'field.skillAbility': 'Caractéristique',
+  'field.skillAbilityShort': 'Carac.',
   'field.trait': 'Trait de personnalité',
   'field.idealLabel': "Nom de l'idéal",
   'field.idealLabelHint': 'Facultatif, ex. « Liberté ».',

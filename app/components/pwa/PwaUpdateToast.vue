@@ -24,8 +24,8 @@ function later(): void {
   >
     <p class="min-w-0 flex-1 text-sm">{{ t('pwa.updateAvailable') }}</p>
     <div class="flex gap-2">
-      <button type="button" class="min-h-11 px-3 font-display text-xs tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright" @click="later">{{ t('pwa.later') }}</button>
-      <button type="button" class="min-h-11 border border-gold/60 bg-gold/15 px-3 font-display text-xs tracking-wider-2 uppercase text-gold-bright hover:bg-gold/25" @click="update">{{ t('pwa.reload') }}</button>
+      <button type="button" class="min-h-11 px-3 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright" @click="later">{{ t('pwa.later') }}</button>
+      <button type="button" class="min-h-11 border border-gold/60 bg-gold/15 px-3 font-display text-sm tracking-wider-2 uppercase text-gold-bright hover:bg-gold/25" @click="update">{{ t('pwa.reload') }}</button>
     </div>
   </div>
 </template>

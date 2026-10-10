@@ -15,12 +15,12 @@ const createStep = (): RitualStep => ({ text: '', emphasis: '' })
     <EditList v-model="character.rituals" collapsible :invalid="i => errors.some(e => e.path.startsWith(`rituals.${i}.`))" :add-label="t('editor.add')" :item-name="ritual => ritual.title || ritual.number" :create="createRitual">
       <template #default="{ item: ritual, index }">
         <div class="grid gap-3">
-          <div class="grid grid-cols-[8rem_1fr] gap-2">
+          <div class="grid gap-2 sm:grid-cols-[8rem_minmax(0,1fr)]">
             <EditText v-model="ritual.number" :label="t('field.ritualNumber')" :hint="t('field.ritualNumberHint')" :error="errorFor(errors, `rituals.${index}.number`)" />
             <EditText v-model="ritual.title" :label="t('field.ritualTitle')" />
           </div>
           <fieldset>
-            <legend class="font-display text-xs tracking-wider-3 text-gold/80 uppercase mb-2">{{ t('editor.subsection.steps') }}</legend>
+            <legend class="font-display text-sm tracking-wider-3 text-gold uppercase mb-2">{{ t('editor.subsection.steps') }}</legend>
             <EditList v-model="ritual.steps" :add-label="t('editor.add')" :item-name="step => step.emphasis || step.text" :create="createStep">
               <template #default="{ item: step }">
                 <div class="grid gap-2 sm:grid-cols-2">
@@ -31,7 +31,7 @@ const createStep = (): RitualStep => ({ text: '', emphasis: '' })
             </EditList>
           </fieldset>
           <fieldset>
-            <legend class="font-display text-xs tracking-wider-3 text-gold/80 uppercase mb-2">{{ t('editor.subsection.formulas') }}</legend>
+            <legend class="font-display text-sm tracking-wider-3 text-gold uppercase mb-2">{{ t('editor.subsection.formulas') }}</legend>
             <EditList v-model="ritual.formulas" inline :add-label="t('editor.add')" :item-name="formula => formula" :create="() => ''">
               <template #default="{ item: formula, index: j }">
                 <EditText :model-value="formula" :label="t('field.formula')" @update:model-value="ritual.formulas[j] = $event" />

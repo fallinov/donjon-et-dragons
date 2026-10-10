@@ -26,11 +26,11 @@ async function remove(): Promise<void> {
   <div class="no-print flex items-center gap-2" role="group" :aria-label="t('actions.label')">
     <NuxtLink
       :to="`/personnages/${character.id}/modifier`"
-      class="inline-flex min-h-11 items-center border border-gold/40 bg-charcoal/60 px-3 font-display text-xs tracking-wider-2 uppercase text-gold hover:text-gold-bright hover:border-gold transition-colors"
+      class="inline-flex min-h-11 items-center border border-gold/40 bg-charcoal/60 px-3 font-display text-sm tracking-wider-2 uppercase text-gold hover:text-gold-bright hover:border-gold transition-colors"
     >{{ t('actions.edit') }}</NuxtLink>
     <button
       type="button"
-      class="inline-flex min-h-11 items-center border border-ember/50 bg-charcoal/60 px-3 font-display text-xs tracking-wider-2 uppercase text-ember-bright hover:bg-blood/40 transition-colors"
+      class="inline-flex min-h-11 items-center border border-ember/50 bg-charcoal/60 px-3 font-display text-sm tracking-wider-2 uppercase text-ember-light hover:bg-blood/40 transition-colors"
       @click="remove"
     >{{ t('actions.delete') }}</button>
   </div>
