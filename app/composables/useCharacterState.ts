@@ -1,5 +1,7 @@
-import { watch, onMounted, ref, getCurrentInstance, type Ref } from 'vue'
+import { ref, getCurrentInstance, type Ref } from 'vue'
 import type { Character } from '~~/shared/types/character'
+import { getState, putState } from '~/db/characterRepository'
+import { persistState } from '~/composables/persistState'
 
 // Fallback si useState Nuxt n'est pas dispo (contexte test pur)
 export const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
@@ -20,10 +22,6 @@ export interface CharacterState {
   dailySpellsUsed: string[]
 }
 
-function storageKey(id: string): string {
-  return `codex:${id}:state`
-}
-
 function defaultState(character: Character): CharacterState {
   return {
     hpCurrent: character.maxHp,
@@ -36,7 +34,7 @@ function defaultState(character: Character): CharacterState {
   }
 }
 
-function isValidState(value: unknown): value is CharacterState {
+export function isValidState(value: unknown): value is CharacterState {
   if (typeof value !== 'object' || value === null) return false
   const s = value as Record<string, unknown>
   return (
@@ -63,23 +61,9 @@ export function normalizeState(character: Character, saved: CharacterState): Cha
   }
 }
 
-function loadState(character: Character): CharacterState {
-  if (typeof window === 'undefined') return defaultState(character)
-  try {
-    const raw = window.localStorage.getItem(storageKey(character.id))
-    if (!raw) return defaultState(character)
-    const parsed: unknown = JSON.parse(raw)
-    if (!isValidState(parsed)) return defaultState(character)
-    return normalizeState(character, parsed)
-  }
-  catch {
-    return defaultState(character)
-  }
-}
-
 /**
  * État mutable d'un personnage, partagé via `useState` Nuxt (singleton par fiche),
- * persisté côté client dans `localStorage`.
+ * persisté sur l'appareil dans IndexedDB.
  */
 export function useCharacterState(character: Character) {
   const state = useStateSafe<CharacterState>(
@@ -87,25 +71,15 @@ export function useCharacterState(character: Character) {
     () => defaultState(character),
   )
 
-  // Hydrate depuis localStorage côté client, seulement si appelé depuis un composant
+  // Synchronisé avec IndexedDB, seulement si appelé depuis un composant
   if (getCurrentInstance()) {
-    onMounted(() => {
-      state.value = loadState(character)
-    })
-
-    watch(
-      state,
-      (next) => {
-        if (typeof window === 'undefined') return
-        try {
-          window.localStorage.setItem(storageKey(character.id), JSON.stringify(next))
-        }
-        catch {
-          // quota ou navigation privée — fail silencieusement
-        }
+    persistState(state, {
+      load: async () => {
+        const saved = await getState(character.id)
+        return isValidState(saved) ? normalizeState(character, saved) : undefined
       },
-      { deep: true },
-    )
+      save: value => putState(character.id, value),
+    })
   }
 
   // Actions

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { CHARACTER_SCHEMA_VERSION } from '~~/shared/types/character'
 import { seeds } from '~/data/characters'
-import { deleteCharacter, getCharacter, listCharacters } from '~/db/characterRepository'
+import { deleteCharacter, getCharacter, getInventory, listCharacters } from '~/db/characterRepository'
 import { seedBuiltins, toStoredCharacter } from '~/db/seed'
 import { fakePortrait } from '../../helpers/characters'
 
@@ -19,6 +19,10 @@ describe('toStoredCharacter', () => {
     expect(stored.createdAt).toBe(stored.updatedAt)
   })
 
+  it('ne garde pas le sac de départ dans la fiche', () => {
+    expect(toStoredCharacter(seeds[0]!, fakePortrait(), now.toISOString())).not.toHaveProperty('inventory')
+  })
+
   it('ne partage aucune référence avec la fiche de départ', () => {
     const stored = toStoredCharacter(seeds[0]!, fakePortrait(), now.toISOString())
     stored.skills[0]!.modifier = 99
@@ -32,6 +36,13 @@ describe('seedBuiltins', () => {
     expect(imported).toHaveLength(6)
     expect((await listCharacters()).map(c => c.id)).toEqual(seeds.map(s => s.slug))
     expect(loader).toHaveBeenCalledWith('/img/dareth-brumeval.jpg')
+  })
+
+  it('range le sac de départ dans le store des sacs', async () => {
+    await seedBuiltins(seeds, loader, now)
+    const inventory = await getInventory('dareth-brumeval') as { coins: { gp: number }, items: unknown[] }
+    expect(inventory.coins.gp).toBe(360)
+    expect(inventory.items.length).toBeGreaterThan(0)
   })
 
   it('n\'est pas rejoué : une fiche supprimée ne revient pas', async () => {

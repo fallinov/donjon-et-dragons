@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { nextTick, ref } from 'vue'
 import { useCharacter, useCharacterList } from '~/composables/useCharacters'
 import { putCharacter } from '~/db/characterRepository'
-import { darethBrumeval, zanna } from '../helpers/characters'
-
-async function settle(): Promise<void> {
-  for (let i = 0; i < 10; i++) await new Promise(resolve => setTimeout(resolve, 0))
-}
+import { darethBrumeval, settle, zanna } from '../helpers/characters'
 
 describe('useCharacterList', () => {
   it('charge les fiches de l\'appareil', async () => {

@@ -1,26 +1,27 @@
 import { describe, it, expect } from 'vitest'
 import {
-  addItem, defaultInventory, parseInventory, removeItem, setCoins, setItemQuantity,
+  addItem, emptyInventory, inventoryFromStart, parseInventory, removeItem, setCoins, setItemQuantity,
 } from '~/composables/useInventory'
-import { darethBrumeval, zanna } from '../helpers/characters'
+import { darethSeed } from '../helpers/characters'
 
-describe('defaultInventory', () => {
+describe('inventoryFromStart', () => {
   it('reprend le sac de départ de Dareth', () => {
-    const inv = defaultInventory(darethBrumeval)
+    const inv = inventoryFromStart(darethSeed.inventory)
     expect(inv.coins).toEqual({ cp: 24, sp: 75, ep: 7, gp: 360, pp: 0 })
     expect(inv.items.find(i => i.name === 'Torche')?.quantity).toBe(10)
     expect(inv.notes).toContain('Zhentarim')
   })
 
   it('donne un sac vide à un personnage sans inventaire', () => {
-    const inv = defaultInventory({ ...zanna, inventory: undefined })
+    const inv = inventoryFromStart(undefined)
+    expect(inv).toEqual(emptyInventory())
     expect(inv.items).toEqual([])
     expect(inv.coins).toEqual({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 })
     expect(inv.notes).toBe('')
   })
 
   it('donne un identifiant unique à chaque objet', () => {
-    const ids = defaultInventory(darethBrumeval).items.map(i => i.id)
+    const ids = inventoryFromStart(darethSeed.inventory).items.map(i => i.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 })

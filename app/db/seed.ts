@@ -1,5 +1,6 @@
 import { CHARACTER_SCHEMA_VERSION, type CharacterSeed, type StoredCharacter } from '~~/shared/types/character'
 import { openCodexDB } from '~/db/schema'
+import { inventoryFromStart } from '~/composables/useInventory'
 
 export interface PortraitBytes {
   data: ArrayBuffer
@@ -10,7 +11,7 @@ export type PortraitLoader = (src: string) => Promise<PortraitBytes>
 
 /** Convertit une fiche de départ en fiche stockée. */
 export function toStoredCharacter(seed: CharacterSeed, portrait: PortraitBytes, createdAt: string): StoredCharacter {
-  const { slug, portrait: seedPortrait, ...fields } = seed
+  const { slug, portrait: seedPortrait, inventory: _startingInventory, ...fields } = seed
   return {
     ...structuredClone(fields),
     id: slug,
@@ -39,7 +40,12 @@ export async function seedBuiltins(seeds: CharacterSeed[], loadPortrait: Portrai
     const portrait = await loadPortrait(seed.portrait.src)
     // Une milliseconde d'écart par fiche : l'ordre des seeds devient l'ordre d'affichage
     const createdAt = new Date(now.getTime() + index).toISOString()
-    await db.put('characters', toStoredCharacter(seed, portrait, createdAt))
+    const tx = db.transaction(['characters', 'inventories'], 'readwrite')
+    await Promise.all([
+      tx.objectStore('characters').put(toStoredCharacter(seed, portrait, createdAt)),
+      tx.objectStore('inventories').put(inventoryFromStart(seed.inventory), seed.slug),
+      tx.done,
+    ])
     imported.push(seed.slug)
   }
   await db.put('meta', { seededAt: now.toISOString() }, 'seed')

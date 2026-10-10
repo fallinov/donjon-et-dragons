@@ -1,6 +1,8 @@
-import { getCurrentInstance, onMounted, watch } from 'vue'
-import type { Character, Coins } from '~~/shared/types/character'
+import { getCurrentInstance } from 'vue'
+import type { Character, Coins, StartingInventory } from '~~/shared/types/character'
 import { useStateSafe } from '~/composables/useCharacterState'
+import { persistState } from '~/composables/persistState'
+import { getInventory, putInventory } from '~/db/characterRepository'
 
 export type CoinType = keyof Coins
 
@@ -24,10 +26,6 @@ function newId(): string {
   return `item-${Date.now().toString(36)}-${idCounter}`
 }
 
-function storageKey(id: string): string {
-  return `codex:${id}:inventory`
-}
-
 /** Entier positif ou nul, sinon 0. */
 function toCount(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0
@@ -37,11 +35,13 @@ export function emptyCoins(): Coins {
   return { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }
 }
 
-/** Sac de départ tiré de la fiche (ou vide). */
-export function defaultInventory(character: Character): InventoryState {
-  const start = character.inventory
+export function emptyInventory(): InventoryState {
+  return { items: [], coins: emptyCoins(), notes: '' }
+}
+
+/** Sac initial tiré du contenu de départ d'une fiche livrée avec l'app (ou vide). */
+export function inventoryFromStart(start: StartingInventory | undefined): InventoryState {
   return {
-    // Identifiants stables : le rendu serveur et le chargement client désignent les mêmes objets
     items: (start?.equipment ?? []).map((item, i) => ({ id: `start-${i}`, name: item.name, quantity: Math.max(1, item.quantity) })),
     coins: { ...emptyCoins(), ...start?.coins },
     notes: start?.notes ?? '',
@@ -92,42 +92,18 @@ export function setCoins(state: InventoryState, type: CoinType, amount: number):
   return { ...state, coins: { ...state.coins, [type]: toCount(amount) } }
 }
 
-function loadInventory(character: Character): InventoryState {
-  if (typeof window === 'undefined') return defaultInventory(character)
-  try {
-    const raw = window.localStorage.getItem(storageKey(character.id))
-    if (!raw) return defaultInventory(character)
-    return parseInventory(JSON.parse(raw)) ?? defaultInventory(character)
-  }
-  catch {
-    return defaultInventory(character)
-  }
-}
-
 /**
  * Sac du personnage (équipement, argent, notes), partagé via `useState` Nuxt
- * et persisté dans `localStorage` sur l'appareil du joueur.
+ * et persisté sur l'appareil du joueur dans IndexedDB.
  */
 export function useInventory(character: Character) {
-  const state = useStateSafe<InventoryState>(`inventory:${character.id}`, () => defaultInventory(character))
+  const state = useStateSafe<InventoryState>(`inventory:${character.id}`, emptyInventory)
 
   if (getCurrentInstance()) {
-    onMounted(() => {
-      state.value = loadInventory(character)
+    persistState(state, {
+      load: async () => parseInventory(await getInventory(character.id)) ?? undefined,
+      save: value => putInventory(character.id, value),
     })
-    watch(
-      state,
-      (next) => {
-        if (typeof window === 'undefined') return
-        try {
-          window.localStorage.setItem(storageKey(character.id), JSON.stringify(next))
-        }
-        catch {
-          // quota ou navigation privée — échec silencieux
-        }
-      },
-      { deep: true },
-    )
   }
 
   return {

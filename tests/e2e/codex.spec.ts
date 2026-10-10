@@ -155,6 +155,49 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.getByLabel('Notes')).toHaveValue(/Gundren/)
   })
 
+  test('PV conservés après rechargement', async ({ page }) => {
+    const openCombat = async () => {
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      const combatTab = page.getByRole('button', { name: /^Combat$/i })
+      if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
+    }
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await openCombat()
+    const minusBtn = page.getByRole('button', { name: /Diminuer points de vie/i })
+    for (let i = 0; i < 5; i++) await minusBtn.click()
+    const hpBar = page.getByRole('progressbar', { name: /points de vie/ })
+    await expect(hpBar).toHaveAttribute('aria-valuenow', '44')
+
+    await page.reload({ waitUntil: 'networkidle' })
+    await openCombat()
+    await expect(page.getByRole('progressbar', { name: /points de vie/ })).toHaveAttribute('aria-valuenow', '44')
+  })
+
+  test('reprend les PV et le sac enregistrés par une version précédente (localStorage)', async ({ page }) => {
+    await page.addInitScript(() => {
+      if (window.sessionStorage.getItem('e2e-legacy-written')) return
+      window.localStorage.setItem('codex:dareth-brumeval:state', JSON.stringify({
+        hpCurrent: 21, hpTemp: 0, inspiration: 0, hitDiceUsed: 0,
+        deathSaves: { successes: 0, failures: 0 }, spellSlotsUsed: [0, 0], dailySpellsUsed: [],
+      }))
+      window.localStorage.setItem('codex:dareth-brumeval:inventory', JSON.stringify({
+        items: [{ id: 'x', name: 'Carte de Phandaline', quantity: 1 }], coins: { cp: 0, sp: 0, ep: 0, gp: 5, pp: 0 }, notes: '',
+      }))
+      window.sessionStorage.setItem('e2e-legacy-written', '1')
+    })
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    const combatTab = page.getByRole('button', { name: /^Combat$/i })
+    if (await combatTab.isVisible()) { await combatTab.dispatchEvent('click'); await page.waitForTimeout(500) }
+    await expect(page.getByRole('progressbar', { name: /points de vie/ })).toHaveAttribute('aria-valuenow', '21')
+
+    const sacTab = page.getByRole('button', { name: /^Sac$/i })
+    if (await sacTab.isVisible()) { await sacTab.dispatchEvent('click'); await page.waitForTimeout(500) }
+    await expect(page.getByText('Carte de Phandaline')).toBeVisible()
+    await expect(page.getByLabel(/Pièces d'or/)).toHaveValue('5')
+    expect(await page.evaluate(() => window.localStorage.getItem('codex:dareth-brumeval:state'))).toBeNull()
+  })
+
   test('Inspiration +/−', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
