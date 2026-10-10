@@ -25,7 +25,7 @@ const meta = computed(() =>
       </template>
       <span
         v-if="spell.concentration"
-        class="ml-0.5 border border-ember/60 text-ember-bright px-1.5 py-px font-display tracking-wider-2 uppercase text-[10px]"
+        class="ml-0.5 border border-ember/60 text-ember-light px-1.5 py-px font-display tracking-wider-2 uppercase text-xs"
         data-spell-concentration
       >{{ t('spells.concentration') }}</span>
     </p>

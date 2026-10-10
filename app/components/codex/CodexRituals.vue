@@ -116,7 +116,7 @@ function panelId(index: number): string {
       class="mt-6 border border-ember/40 bg-blood/20 px-4 py-3 text-sm text-parchment italic"
       data-rituals-note
     >
-      <span class="not-italic font-display text-xs tracking-wider-3 text-ember-bright uppercase mr-2">{{ t('rituals.noteLabel') }}</span>{{ note }}
+      <span class="not-italic font-display text-xs tracking-wider-3 text-ember-light uppercase mr-2">{{ t('rituals.noteLabel') }}</span>{{ note }}
     </p>
   </section>
 </template>

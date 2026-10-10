@@ -69,39 +69,39 @@ function label(item: T, index: number): string {
       <li
         v-for="(item, index) in items"
         :key="index"
-        :class="inline ? '' : 'border border-gold/25 bg-charcoal/40'"
+        :class="inline ? '' : 'border-l-2 border-gold/40 bg-charcoal/30'"
         data-edit-item
       >
         <details v-if="collapsible" :open="isOpen(index)" class="group" @toggle="onToggle(index, $event)">
-          <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 font-display text-sm tracking-wider-2 text-parchment">
-            <span class="min-w-0 truncate" :class="invalid?.(index) ? 'text-ember-bright' : ''">{{ label(item, index) }}</span>
+          <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 pl-3 pr-2 py-2 font-display text-base tracking-wider-2 text-parchment">
+            <span class="min-w-0 truncate" :class="invalid?.(index) ? 'text-ember-light' : ''">{{ label(item, index) }}</span>
             <span class="shrink-0 text-gold motion-safe:transition-transform group-open:rotate-180" aria-hidden="true">▾</span>
           </summary>
-          <div class="border-t border-gold/15 p-3">
+          <div class="border-t border-gold/15 py-2 pl-3 pr-1">
             <slot :item="item" :index="index" />
           </div>
-          <div class="flex justify-end gap-1 px-3 pb-2">
+          <div class="flex justify-end gap-1 pr-1 pb-1">
             <button type="button" class="h-11 w-11 text-gold hover:text-gold-bright disabled:opacity-25" :disabled="index === 0" :aria-label="t('editor.moveUp', { name: label(item, index) })" @click="move(index, -1)">↑</button>
             <button type="button" class="h-11 w-11 text-gold hover:text-gold-bright disabled:opacity-25" :disabled="index === items.length - 1" :aria-label="t('editor.moveDown', { name: label(item, index) })" @click="move(index, 1)">↓</button>
-            <button type="button" class="h-11 w-11 text-parchment-mute hover:text-ember-bright" :aria-label="t('editor.remove', { name: label(item, index) })" @click="remove(index)">✕</button>
+            <button type="button" class="h-11 w-11 text-parchment-mute hover:text-ember-light" :aria-label="t('editor.remove', { name: label(item, index) })" @click="remove(index)">✕</button>
           </div>
         </details>
 
-        <div v-else :class="inline ? 'flex items-end gap-1' : 'p-3'">
+        <div v-else :class="inline ? 'flex items-end gap-1' : 'py-2 pl-3 pr-1'">
           <div :class="inline ? 'min-w-0 flex-1' : ''">
             <slot :item="item" :index="index" />
           </div>
           <div class="flex shrink-0 justify-end gap-1" :class="inline ? '' : 'mt-2'">
             <button type="button" class="h-11 w-11 text-gold hover:text-gold-bright disabled:opacity-25" :disabled="index === 0" :aria-label="t('editor.moveUp', { name: label(item, index) })" @click="move(index, -1)">↑</button>
             <button type="button" class="h-11 w-11 text-gold hover:text-gold-bright disabled:opacity-25" :disabled="index === items.length - 1" :aria-label="t('editor.moveDown', { name: label(item, index) })" @click="move(index, 1)">↓</button>
-            <button type="button" class="h-11 w-11 text-parchment-mute hover:text-ember-bright" :aria-label="t('editor.remove', { name: label(item, index) })" @click="remove(index)">✕</button>
+            <button type="button" class="h-11 w-11 text-parchment-mute hover:text-ember-light" :aria-label="t('editor.remove', { name: label(item, index) })" @click="remove(index)">✕</button>
           </div>
         </div>
       </li>
     </ol>
     <button
       type="button"
-      class="min-h-11 border border-gold/40 bg-gold/5 px-4 font-display text-xs tracking-wider-2 uppercase text-gold hover:text-gold-bright hover:bg-gold/15 transition-colors"
+      class="min-h-11 border border-gold/40 bg-gold/5 px-4 font-display text-sm tracking-wider-2 uppercase text-gold hover:text-gold-bright hover:bg-gold/15 transition-colors"
       @click="add"
     >+ {{ addLabel }}</button>
   </div>

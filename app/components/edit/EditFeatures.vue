@@ -17,7 +17,7 @@ const createFeature = (): Trait => ({ title: '', description: '', benefits: [] }
           <EditText v-model="feature.title" :label="t('field.featureTitle')" :error="errorFor(errors, `features.${index}.title`)" />
           <EditText v-model="feature.description" multiline :label="t('field.featureDescription')" />
           <fieldset>
-            <legend class="font-display text-xs tracking-wider-3 text-gold/80 uppercase mb-2">{{ t('editor.subsection.benefits') }}</legend>
+            <legend class="font-display text-sm tracking-wider-3 text-gold uppercase mb-2">{{ t('editor.subsection.benefits') }}</legend>
             <EditList
               :model-value="feature.benefits ?? []"
               inline

@@ -40,7 +40,7 @@ const inputId = (suffix: string): string => `${props.character.id}-${suffix}`
   <div class="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-10">
     <!-- ═══ Argent ═══ -->
     <section :aria-labelledby="inputId('argent-title')">
-      <h3 :id="inputId('argent-title')" class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-3">{{ t('inventory.coins') }}</h3>
+      <h3 :id="inputId('argent-title')" class="font-display text-xs tracking-wider-3 text-gold uppercase mb-3">{{ t('inventory.coins') }}</h3>
       <div class="grid grid-cols-5 gap-2">
         <div v-for="type in COIN_TYPES" :key="type" class="flex flex-col items-center gap-1">
           <label
@@ -66,7 +66,7 @@ const inputId = (suffix: string): string => `${props.character.id}-${suffix}`
 
     <!-- ═══ Équipement ═══ -->
     <section :aria-labelledby="inputId('equipement-title')">
-      <h3 :id="inputId('equipement-title')" class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-3">{{ t('inventory.equipment') }}</h3>
+      <h3 :id="inputId('equipement-title')" class="font-display text-xs tracking-wider-3 text-gold uppercase mb-3">{{ t('inventory.equipment') }}</h3>
       <p v-if="!state.items.length" class="text-parchment-mute italic text-sm mb-3">{{ t('inventory.empty') }}</p>
       <ul v-else class="mb-4" data-inventory-items>
         <li
@@ -78,21 +78,21 @@ const inputId = (suffix: string): string => `${props.character.id}-${suffix}`
           <div class="flex items-center shrink-0" role="group" :aria-label="t('inventory.quantityOf', { name: item.name })">
             <button
               type="button"
-              class="h-11 w-9 text-gold hover:text-gold-bright text-lg"
+              class="h-11 w-11 text-gold hover:text-gold-bright text-lg"
               :aria-label="t('inventory.decrease', { name: item.name })"
               @click="setQuantity(item.id, item.quantity - 1)"
             >−</button>
             <span class="w-7 text-center font-display text-sm text-parchment" data-item-quantity>{{ item.quantity }}</span>
             <button
               type="button"
-              class="h-11 w-9 text-gold hover:text-gold-bright text-lg"
+              class="h-11 w-11 text-gold hover:text-gold-bright text-lg"
               :aria-label="t('inventory.increase', { name: item.name })"
               @click="setQuantity(item.id, item.quantity + 1)"
             >+</button>
           </div>
           <button
             type="button"
-            class="h-11 w-9 shrink-0 text-parchment-mute hover:text-ember-bright"
+            class="h-11 w-11 shrink-0 text-parchment-mute hover:text-ember-light"
             :aria-label="t('inventory.remove', { name: item.name })"
             @click="remove(item.id)"
           >
@@ -123,14 +123,14 @@ const inputId = (suffix: string): string => `${props.character.id}-${suffix}`
         <button
           type="submit"
           :disabled="!newName.trim()"
-          class="shrink-0 min-h-11 border border-gold/30 bg-gold/5 text-gold hover:text-gold-bright hover:bg-gold/15 disabled:opacity-30 font-display text-xs tracking-wider-2 uppercase px-3 transition-colors"
+          class="shrink-0 min-h-11 border border-gold/30 bg-gold/5 text-gold hover:text-gold-bright hover:bg-gold/15 disabled:opacity-30 font-display text-sm tracking-wider-2 uppercase px-4 transition-colors"
         >{{ t('inventory.add') }}</button>
       </form>
     </section>
 
     <!-- ═══ Notes ═══ -->
     <section>
-      <h3 class="font-display text-xs tracking-wider-3 text-gold/60 uppercase mb-3">
+      <h3 class="font-display text-xs tracking-wider-3 text-gold uppercase mb-3">
         <label :for="inputId('notes')">{{ t('inventory.notes') }}</label>
       </h3>
       <textarea

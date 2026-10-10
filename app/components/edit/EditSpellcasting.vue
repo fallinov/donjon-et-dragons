@@ -50,7 +50,7 @@ const createSpell = (): Spell => fillSpellTexts({ title: '', description: '', le
       <EditCheckbox v-model="shortRestRefresh" :label="t('field.shortRestRefresh')" />
 
       <fieldset>
-        <legend class="font-display text-xs tracking-wider-3 text-gold/80 uppercase mb-2">{{ t('editor.subsection.slots') }}</legend>
+        <legend class="font-display text-sm tracking-wider-3 text-gold uppercase mb-2">{{ t('editor.subsection.slots') }}</legend>
         <EditList
           v-model="character.spellcasting.slotLevels"
           :add-label="t('editor.add')"
@@ -67,7 +67,7 @@ const createSpell = (): Spell => fillSpellTexts({ title: '', description: '', le
       </fieldset>
 
       <fieldset>
-        <legend class="font-display text-xs tracking-wider-3 text-gold/80 uppercase mb-2">{{ t('editor.subsection.spells') }}</legend>
+        <legend class="font-display text-sm tracking-wider-3 text-gold uppercase mb-2">{{ t('editor.subsection.spells') }}</legend>
         <EditList v-model="character.spellcasting.spells" collapsible :invalid="i => errors.some(e => e.path.startsWith(`spellcasting.spells.${i}.`))" :add-label="t('editor.add')" :item-name="spell => spell.title" :create="createSpell">
           <template #default="{ item: spell, index }">
             <div class="grid gap-3 sm:grid-cols-2">

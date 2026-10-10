@@ -62,7 +62,7 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <form class="space-y-6 pb-28" novalidate @submit.prevent="submit">
+  <form class="space-y-8 pb-28 sm:space-y-6" novalidate @submit.prevent="submit">
     <h1 class="font-display uppercase tracking-wider-2 text-gold-bright text-[clamp(1.5rem,6vw,2.5rem)]">{{ title }}</h1>
 
     <div
@@ -73,8 +73,8 @@ async function submit(): Promise<void> {
       class="border border-ember/60 bg-blood/30 p-4 text-parchment"
       data-error-summary
     >
-      <p class="font-display text-sm tracking-wider-2 uppercase text-ember-bright mb-2">{{ t('editor.errorsTitle') }}</p>
-      <ul class="list-disc pl-5 text-sm">
+      <p class="font-display text-sm tracking-wider-2 uppercase text-ember-light mb-2">{{ t('editor.errorsTitle') }}</p>
+      <ul class="list-disc pl-5 text-base">
         <li v-for="error in visibleErrors" :key="error.path">{{ fieldName(error.path) }} — {{ t(error.message) }}</li>
       </ul>
     </div>
@@ -93,7 +93,7 @@ async function submit(): Promise<void> {
 
     <div class="fixed bottom-0 left-0 right-0 z-30 border-t border-gold/30 bg-charcoal/95 backdrop-blur-md edit-bar">
       <div class="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
-        <p v-if="saveFailed" role="alert" class="flex-1 text-sm text-ember-bright">{{ t('editor.saveError') }}</p>
+        <p v-if="saveFailed" role="alert" class="flex-1 text-sm text-ember-light">{{ t('editor.saveError') }}</p>
         <span v-else class="flex-1" />
         <button
           type="button"

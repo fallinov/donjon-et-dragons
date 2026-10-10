@@ -23,12 +23,13 @@ onMounted(() => {
     <div class="lg:hidden" ref="mobileCard">
       <!-- Lien retour et actions au-dessus de la carte -->
       <div class="flex items-center justify-between gap-3 mb-2">
+      <!-- Flèche seule : la place va aux actions (le nom complet reste lu par les lecteurs d'écran) -->
       <NuxtLink
         to="/"
-        class="inline-flex min-h-11 items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
+        :aria-label="t('common.back')"
+        class="-ml-3 inline-flex h-11 w-11 shrink-0 items-center justify-center text-parchment-dim hover:text-gold-bright"
       >
-        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
-        {{ t('common.back') }}
+        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
       </NuxtLink>
       <slot name="actions" />
       </div>
@@ -60,16 +61,16 @@ onMounted(() => {
 
         <!-- Texte superposé en bas de la carte (au-dessus du brouillard) -->
         <div class="absolute bottom-0 left-0 right-0 z-20 px-3 pb-3 pt-4 sm:px-5 sm:pb-5 sm:pt-6">
-          <p class="font-display text-xs tracking-wider-5 text-parchment-dim/80 uppercase mb-1">
+          <p class="font-display text-xs tracking-wider-5 text-parchment-dim uppercase mb-1">
             {{ character.eyebrow }}
           </p>
           <h1 class="font-display uppercase tracking-wider-2 font-normal leading-[0.95] text-gold-bright text-[clamp(2rem,10vw,3.5rem)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {{ character.firstName }}{{ character.lastName ? ` ${character.lastName}` : '' }}
           </h1>
           <p class="mt-2 text-parchment-dim text-sm flex flex-wrap gap-x-2 gap-y-1">
-            <span>{{ character.race }}</span><span class="text-gold/60">·</span>
-            <span>{{ t('character.levelShort', { className: character.className, level: character.level }) }}</span><span class="text-gold/60">·</span>
-            <span>{{ character.background }}</span><span class="text-gold/60">·</span>
+            <span>{{ character.race }}</span><span class="text-gold">·</span>
+            <span>{{ t('character.levelShort', { className: character.className, level: character.level }) }}</span><span class="text-gold">·</span>
+            <span>{{ character.background }}</span><span class="text-gold">·</span>
             <span>{{ character.alignment }}</span>
           </p>
 
@@ -77,19 +78,19 @@ onMounted(() => {
           <dl class="mt-3 grid grid-cols-4 gap-1.5">
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
               <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'armorClass')?.value }}</dd>
-              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.armor') }}</dt>
+              <dt class="font-display text-xs tracking-wider-3 text-gold uppercase mt-1">{{ t('hero.armor') }}</dt>
             </div>
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
               <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'initiative')?.value }}</dd>
-              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.initiative') }}</dt>
+              <dt class="font-display text-xs tracking-wider-3 text-gold uppercase mt-1">{{ t('hero.initiative') }}</dt>
             </div>
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
               <dd class="font-display text-lg text-gold-bright tabular-nums leading-none">+{{ character.proficiencyBonus }}</dd>
-              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.mastery') }}</dt>
+              <dt class="font-display text-xs tracking-wider-3 text-gold uppercase mt-1">{{ t('hero.mastery') }}</dt>
             </div>
             <div class="backdrop-blur-md border border-gold/40 px-1.5 py-2 text-center">
-              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'speed')?.value }}<span class="text-[9px] text-parchment-mute">{{ findVital(character, 'speed')?.unit }}</span></dd>
-              <dt class="font-display text-[9px] tracking-wider-3 text-gold/70 uppercase mt-1">{{ t('hero.speed') }}</dt>
+              <dd class="font-display text-lg text-parchment tabular-nums leading-none">{{ findVital(character, 'speed')?.value }}<span class="text-xs text-parchment-mute">{{ findVital(character, 'speed')?.unit }}</span></dd>
+              <dt class="font-display text-xs tracking-wider-3 text-gold uppercase mt-1">{{ t('hero.speed') }}</dt>
             </div>
           </dl>
         </div>

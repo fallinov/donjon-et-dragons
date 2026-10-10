@@ -31,7 +31,7 @@ const darkvision = computed({
       <EditNumber v-model="character.hitDice.total" :label="t('field.hitDiceTotal')" :error="errorFor(errors, 'hitDice.total')" />
       <EditText v-model="armorClass.value" :label="t('field.armorClass')" />
       <EditText v-model="initiative.value" :label="t('field.initiative')" />
-      <div class="grid grid-cols-[1fr_5rem] gap-2">
+      <div class="col-span-2 grid grid-cols-[minmax(0,1fr)_5rem] gap-2 sm:col-span-1">
         <EditText v-model="speed.value" :label="t('field.speed')" />
         <EditText v-model="speed.unit!" :label="t('field.speedUnit')" />
       </div>

@@ -42,7 +42,7 @@ const items = computed(() => order.map(key => ({ key, ability: props.abilities[k
           <abbr
             v-if="item.ability.proficient"
             :title="t('common.mastery')"
-            class="ml-1 inline-block border border-gold-bright text-gold-bright text-[10px] font-display tracking-wider-2 px-1.5 leading-none py-0.5 no-underline"
+            class="ml-1 inline-block border border-gold-bright text-gold-bright text-xs font-display tracking-wider-2 px-1.5 leading-none py-0.5 no-underline"
           >{{ t('common.masteryShort') }}</abbr>
         </p>
       </div>

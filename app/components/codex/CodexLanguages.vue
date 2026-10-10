@@ -9,9 +9,9 @@ defineProps<{ languages: Character['languages'] }>()
     <li
       v-for="lang in languages"
       :key="lang.name"
-      class="px-3 py-1 text-xs font-display tracking-wider-3 uppercase border"
+      class="px-3 py-1.5 text-sm font-display tracking-wider-2 uppercase border"
       :class="lang.rare
-        ? 'border-ember bg-blood/40 text-ember-bright'
+        ? 'border-ember bg-blood/40 text-ember-light'
         : 'border-gold/40 bg-charcoal/50 text-parchment'"
     >
       {{ lang.name }}

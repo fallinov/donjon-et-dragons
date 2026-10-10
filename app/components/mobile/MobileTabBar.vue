@@ -72,7 +72,7 @@ function selectTab(id: string): void {
             </template>
           </svg>
 
-          <span class="text-[10px] font-display tracking-wider-2 uppercase">{{ tab.label }}</span>
+          <span class="text-xs font-display tracking-wider-2 uppercase">{{ tab.label }}</span>
         </button>
       </li>
     </ul>
