@@ -251,3 +251,13 @@ button, a, [role="button"] {
   ul.flex { display: flex !important; flex-wrap: wrap !important; gap: 1.5mm !important; }
   ul.flex li { border: 0.5pt solid #000 !important; padding: 0.5mm 1.5mm !important; font-size: 7pt !important; }
 }
+
+/* ── Champs de l'éditeur de fiche ────────────────────── */
+.edit-input {
+  background: var(--color-charcoal);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 65%, transparent);
+  color: var(--color-parchment);
+  font-size: 1rem; /* 16 px : pas de zoom automatique sur iOS */
+}
+.edit-input:focus { border-color: var(--color-gold-bright); }
+.edit-input[aria-invalid="true"] { border-color: var(--color-ember-bright); }

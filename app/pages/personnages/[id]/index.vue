@@ -53,7 +53,7 @@ setTab('profil')
       class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-3 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto pb-24 lg:pb-16"
     >
       <!-- Breadcrumb (desktop uniquement, mobile = dans mini-header) -->
-      <nav v-if="isDesktop" :aria-label="t('common.breadcrumb')" class="no-print mb-6">
+      <nav v-if="isDesktop" :aria-label="t('common.breadcrumb')" class="no-print mb-6 flex items-center justify-between gap-4">
         <NuxtLink
           to="/"
           class="inline-flex items-center gap-1 text-sm font-display tracking-wider-3 text-parchment-dim hover:text-gold-bright uppercase"
@@ -61,6 +61,7 @@ setTab('profil')
           <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/></svg>
           {{ t('common.back') }}
         </NuxtLink>
+        <CodexActions :character="character" />
       </nav>
 
       <!-- ═══════════════════════════════════════════════════════ -->
@@ -68,7 +69,11 @@ setTab('profil')
       <!-- ═══════════════════════════════════════════════════════ -->
       <div v-if="!isDesktop">
         <!-- Carte plein écran seulement sur l'onglet Profil -->
-        <CodexHero v-if="activeTab === 'profil'" :character="character" />
+        <CodexHero v-if="activeTab === 'profil'" :character="character">
+          <template #actions>
+            <CodexActions :character="character" />
+          </template>
+        </CodexHero>
         <!-- Mini-header sticky sur les autres onglets -->
         <MobileMiniHeader v-else :character="character" />
 

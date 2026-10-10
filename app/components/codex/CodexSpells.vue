@@ -4,6 +4,7 @@ import type { Character, Spell } from '~~/shared/types/character'
 import { useCharacterState } from '~/composables/useCharacterState'
 import CodexSpellInfo from '~/components/codex/CodexSpellInfo.vue'
 import { t } from '~/composables/useT'
+import { useConfirm } from '~/composables/useConfirm'
 
 const props = defineProps<{ character: Character }>()
 const sc = computed(() => props.character.spellcasting!)
@@ -13,8 +14,16 @@ function doShortRest(): void {
   shortRest()
 }
 
-function doLongRest(): void {
-  if (!confirm(t('spells.longRestConfirm'))) return
+const { confirm } = useConfirm()
+
+async function doLongRest(): Promise<void> {
+  const confirmed = await confirm({
+    title: t('rest.longTitle'),
+    message: t('spells.longRestConfirm'),
+    confirmLabel: t('rest.longConfirmAction'),
+    cancelLabel: t('actions.cancel'),
+  })
+  if (!confirmed) return
   longRest()
 }
 

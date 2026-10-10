@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Character } from '~~/shared/types/character'
 import { t } from '~/composables/useT'
+import { findVital } from '~/utils/vitals'
 
 defineProps<{ character: Character }>()
 </script>
@@ -17,11 +18,11 @@ defineProps<{ character: Character }>()
     </div>
     <dl class="flex items-center gap-3 shrink-0">
       <div class="text-center">
-        <dd class="font-display text-base text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === "Classe d'armure")?.value }}</dd>
+        <dd class="font-display text-base text-parchment tabular-nums leading-none">{{ findVital(character, 'armorClass')?.value }}</dd>
         <dt class="font-display text-[8px] tracking-wider-3 text-gold/60 uppercase">{{ t('miniHeader.armor') }}</dt>
       </div>
       <div class="text-center">
-        <dd class="font-display text-base text-parchment tabular-nums leading-none">{{ character.vitals.find(v => v.label === 'Initiative')?.value }}</dd>
+        <dd class="font-display text-base text-parchment tabular-nums leading-none">{{ findVital(character, 'initiative')?.value }}</dd>
         <dt class="font-display text-[8px] tracking-wider-3 text-gold/60 uppercase">{{ t('miniHeader.initiative') }}</dt>
       </div>
       <div class="text-center">

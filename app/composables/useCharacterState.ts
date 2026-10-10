@@ -2,6 +2,7 @@ import { ref, getCurrentInstance, type Ref } from 'vue'
 import type { Character } from '~~/shared/types/character'
 import { getState, putState } from '~/db/characterRepository'
 import { persistState } from '~/composables/persistState'
+import { deepEqual } from '~/utils/deepEqual'
 
 // Fallback si useState Nuxt n'est pas dispo (contexte test pur)
 export const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
@@ -49,14 +50,16 @@ export function isValidState(value: unknown): value is CharacterState {
 }
 
 /**
- * Aligne un état sauvegardé sur la fiche actuelle. Après une montée de niveau,
- * le nombre de niveaux d'emplacements peut changer : on complète avec 0 et on
- * borne chaque compteur au nouveau maximum.
+ * Aligne un état sauvegardé sur la fiche actuelle, après une montée de niveau
+ * ou une modification dans l'éditeur : niveaux d'emplacements complétés avec 0,
+ * compteurs bornés aux nouveaux maximums (emplacements, PV, dés de vie utilisés).
  */
 export function normalizeState(character: Character, saved: CharacterState): CharacterState {
   const levels = character.spellcasting?.slotLevels ?? []
   return {
     ...saved,
+    hpCurrent: Math.min(saved.hpCurrent, character.maxHp),
+    hitDiceUsed: Math.min(saved.hitDiceUsed, character.hitDice.total),
     spellSlotsUsed: levels.map((sl, i) => Math.min(saved.spellSlotsUsed[i] ?? 0, sl.slots)),
   }
 }
@@ -73,6 +76,10 @@ export function useCharacterState(character: Character) {
 
   // Synchronisé avec IndexedDB, seulement si appelé depuis un composant
   if (getCurrentInstance()) {
+    // État déjà en mémoire (navigation dans l'app) : l'aligner sur la fiche, peut-être modifiée entre-temps
+    const aligned = normalizeState(character, state.value)
+    if (!deepEqual(aligned, state.value)) state.value = aligned
+
     persistState(state, {
       load: async () => {
         const saved = await getState(character.id)

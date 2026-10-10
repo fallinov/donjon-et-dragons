@@ -4,6 +4,7 @@ import type { Character } from '~~/shared/types/character'
 import { useCharacterState, computePassivePerception, computePassiveInvestigation } from '~/composables/useCharacterState'
 import { useIsDesktop } from '~/composables/useIsDesktop'
 import { t } from '~/composables/useT'
+import { useConfirm } from '~/composables/useConfirm'
 
 const props = defineProps<{ character: Character }>()
 const isDesktop = useIsDesktop()
@@ -41,8 +42,16 @@ function doShortRest(): void {
   showToast(t('rest.shortDone'))
 }
 
-function doLongRest(): void {
-  if (!confirm(t('rest.longConfirm'))) return
+const { confirm } = useConfirm()
+
+async function doLongRest(): Promise<void> {
+  const confirmed = await confirm({
+    title: t('rest.longTitle'),
+    message: t('rest.longConfirm'),
+    confirmLabel: t('rest.longConfirmAction'),
+    cancelLabel: t('actions.cancel'),
+  })
+  if (!confirmed) return
   longRest()
   showToast(t('rest.longDone', { hp: props.character.maxHp }))
 }

@@ -25,7 +25,8 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **Fiches stockées sur l'appareil** : IndexedDB (lib `idb`), rendu 100 % client (`ssr: false`, page d'accueil pré-rendue). Les 6 fiches de `app/data/characters/` sont importées au premier lancement
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
-- **Tests** : Vitest (unit, 119 tests) + Playwright (e2e, 30 tests, chromium desktop + mobile safari)
+- **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
+- **Tests** : Vitest (unit, 159 tests) + Playwright (e2e, 44 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -56,9 +57,16 @@ donjon-et-dragons/
 │   │   └── fr.ts                    # catalogue des textes de l'interface (clés plates)
 │   ├── utils/
 │   │   ├── toPlain.ts               # copie sans proxy réactif (avant écriture IndexedDB)
+│   │   ├── characterFactory.ts      # fiche vierge (niveau 1) et fiche prête à enregistrer depuis un brouillon
+│   │   ├── validateCharacter.ts     # contrôles structurels de l'éditeur (aucune règle D&D)
+│   │   ├── vitals.ts                # libellés CA / initiative / vitesse lus par l'en-tête
+│   │   ├── deepEqual.ts             # détection des modifications du brouillon
+│   │   ├── newId.ts                 # UUID v4, aussi en http (réseau local)
 │   │   └── swipe.ts                 # logique pure du swipe mobile (verrouillage d'axe)
 │   ├── components/
 │   │   ├── PrintButton.vue
+│   │   ├── ConfirmDialog.vue        # boîte de confirmation du codex (useConfirm), remplace confirm()
+│   │   ├── edit/                    # éditeur : EditForm, sections (EditIdentity, EditStats, EditAbilities…), champs (EditText, EditNumber, EditList…)
 │   │   ├── mobile/
 │   │   │   ├── MobileMiniHeader.vue
 │   │   │   ├── MobileSwipeContainer.vue # swipe horizontal entre onglets
@@ -89,7 +97,11 @@ donjon-et-dragons/
 │   │   └── kael-draven.ts
 │   └── pages/
 │       ├── index.vue                # liste des codex
-│       └── personnages/[id]/index.vue # fiche dynamique (lue dans IndexedDB)
+│       └── personnages/
+│           ├── nouveau.vue          # création d'une fiche
+│           └── [id]/
+│               ├── index.vue        # fiche dynamique (lue dans IndexedDB)
+│               └── modifier.vue     # édition d'une fiche
 ├── shared/types/character.ts        # interface Character (abilities, skills, attacks, spellcasting, rituals, personality)
 ├── prompts/
 │   └── character-portrait.md        # template prompt pour la génération des portraits (Gemini)
@@ -120,9 +132,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 119 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 159 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 30 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 44 tests (chromium desktop + mobile safari)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt et fournit une base IndexedDB neuve à chaque test (`fake-indexeddb`). `tests/helpers/characters.ts` construit des fiches stockées à partir des seeds.

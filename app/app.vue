@@ -7,5 +7,6 @@ import { t } from '~/composables/useT'
     <NuxtRouteAnnouncer />
     <a href="#contenu" class="skip-link">{{ t('common.skipLink') }}</a>
     <NuxtPage />
+    <ConfirmDialog />
   </div>
 </template>

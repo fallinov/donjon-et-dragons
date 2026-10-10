@@ -225,9 +225,9 @@ test.describe('Codex Donjon et Dragons', () => {
     for (let i = 0; i < 5; i++) await minusBtn.click()
     await expect(page.getByText('44', { exact: false }).first()).toBeVisible()
 
-    // Repos long (confirm dialog)
-    page.on('dialog', dialog => dialog.accept())
+    // Repos long : boîte de confirmation du codex
     await page.getByRole('button', { name: 'Repos long' }).first().click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Se reposer' }).click()
     await expect(page.getByText('49', { exact: false }).first()).toBeVisible()
   })
 

@@ -21,6 +21,13 @@ useSeoMeta({
         <p v-if="status === 'ready'" class="mt-4 text-parchment-dim italic">
           {{ tCount('home.count', characters.length) }}
         </p>
+        <NuxtLink
+          v-if="status === 'ready'"
+          to="/personnages/nouveau"
+          class="mt-6 inline-flex min-h-11 items-center gap-2 border border-gold/50 bg-gold/10 px-5 font-display text-sm tracking-wider-2 uppercase text-gold-bright hover:bg-gold/20 transition-colors"
+        >
+          <span aria-hidden="true">+</span> {{ t('actions.newCharacter') }}
+        </NuxtLink>
         <p v-else-if="status === 'error'" class="mt-4 text-ember-bright italic" role="alert">
           {{ t('home.loadError') }}
         </p>
@@ -29,6 +36,17 @@ useSeoMeta({
       <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <li v-for="character in characters" :key="character.id">
           <CodexCharacterCard :character="character" />
+        </li>
+        <li v-if="status === 'ready'" class="hidden sm:block" aria-hidden="true">
+          <NuxtLink
+            tabindex="-1"
+            to="/personnages/nouveau"
+            class="flex aspect-[3/4] flex-col items-center justify-center gap-3 border border-dashed border-gold/50 bg-charcoal/30 text-gold hover:border-gold hover:bg-charcoal/60 hover:text-gold-bright transition-colors"
+          >
+            <span class="font-display text-5xl leading-none" aria-hidden="true">+</span>
+            <span class="font-display text-lg tracking-wider-3 uppercase">{{ t('actions.newCharacter') }}</span>
+            <span class="text-sm italic text-parchment-dim">{{ t('actions.newCharacterHint') }}</span>
+          </NuxtLink>
         </li>
       </ul>
     </div>
