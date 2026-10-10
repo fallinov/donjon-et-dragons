@@ -269,7 +269,3 @@ export function computePassivePerception(character: Character): number {
 export function computePassiveInvestigation(character: Character): number {
   return computePassiveSkill(character, 'Investigation')
 }
-
-export function computePassiveInsight(character: Character): number {
-  return computePassiveSkill(character, 'Perspicacité') || computePassiveSkill(character, 'Intuition')
-}
