@@ -154,6 +154,16 @@ export const fr = {
   'inventory.notesPlaceholder': 'Quêtes, PNJ, indices…',
   'inventory.localOnly': 'Enregistré sur cet appareil uniquement.',
 
+  // Application installable
+  'pwa.updateAvailable': "Une nouvelle version de l'application est disponible.",
+  'pwa.reload': 'Mettre à jour',
+  'pwa.later': 'Plus tard',
+  'pwa.installTitle': "Installer l'application",
+  'pwa.installText': "Ajoutez le codex à l'écran d'accueil : il s'ouvre comme une app, fonctionne hors ligne et vos fiches sont mieux protégées.",
+  'pwa.install': 'Installer',
+  'pwa.iosText': "Sur iPhone : touchez le bouton Partager, puis « Sur l'écran d'accueil ».",
+  'pwa.dismiss': 'Masquer',
+
   // Navigation mobile
   'tabs.nav': 'Navigation mobile',
   'tabs.profil': 'Profil',

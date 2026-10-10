@@ -11,7 +11,8 @@
     "typecheck": "nuxt typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:pwa": "playwright test -c playwright.pwa.config.ts"
   },
   "dependencies": {
     "idb": "^8.0.4",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@playwright/test": "^1.50.1",
     "@tailwindcss/vite": "^4.1.13",
+    "@vite-pwa/nuxt": "^1.1.1",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/test-utils": "^2.4.6",
     "fake-indexeddb": "^6.2.5",
