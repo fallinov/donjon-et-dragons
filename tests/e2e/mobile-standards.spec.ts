@@ -114,7 +114,19 @@ const screens: { name: string, url: string, prepare?: (page: Page) => Promise<vo
   } },
   { name: 'éditeur (tout déplié)', url: '/personnages/zanna/modifier', prepare: p => p.locator('details').evaluateAll((ds) => { ds.forEach((d) => { (d as HTMLDetailsElement).open = true }) }) },
   { name: 'éditeur avec erreurs', url: '/personnages/nouveau', prepare: p => p.getByRole('button', { name: 'Enregistrer' }).click() },
-  { name: 'boîte de confirmation', url: '/personnages/dareth-brumeval', prepare: p => p.getByRole('button', { name: 'Supprimer' }).click() },
+  { name: 'menu des actions de la fiche', url: '/personnages/dareth-brumeval', prepare: p => p.getByRole('button', { name: 'Autres actions' }).click() },
+  { name: 'boîte de confirmation', url: '/personnages/dareth-brumeval', prepare: async (p) => {
+    await p.getByRole('button', { name: 'Autres actions' }).click()
+    await p.getByRole('button', { name: 'Supprimer' }).click()
+  } },
+  { name: 'accueil avec fiche de départ supprimée et erreur d\'import', url: '/', prepare: async (p) => {
+    await p.goto('/personnages/zanna')
+    await p.getByRole('button', { name: 'Autres actions' }).click()
+    await p.getByRole('button', { name: 'Supprimer' }).click()
+    await p.getByRole('dialog').getByRole('button', { name: 'Supprimer' }).click()
+    await p.locator('[data-import-input]').setInputFiles({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{}') })
+    await p.locator('[data-import-error]').waitFor()
+  } },
 ]
 
 test.describe('Normes smartphone', () => {

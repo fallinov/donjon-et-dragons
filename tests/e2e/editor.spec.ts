@@ -62,7 +62,8 @@ test.describe('Éditeur de fiche', () => {
   test('supprimer une fiche : refus puis confirmation', async ({ page }) => {
     const url = await createCharacter(page, 'Brann')
 
-    await page.getByRole('button', { name: 'Supprimer' }).click()
+    await page.getByRole('button', { name: 'Autres actions' }).filter({ visible: true }).click()
+    await page.getByRole('button', { name: 'Supprimer', exact: true }).filter({ visible: true }).click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toContainText('Supprimer la fiche ?')
     await expect(dialog).toContainText('Brann')
@@ -71,7 +72,8 @@ test.describe('Éditeur de fiche', () => {
     await expect(dialog).toBeHidden()
     await expect(page).toHaveURL(url)
 
-    await page.getByRole('button', { name: 'Supprimer' }).click()
+    await page.getByRole('button', { name: 'Autres actions' }).filter({ visible: true }).click()
+    await page.getByRole('button', { name: 'Supprimer', exact: true }).filter({ visible: true }).click()
     await page.getByRole('dialog').getByRole('button', { name: 'Supprimer' }).click()
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByText('6 personnages consignés')).toBeVisible()

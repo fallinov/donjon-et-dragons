@@ -1,6 +1,6 @@
 import type { StoredCharacter } from '~~/shared/types/character'
-import type { CharacterState } from '~/composables/useCharacterState'
-import type { InventoryState } from '~/composables/useInventory'
+import { isValidState, type CharacterState } from '~/composables/useCharacterState'
+import { parseInventory, type InventoryState } from '~/composables/useInventory'
 import { openCodexDB } from '~/db/schema'
 import { migrateDocument } from '~/db/migrations'
 
@@ -54,4 +54,32 @@ export async function getInventory(id: string): Promise<unknown> {
 export async function putInventory(id: string, inventory: InventoryState): Promise<void> {
   const db = await openCodexDB()
   await db.put('inventories', inventory, id)
+}
+
+/**
+ * Remplace une fiche, son état de jeu et son sac en une seule transaction.
+ * État ou sac absents : effacés (valeurs par défaut au prochain affichage).
+ */
+export async function replaceCharacterData(character: StoredCharacter, state?: CharacterState, inventory?: InventoryState): Promise<void> {
+  const db = await openCodexDB()
+  const tx = db.transaction(['characters', 'states', 'inventories'], 'readwrite')
+  await Promise.all([
+    tx.objectStore('characters').put(character),
+    state ? tx.objectStore('states').put(state, character.id) : tx.objectStore('states').delete(character.id),
+    inventory ? tx.objectStore('inventories').put(inventory, character.id) : tx.objectStore('inventories').delete(character.id),
+    tx.done,
+  ])
+}
+
+/** Fiche avec son état de jeu et son sac (export). Éléments abîmés ignorés. */
+export async function getCharacterBundle(id: string): Promise<{ character: StoredCharacter, state?: CharacterState, inventory?: InventoryState } | undefined> {
+  const character = await getCharacter(id)
+  if (!character) return undefined
+  const state = await getState(id)
+  const inventory = parseInventory(await getInventory(id))
+  return {
+    character,
+    ...(isValidState(state) ? { state } : {}),
+    ...(inventory ? { inventory } : {}),
+  }
 }

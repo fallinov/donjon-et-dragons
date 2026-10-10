@@ -1,6 +1,7 @@
 import { CHARACTER_SCHEMA_VERSION, type CharacterSeed, type StoredCharacter } from '~~/shared/types/character'
 import { openCodexDB } from '~/db/schema'
 import { inventoryFromStart } from '~/composables/useInventory'
+import { getCharacter, replaceCharacterData } from '~/db/characterRepository'
 
 export interface PortraitBytes {
   data: ArrayBuffer
@@ -58,4 +59,17 @@ export async function fetchPortrait(src: string): Promise<PortraitBytes> {
   if (!response.ok) throw new Error(`Portrait introuvable : ${src} (${response.status})`)
   const mime = response.headers.get('content-type') ?? 'image/jpeg'
   return { data: await response.arrayBuffer(), mime }
+}
+
+/**
+ * Remet une fiche de départ dans son état d'origine (fiche, portrait, sac de départ),
+ * qu'elle ait été modifiée ou supprimée. L'état de jeu (PV, emplacements) repart à zéro.
+ */
+export async function restoreBuiltin(seed: CharacterSeed, loadPortrait: PortraitLoader, now: Date = new Date()): Promise<StoredCharacter> {
+  const existing = await getCharacter(seed.slug)
+  const portrait = await loadPortrait(seed.portrait.src)
+  const restored = toStoredCharacter(seed, portrait, existing?.createdAt ?? now.toISOString())
+  restored.updatedAt = now.toISOString()
+  await replaceCharacterData(restored, undefined, inventoryFromStart(seed.inventory))
+  return restored
 }
