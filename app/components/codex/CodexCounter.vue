@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue'
+import { t } from '~/composables/useT'
 
 const props = defineProps<{
   label: string
@@ -54,7 +55,7 @@ onUnmounted(stopRepeat)
         type="button"
         :disabled="disableMinus"
         class="h-14 w-14 shrink-0 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
-        :aria-label="`Diminuer ${label.toLowerCase()}`"
+        :aria-label="t('counter.decrease', { label: label.toLowerCase() })"
         @pointerdown.prevent="startMinus"
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
@@ -76,7 +77,7 @@ onUnmounted(stopRepeat)
         type="button"
         :disabled="disablePlus"
         class="h-14 w-14 shrink-0 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
-        :aria-label="`Augmenter ${label.toLowerCase()}`"
+        :aria-label="t('counter.increase', { label: label.toLowerCase() })"
         @pointerdown.prevent="startPlus"
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"

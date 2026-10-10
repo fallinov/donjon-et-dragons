@@ -3,6 +3,7 @@ import { ref, computed, onUnmounted } from 'vue'
 import type { Character } from '~~/shared/types/character'
 import { useCharacterState, computePassivePerception, computePassiveInvestigation } from '~/composables/useCharacterState'
 import { useIsDesktop } from '~/composables/useIsDesktop'
+import { t } from '~/composables/useT'
 
 const props = defineProps<{ character: Character }>()
 const isDesktop = useIsDesktop()
@@ -37,13 +38,13 @@ function showToast(msg: string): void {
 
 function doShortRest(): void {
   shortRest()
-  showToast('Repos court effectué')
+  showToast(t('rest.shortDone'))
 }
 
 function doLongRest(): void {
-  if (!confirm('Repos long : restaure HP, emplacements et dés de vie. Confirmer ?')) return
+  if (!confirm(t('rest.longConfirm'))) return
   longRest()
-  showToast(`Repos long effectué — HP restaurés à ${props.character.maxHp}`)
+  showToast(t('rest.longDone', { hp: props.character.maxHp }))
 }
 
 // Repeat au maintien
@@ -67,7 +68,7 @@ onUnmounted(stopRepeat)
 
 <template>
   <section
-    aria-label="Tableau de bord du personnage"
+    :aria-label="t('status.label')"
     class="no-print mb-8 motion-safe:animate-rise"
   >
     <!-- Toast feedback -->
@@ -87,7 +88,7 @@ onUnmounted(stopRepeat)
 
       <!-- HP -->
       <CodexCounter
-        label="Points de vie"
+        :label="t('status.hp')"
         :value="`${state.hpCurrent} / ${character.maxHp}`"
         :disable-minus="isDown"
         :disable-plus="isFull"
@@ -96,18 +97,18 @@ onUnmounted(stopRepeat)
         @minus="damage(1)"
         @plus="heal(1)"
       >
-        <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">+{{ state.hpTemp }} temp</p>
+        <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">{{ t('status.hpTemp', { value: state.hpTemp }) }}</p>
         <template #below>
           <!-- Barre HP -->
-          <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden mt-3" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="`${state.hpCurrent} sur ${character.maxHp} points de vie`">
+          <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden mt-3" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="t('status.hpProgress', { current: state.hpCurrent, max: character.maxHp })">
             <div class="h-full transition-all duration-300" :class="hpPercent > 50 ? 'bg-gold-bright' : hpPercent > 25 ? 'bg-ember-bright' : 'bg-ember motion-safe:animate-ember'" :style="{ width: `${hpPercent}%` }" />
           </div>
           <!-- Death saves -->
           <div v-if="isDown" class="mt-3 py-3 border-t border-ember/40">
-            <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase mb-3">⚠ Sauvegardes contre la mort</p>
+            <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase mb-3">{{ t('status.deathSaves') }}</p>
             <div class="flex flex-wrap gap-6 items-center justify-center">
-              <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">Succès</span><div class="flex gap-2" role="group" aria-label="Succès contre la mort"><button v-for="i in 3" :key="`s-${i}`" type="button" :aria-pressed="i <= state.deathSaves.successes" :aria-label="`Succès ${i}`" class="w-11 h-11 rounded-full border-2 border-gold-bright/60 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.successes ? 'bg-gold-bright' : 'bg-transparent hover:bg-gold-bright/10'" @click="toggleDeathSaveSuccess(i - 1)"><span v-if="i <= state.deathSaves.successes" class="text-obsidian font-bold">✓</span></button></div></div>
-              <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">Échecs</span><div class="flex gap-2" role="group" aria-label="Échecs contre la mort"><button v-for="i in 3" :key="`f-${i}`" type="button" :aria-pressed="i <= state.deathSaves.failures" :aria-label="`Échec ${i}`" class="w-11 h-11 rounded-full border-2 border-ember-bright/70 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.failures ? 'bg-ember' : 'bg-transparent hover:bg-ember/10'" @click="toggleDeathSaveFailure(i - 1)"><span v-if="i <= state.deathSaves.failures" class="text-parchment font-bold">✗</span></button></div></div>
+              <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">{{ t('status.successes') }}</span><div class="flex gap-2" role="group" :aria-label="t('status.successesGroup')"><button v-for="i in 3" :key="`s-${i}`" type="button" :aria-pressed="i <= state.deathSaves.successes" :aria-label="t('status.success', { index: i })" class="w-11 h-11 rounded-full border-2 border-gold-bright/60 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.successes ? 'bg-gold-bright' : 'bg-transparent hover:bg-gold-bright/10'" @click="toggleDeathSaveSuccess(i - 1)"><span v-if="i <= state.deathSaves.successes" class="text-obsidian font-bold">✓</span></button></div></div>
+              <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">{{ t('status.failures') }}</span><div class="flex gap-2" role="group" :aria-label="t('status.failuresGroup')"><button v-for="i in 3" :key="`f-${i}`" type="button" :aria-pressed="i <= state.deathSaves.failures" :aria-label="t('status.failure', { index: i })" class="w-11 h-11 rounded-full border-2 border-ember-bright/70 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.failures ? 'bg-ember' : 'bg-transparent hover:bg-ember/10'" @click="toggleDeathSaveFailure(i - 1)"><span v-if="i <= state.deathSaves.failures" class="text-parchment font-bold">✗</span></button></div></div>
             </div>
           </div>
         </template>
@@ -115,7 +116,7 @@ onUnmounted(stopRepeat)
 
       <!-- Inspiration -->
       <CodexCounter
-        label="Inspiration"
+        :label="t('status.inspiration')"
         :value="state.inspiration"
         :disable-minus="state.inspiration === 0"
         :color-class="state.inspiration > 0 ? 'text-gold-bright drop-shadow-[0_0_8px_rgba(242,208,122,0.5)]' : 'text-gold-bright'"
@@ -125,7 +126,7 @@ onUnmounted(stopRepeat)
 
       <!-- Dés de vie -->
       <CodexCounter
-        label="Dés de vie"
+        :label="t('status.hitDice')"
         :value="hitDiceRemaining"
         :suffix="`d${character.hitDice.die}`"
         :disable-minus="hitDiceRemaining === 0"
@@ -136,8 +137,8 @@ onUnmounted(stopRepeat)
 
       <!-- Repos court / long : 2 boutons pleine largeur -->
       <div class="grid grid-cols-2 gap-3">
-        <button type="button" class="min-h-12 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doShortRest">Repos court</button>
-        <button type="button" class="min-h-12 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doLongRest">Repos long</button>
+        <button type="button" class="min-h-12 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doShortRest">{{ t('rest.short') }}</button>
+        <button type="button" class="min-h-12 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase py-3 transition-colors" @click="doLongRest">{{ t('rest.long') }}</button>
       </div>
     </div>
 
@@ -147,62 +148,62 @@ onUnmounted(stopRepeat)
       <!-- Bloc HP desktop -->
       <div class="border border-gold/40 p-5 transition-colors" :class="isDown ? 'bg-blood/30 border-ember' : 'bg-charcoal/60'">
         <div class="flex items-center justify-center gap-4 mb-3">
-          <button type="button" :disabled="isDown" class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none" aria-label="Diminuer points de vie" @pointerdown.prevent="startRepeat(() => damage(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          <button type="button" :disabled="isDown" class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-bright flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.decrease', { label: t('status.hp').toLowerCase() })" @pointerdown.prevent="startRepeat(() => damage(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           <div class="text-center min-w-[120px]" aria-live="polite" aria-atomic="true">
-            <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">Points de vie</p>
+            <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">{{ t('status.hp') }}</p>
             <p class="font-display tabular-nums leading-none" :class="isDown ? 'text-ember-bright' : hpPercent > 50 ? 'text-gold-bright' : hpPercent > 25 ? 'text-ember-bright' : 'text-ember'">
               <span class="text-5xl sm:text-6xl">{{ state.hpCurrent }}</span><span class="text-2xl text-parchment-mute"> / {{ character.maxHp }}</span>
             </p>
-            <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">+{{ state.hpTemp }} temp</p>
+            <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">{{ t('status.hpTemp', { value: state.hpTemp }) }}</p>
           </div>
-          <button type="button" :disabled="isFull" class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none" aria-label="Augmenter points de vie" @pointerdown.prevent="startRepeat(() => heal(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          <button type="button" :disabled="isFull" class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.increase', { label: t('status.hp').toLowerCase() })" @pointerdown.prevent="startRepeat(() => heal(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
         </div>
-        <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="`${state.hpCurrent} sur ${character.maxHp} points de vie`">
+        <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="t('status.hpProgress', { current: state.hpCurrent, max: character.maxHp })">
           <div class="h-full transition-all duration-300" :class="hpPercent > 50 ? 'bg-gold-bright' : hpPercent > 25 ? 'bg-ember-bright' : 'bg-ember motion-safe:animate-ember'" :style="{ width: `${hpPercent}%` }" />
         </div>
         <div v-if="isDown" class="py-3 border-t border-ember/40">
-          <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase mb-3">⚠ Sauvegardes contre la mort</p>
+          <p class="font-display text-sm tracking-wider-4 text-ember-bright uppercase mb-3">{{ t('status.deathSaves') }}</p>
           <div class="flex flex-wrap gap-6 items-center">
-            <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">Succès</span><div class="flex gap-2" role="group" aria-label="Succès contre la mort"><button v-for="i in 3" :key="`s-${i}`" type="button" :aria-pressed="i <= state.deathSaves.successes" :aria-label="`Succès ${i}`" class="w-11 h-11 rounded-full border-2 border-gold-bright/60 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.successes ? 'bg-gold-bright' : 'bg-transparent hover:bg-gold-bright/10'" @click="toggleDeathSaveSuccess(i - 1)"><span v-if="i <= state.deathSaves.successes" class="text-obsidian font-bold">✓</span></button></div></div>
-            <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">Échecs</span><div class="flex gap-2" role="group" aria-label="Échecs contre la mort"><button v-for="i in 3" :key="`f-${i}`" type="button" :aria-pressed="i <= state.deathSaves.failures" :aria-label="`Échec ${i}`" class="w-11 h-11 rounded-full border-2 border-ember-bright/70 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.failures ? 'bg-ember' : 'bg-transparent hover:bg-ember/10'" @click="toggleDeathSaveFailure(i - 1)"><span v-if="i <= state.deathSaves.failures" class="text-parchment font-bold">✗</span></button></div></div>
+            <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">{{ t('status.successes') }}</span><div class="flex gap-2" role="group" :aria-label="t('status.successesGroup')"><button v-for="i in 3" :key="`s-${i}`" type="button" :aria-pressed="i <= state.deathSaves.successes" :aria-label="t('status.success', { index: i })" class="w-11 h-11 rounded-full border-2 border-gold-bright/60 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.successes ? 'bg-gold-bright' : 'bg-transparent hover:bg-gold-bright/10'" @click="toggleDeathSaveSuccess(i - 1)"><span v-if="i <= state.deathSaves.successes" class="text-obsidian font-bold">✓</span></button></div></div>
+            <div class="flex items-center gap-3"><span class="text-sm text-parchment-dim">{{ t('status.failures') }}</span><div class="flex gap-2" role="group" :aria-label="t('status.failuresGroup')"><button v-for="i in 3" :key="`f-${i}`" type="button" :aria-pressed="i <= state.deathSaves.failures" :aria-label="t('status.failure', { index: i })" class="w-11 h-11 rounded-full border-2 border-ember-bright/70 flex items-center justify-center transition-colors" :class="i <= state.deathSaves.failures ? 'bg-ember' : 'bg-transparent hover:bg-ember/10'" @click="toggleDeathSaveFailure(i - 1)"><span v-if="i <= state.deathSaves.failures" class="text-parchment font-bold">✗</span></button></div></div>
           </div>
         </div>
       </div>
 
       <!-- Bloc Combat desktop -->
       <div class="border border-gold/30 bg-charcoal/40 p-4 flex flex-col gap-5">
-        <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase">Combat</p>
+        <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase">{{ t('status.combat') }}</p>
         <div>
-          <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">Inspiration</p>
+          <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">{{ t('status.inspiration') }}</p>
           <div class="flex items-center justify-center gap-3">
-            <button type="button" :disabled="state.inspiration === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Diminuer inspiration" @click="useInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" :disabled="state.inspiration === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.decrease', { label: t('status.inspiration').toLowerCase() })" @click="useInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
             <p class="font-display text-3xl text-gold-bright tabular-nums min-w-[2ch] text-center" :class="state.inspiration > 0 ? 'drop-shadow-[0_0_8px_rgba(242,208,122,0.5)]' : ''">{{ state.inspiration }}</p>
-            <button type="button" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 transition-colors select-none" aria-label="Augmenter inspiration" @click="addInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 transition-colors select-none" :aria-label="t('counter.increase', { label: t('status.inspiration').toLowerCase() })" @click="addInspiration"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           </div>
         </div>
         <div>
-          <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">Dés de vie</p>
+          <p class="font-display text-sm tracking-wider-4 text-gold/70 uppercase text-center mb-2">{{ t('status.hitDice') }}</p>
           <div class="flex items-center justify-center gap-3">
-            <button type="button" :disabled="hitDiceRemaining === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Diminuer dés de vie" @click="spendHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" :disabled="hitDiceRemaining === 0" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.decrease', { label: t('status.hitDice').toLowerCase() })" @click="spendHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
             <p class="font-display text-3xl text-gold-bright tabular-nums min-w-[2ch] text-center">{{ hitDiceRemaining }}<span class="text-parchment-mute text-base">d{{ character.hitDice.die }}</span></p>
-            <button type="button" :disabled="hitDiceRemaining >= character.hitDice.total" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" aria-label="Augmenter dés de vie" @click="restoreHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+            <button type="button" :disabled="hitDiceRemaining >= character.hitDice.total" class="h-10 w-10 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.increase', { label: t('status.hitDice').toLowerCase() })" @click="restoreHitDie"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           </div>
         </div>
       </div>
 
       <!-- Bloc Sens desktop -->
       <div class="border border-gold/20 bg-charcoal/30 p-4 flex flex-col gap-3">
-        <p class="font-display text-sm tracking-wider-4 text-gold/50 uppercase">Sens</p>
-        <div><p class="text-xs text-parchment-mute uppercase tracking-wider-3">Perception</p><p class="font-display text-xl text-parchment">{{ passivePerception }}</p></div>
-        <div><p class="text-xs text-parchment-mute uppercase tracking-wider-3">Investigation</p><p class="font-display text-xl text-parchment">{{ passiveInvestigation }}</p></div>
-        <div v-if="character.darkvision"><p class="text-xs text-parchment-mute uppercase tracking-wider-3">Vision nocturne</p><p class="font-display text-xl text-parchment">{{ character.darkvision }}<span class="text-xs text-parchment-mute ml-0.5">m</span></p></div>
+        <p class="font-display text-sm tracking-wider-4 text-gold/50 uppercase">{{ t('senses.title') }}</p>
+        <div><p class="text-xs text-parchment-mute uppercase tracking-wider-3">{{ t('senses.perception') }}</p><p class="font-display text-xl text-parchment">{{ passivePerception }}</p></div>
+        <div><p class="text-xs text-parchment-mute uppercase tracking-wider-3">{{ t('senses.investigation') }}</p><p class="font-display text-xl text-parchment">{{ passiveInvestigation }}</p></div>
+        <div v-if="character.darkvision"><p class="text-xs text-parchment-mute uppercase tracking-wider-3">{{ t('senses.darkvision') }}</p><p class="font-display text-xl text-parchment">{{ character.darkvision }}<span class="text-xs text-parchment-mute ml-0.5">{{ t('common.meters') }}</span></p></div>
       </div>
 
       <!-- Bloc Repos desktop -->
       <div class="border border-gold/20 bg-charcoal/30 p-4 flex flex-col gap-3 justify-center">
-        <p class="font-display text-sm tracking-wider-4 text-gold/50 uppercase">Repos</p>
-        <button type="button" class="min-h-11 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright hover:border-gold/60 font-display text-sm tracking-wider-2 uppercase px-3 py-2 transition-colors" @click="doShortRest">Court</button>
-        <button type="button" class="min-h-11 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase px-3 py-2 transition-colors" @click="doLongRest">Long</button>
+        <p class="font-display text-sm tracking-wider-4 text-gold/50 uppercase">{{ t('rest.title') }}</p>
+        <button type="button" class="min-h-11 border border-gold/30 bg-charcoal/50 text-parchment-dim hover:text-gold-bright hover:border-gold/60 font-display text-sm tracking-wider-2 uppercase px-3 py-2 transition-colors" @click="doShortRest">{{ t('rest.shortCompact') }}</button>
+        <button type="button" class="min-h-11 border border-gold/40 bg-gold/10 text-gold hover:text-gold-bright hover:bg-gold/20 font-display text-sm tracking-wider-2 uppercase px-3 py-2 transition-colors" @click="doLongRest">{{ t('rest.longCompact') }}</button>
       </div>
     </div>
   </section>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Ability, AbilityKey } from '~~/shared/types/character'
+import { t } from '~/composables/useT'
 
 const props = defineProps<{ abilities: Record<AbilityKey, Ability> }>()
 
@@ -15,7 +16,7 @@ const items = computed(() => order.map(key => ({ key, ability: props.abilities[k
 
 <template>
   <section aria-labelledby="caracs-title" class="space-y-3 md:grid md:grid-cols-2 md:gap-3 md:space-y-0 lg:block lg:space-y-3">
-    <h2 id="caracs-title" class="sr-only">Caractéristiques</h2>
+    <h2 id="caracs-title" class="sr-only">{{ t('abilities.title') }}</h2>
 
     <div
       v-for="item in items"
@@ -37,12 +38,12 @@ const items = computed(() => order.map(key => ({ key, ability: props.abilities[k
           class="text-xs mt-1"
           :class="item.ability.proficient ? 'text-gold' : 'text-parchment-mute'"
         >
-          sauv · {{ fmt(item.ability.saveModifier) }}
+          {{ t('abilities.save', { value: fmt(item.ability.saveModifier) }) }}
           <abbr
             v-if="item.ability.proficient"
-            title="Maîtrise"
+            :title="t('common.mastery')"
             class="ml-1 inline-block border border-gold-bright text-gold-bright text-[10px] font-display tracking-wider-2 px-1.5 leading-none py-0.5 no-underline"
-          >M</abbr>
+          >{{ t('common.masteryShort') }}</abbr>
         </p>
       </div>
       <p class="font-display text-3xl text-gold-bright">{{ fmt(item.ability.modifier) }}</p>

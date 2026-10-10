@@ -7,6 +7,7 @@
 - État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort)
 - Sac (équipement, argent, notes) : composable `useInventory`, modifiable et sauvegardé dans le navigateur (clé `codex:{slug}:inventory`)
 - Tests : Vitest (unit) + Playwright (e2e)
+- Textes de l'interface : catalogue `app/i18n/fr.ts` + `t()` / `tCount()` (`app/composables/useT.ts`), jamais de texte en dur dans un composant
 
 ## Personnages (6)
 Steve (Dareth Brumeval), Normand (Skamos Aurum), Myriam (Zanna), Sandra (Maera Vifbois), Juan (Thunon), Jérôme (Kael Draven).

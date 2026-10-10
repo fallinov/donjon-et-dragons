@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Attack } from '~~/shared/types/character'
+import { t } from '~/composables/useT'
 
 defineProps<{ attacks: Attack[] }>()
 </script>
@@ -16,22 +17,22 @@ defineProps<{ attacks: Attack[] }>()
         <p class="font-display text-gold-bright text-base">{{ attack.name }}</p>
         <p class="text-xs text-parchment-mute italic">{{ attack.note }}</p>
         <p class="mt-2 text-sm">
-          <span class="text-gold">Bonus d'att.</span> · <span class="font-display text-parchment">{{ attack.attackBonus }}</span>
+          <span class="text-gold">{{ t('attacks.bonus') }}</span> · <span class="font-display text-parchment">{{ attack.attackBonus }}</span>
         </p>
         <p class="text-sm">
-          <span class="text-gold">Dégâts</span> · <span class="font-display text-parchment">{{ attack.damage }} <em class="text-bone not-italic text-xs">{{ attack.damageType }}</em></span>
+          <span class="text-gold">{{ t('attacks.damage') }}</span> · <span class="font-display text-parchment">{{ attack.damage }} <em class="text-bone not-italic text-xs">{{ attack.damageType }}</em></span>
         </p>
       </article>
     </div>
 
     <!-- Desktop : table -->
     <table class="print-arsenal-table hidden md:table w-full border-collapse">
-      <caption class="sr-only">Armes équipées avec bonus d'attaque et dégâts</caption>
+      <caption class="sr-only">{{ t('attacks.caption') }}</caption>
       <thead>
         <tr class="border-b border-gold/30">
-          <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">Arme</th>
-          <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">Bonus d'att.</th>
-          <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">Dégâts</th>
+          <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">{{ t('attacks.weapon') }}</th>
+          <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">{{ t('attacks.bonus') }}</th>
+          <th scope="col" class="text-left font-display text-xs tracking-wider-4 text-gold uppercase pb-2">{{ t('attacks.damage') }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gold/15">
