@@ -33,6 +33,19 @@ function fieldName(path: string): string {
   if (head === 'skills') return `${t('field.skillName')} ${Number(first) + 1}`
   if (head === 'languages') return `${t('field.languageName')} ${Number(first) + 1}`
   if (head === 'hitDice') return first === 'die' ? t('field.hitDie') : t('field.hitDiceTotal')
+  const position = (label: string, at: string): string => `${label} ${Number(at) + 1}`
+  if (head === 'features') {
+    return second === 'benefits' ? `${position(t('field.featureTitle'), first)} · ${position(t('field.benefit'), path.split('.')[3] ?? '0')}` : position(t('field.featureTitle'), first)
+  }
+  if (head === 'attacks') return position(t('field.attackName'), first)
+  if (head === 'rituals') return position(t('field.ritualNumber'), first)
+  if (head === 'spellcasting') {
+    const [, , at = '0', field = ''] = path.split('.')
+    if (first === 'saveDc') return t('field.saveDc')
+    if (first === 'attackBonus') return t('field.spellAttackBonus')
+    if (first === 'slotLevels') return `${t('editor.subsection.slots')} ${Number(at) + 1} · ${field === 'slots' ? t('field.slotCount') : t('field.slotLevel')}`
+    return `${t('field.spellTitle')} ${Number(at) + 1}${field === 'level' ? ` · ${t('field.spellLevel')}` : ''}`
+  }
   const key = `field.${head}`
   return hasMessage(key) ? t(key) : path
 }
@@ -71,6 +84,10 @@ async function submit(): Promise<void> {
     <EditStats v-model="character" :errors="visibleErrors" />
     <EditAbilities v-model="character" :errors="visibleErrors" />
     <EditSkills v-model="character" :errors="visibleErrors" />
+    <EditFeatures v-model="character" :errors="visibleErrors" />
+    <EditAttacks v-model="character" :errors="visibleErrors" />
+    <EditSpellcasting v-model="character" :errors="visibleErrors" />
+    <EditRituals v-model="character" :errors="visibleErrors" />
     <EditLanguages v-model="character" :errors="visibleErrors" />
     <EditPersonality v-model="character" />
 

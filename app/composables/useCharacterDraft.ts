@@ -1,11 +1,22 @@
 import { computed, ref, shallowRef } from 'vue'
-import type { Character } from '~~/shared/types/character'
+import type { Character, Spell } from '~~/shared/types/character'
 import { deepEqual } from '~/utils/deepEqual'
 import { toPlain } from '~/utils/toPlain'
 import { validateCharacter } from '~/utils/validateCharacter'
 import { ensureVital, VITAL_LABELS, type VitalKey } from '~/utils/vitals'
 
 const EDITED_VITALS: VitalKey[] = ['armorClass', 'initiative', 'speed']
+
+/** Textes facultatifs d'un sort : chaîne vide plutôt qu'absents (champs de l'éditeur). */
+export function fillSpellTexts(spell: Spell): Spell {
+  spell.castingTime ??= ''
+  spell.range ??= ''
+  spell.duration ??= ''
+  spell.check ??= ''
+  spell.effect ??= ''
+  spell.concentration ??= false
+  return spell
+}
 
 /** Brouillon d'édition d'une fiche : copie modifiable, détection des changements, validation. */
 export function useCharacterDraft() {
@@ -22,6 +33,13 @@ export function useCharacterDraft() {
     plain.personality.idealLabel ??= ''
     const speed = plain.vitals.find(vital => vital.label === VITAL_LABELS.speed)
     if (speed) speed.unit ??= ''
+    plain.ritualsNote ??= ''
+    for (const feature of plain.features) feature.benefits ??= []
+    for (const spell of plain.spellcasting?.spells ?? []) fillSpellTexts(spell)
+    for (const ritual of plain.rituals) {
+      ritual.footnote ??= ''
+      for (const step of ritual.steps) step.emphasis ??= ''
+    }
     original.value = structuredClone(plain)
     draft.value = structuredClone(plain)
   }

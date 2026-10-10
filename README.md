@@ -26,7 +26,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 159 tests) + Playwright (e2e, 44 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 175 tests) + Playwright (e2e, 52 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -66,7 +66,7 @@ donjon-et-dragons/
 │   ├── components/
 │   │   ├── PrintButton.vue
 │   │   ├── ConfirmDialog.vue        # boîte de confirmation du codex (useConfirm), remplace confirm()
-│   │   ├── edit/                    # éditeur : EditForm, sections (EditIdentity, EditStats, EditAbilities…), champs (EditText, EditNumber, EditList…)
+│   │   ├── edit/                    # éditeur : EditForm, sections (identité, stats, caractéristiques, compétences, aptitudes, attaques, sorts, rites, langues, personnalité), champs (EditText, EditNumber, EditList repliable…)
 │   │   ├── mobile/
 │   │   │   ├── MobileMiniHeader.vue
 │   │   │   ├── MobileSwipeContainer.vue # swipe horizontal entre onglets
@@ -132,9 +132,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 159 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 175 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 44 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 52 tests (chromium desktop + mobile safari)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt et fournit une base IndexedDB neuve à chaque test (`fake-indexeddb`). `tests/helpers/characters.ts` construit des fiches stockées à partir des seeds.

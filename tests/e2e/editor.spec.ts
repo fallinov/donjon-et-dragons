@@ -1,5 +1,12 @@
 import { test, expect, type Page } from '@playwright/test'
 
+/** Sur mobile, ouvre l'onglet demandé de la fiche ; sur ordinateur tout est déjà affiché. */
+async function openTab(page: Page, name: string): Promise<void> {
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  const tab = page.getByRole('button', { name: new RegExp(`^${name}$`, 'i') })
+  if (await tab.isVisible()) { await tab.dispatchEvent('click'); await page.waitForTimeout(300) }
+}
+
 const levelText = (level: number) => new RegExp(`niv(eau|\\.) ${level}`)
 
 async function createCharacter(page: Page, firstName: string): Promise<string> {
@@ -43,7 +50,7 @@ test.describe('Éditeur de fiche', () => {
     await page.goto('/personnages/dareth-brumeval')
     await page.getByRole('link', { name: 'Modifier' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Modifier la fiche' })).toBeVisible()
-    await page.getByRole('spinbutton', { name: 'Niveau', exact: true }).fill('7')
+    await page.getByRole('region', { name: 'Identité' }).getByRole('spinbutton', { name: 'Niveau', exact: true }).fill('7')
     await page.getByRole('button', { name: 'Enregistrer' }).click()
 
     await expect(page).toHaveURL(/\/personnages\/dareth-brumeval$/)
@@ -105,4 +112,56 @@ test.describe('Éditeur de fiche', () => {
     await expect(page).toHaveURL(/\/personnages\/dareth-brumeval$/)
     await expect(page.getByText('Géant')).toBeVisible()
   })
+
+  test('ajouter un sort de niveau 1 à Thunon : il peut être lancé', async ({ page }) => {
+    await page.goto('/personnages/thunon/modifier')
+    const spells = page.getByRole('group', { name: 'Sorts connus' })
+    await spells.getByRole('button', { name: '+ Ajouter' }).last().click()
+    await spells.getByRole('textbox', { name: 'Nom du sort', exact: true }).last().fill('Graisse')
+    await spells.getByRole('spinbutton', { name: 'Niveau du sort' }).last().fill('1')
+    await spells.getByRole('combobox', { name: 'Ressource' }).last().selectOption('slot')
+    await page.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(page).toHaveURL(/\/personnages\/thunon$/)
+
+    await openTab(page, 'Sorts')
+    const row = page.locator('li').filter({ hasText: 'Graisse' }).filter({ visible: true }).first()
+    await expect(row).toBeVisible()
+    await expect(row.getByRole('button', { name: 'Lancer' })).toBeEnabled()
+  })
+
+  test('retirer le lanceur de sorts : plus aucun sort sur la fiche', async ({ page }) => {
+    await page.goto('/personnages/dareth-brumeval/modifier')
+    await page.getByRole('checkbox', { name: 'Lanceur de sorts' }).uncheck()
+    await page.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(page).toHaveURL(/\/personnages\/dareth-brumeval$/)
+
+    await openTab(page, 'Sorts')
+    await expect(page.getByRole('region', { name: 'Sorts', exact: true })).toHaveCount(0)
+    await expect(page.locator('#slots-count-1')).toHaveCount(0)
+    const tab = page.getByRole('button', { name: /^Sorts$/i })
+    if (await tab.isVisible()) await expect(page.getByText('Aucun sort connu.')).toBeVisible()
+  })
+
+  test('nouveau lanceur : le DD est obligatoire', async ({ page }) => {
+    await page.goto('/personnages/kael-draven/modifier')
+    const caster = page.getByRole('checkbox', { name: 'Lanceur de sorts' })
+    if (await caster.isChecked()) await caster.uncheck()
+    await caster.check()
+    await page.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(page.locator('[data-error-summary]')).toContainText('DD de sauvegarde — Nombre entier attendu.')
+  })
+
+  test('ajouter une attaque : visible sur la fiche', async ({ page }) => {
+    await page.goto('/personnages/zanna/modifier')
+    const attacks = page.getByRole('region', { name: 'Attaques et incantations' })
+    await attacks.getByRole('button', { name: '+ Ajouter' }).click()
+    await attacks.getByRole('textbox', { name: 'Arme ou sort', exact: true }).last().fill('Arbalète légère')
+    await attacks.getByRole('textbox', { name: "Jet d'attaque", exact: true }).last().fill('1d20+3')
+    await page.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(page).toHaveURL(/\/personnages\/zanna$/)
+
+    await openTab(page, 'Combat')
+    await expect(page.getByText('Arbalète légère').filter({ visible: true }).first()).toBeVisible()
+  })
 })
+

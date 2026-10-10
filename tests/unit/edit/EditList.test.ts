@@ -5,7 +5,7 @@ import EditList from '~/components/edit/EditList.vue'
 
 interface Item { name: string }
 
-function mountList(items: Item[]) {
+function mountList(items: Item[], extra: Record<string, unknown> = {}) {
   let current = items
   const wrapper = mount(EditList<Item>, {
     props: {
@@ -17,6 +17,7 @@ function mountList(items: Item[]) {
       'addLabel': 'Ajouter',
       'itemName': (item: Item) => item.name,
       'create': () => ({ name: '' }),
+      ...extra,
     },
     slots: { default: ({ item }: { item: Item }) => h('span', item.name) },
   })
@@ -53,4 +54,21 @@ describe('EditList', () => {
     const { wrapper } = mountList([])
     expect(wrapper.text()).toContain('Aucun élément.')
   })
+
+  it('repliable : fermé par défaut, nommé par l\'élément, ouvert à l\'ajout', async () => {
+    const { wrapper } = mountList([{ name: 'Sommeil' }], { collapsible: true })
+    const details = () => wrapper.findAll('details')
+    expect(details()[0]!.attributes('open')).toBeUndefined()
+    expect(wrapper.find('summary').text()).toContain('Sommeil')
+    await wrapper.findAll('button').at(-1)!.trigger('click')
+    expect(details()[1]!.attributes('open')).toBeDefined()
+  })
+
+  it('repliable : un élément en erreur reste ouvert', () => {
+    const { wrapper } = mountList([{ name: 'A' }, { name: '' }], { collapsible: true, invalid: (i: number) => i === 1 })
+    const details = wrapper.findAll('details')
+    expect(details[0]!.attributes('open')).toBeUndefined()
+    expect(details[1]!.attributes('open')).toBeDefined()
+  })
 })
+
