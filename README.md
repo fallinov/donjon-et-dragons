@@ -8,7 +8,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 
 | Slug | Personnage | Joueur | Race · Classe |
 |---|---|---|---|
-| [`dareth-brumeval`](https://donjon-et-dragons.vercel.app/personnages/dareth-brumeval) | Dareth Brumeval | Steve | Demi-elfe · Rôdeur niveau 4 |
+| [`dareth-brumeval`](https://donjon-et-dragons.vercel.app/personnages/dareth-brumeval) | Dareth Brumeval | Steve | Demi-elfe · Rôdeur niveau 6 |
 | [`skamos-aurum`](https://donjon-et-dragons.vercel.app/personnages/skamos-aurum) | Skamos Aurum | Normand | Tieffelin · Ensorceleur niveau 4 |
 | [`zanna`](https://donjon-et-dragons.vercel.app/personnages/zanna) | Zanna | Myriam | Gnome des forêts · Occultiste niveau 3 |
 | [`maera-vifbois`](https://donjon-et-dragons.vercel.app/personnages/maera-vifbois) | Maera Vifbois | Sandra | Humaine · Paladin (Conquête) niveau 4 |
@@ -155,6 +155,7 @@ Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharac
 - **Persistance** : store IndexedDB `states`, clé = identifiant de la fiche. Écriture à chaque changement : une écriture différée serait perdue si l'app se ferme juste après
 - **Singleton** : via `useState` Nuxt pour que `CodexStatusBar` et `CodexSpells` partagent le même state
 - **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
+- **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée
 
 ### Sac du personnage
 
@@ -164,7 +165,6 @@ Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.t
 - **Persistance** : store IndexedDB `inventories`, clé = identifiant de la fiche. Propre à chaque appareil, non synchronisé.
 - **Affichage** : cinquième onglet « Sac » sur mobile, section sous les rites sur ordinateur. Non imprimé.
 - **Robustesse** : une sauvegarde abîmée est nettoyée, une quantité à 0 retire l'objet.
-- **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée
 
 ## Export, import et partage
 
