@@ -7,7 +7,7 @@ import { useConfirm } from '~/composables/useConfirm'
 const options = { title: 'Supprimer la fiche ?', message: 'Définitif.', confirmLabel: 'Supprimer', cancelLabel: 'Annuler' }
 
 describe('ConfirmDialog + useConfirm', () => {
-  afterEach(() => useConfirm().request.value?.resolve(false))
+  afterEach(() => useConfirm().request.value?.resolve('cancel'))
 
   it('résout true sur confirmation et ferme la boîte', async () => {
     const wrapper = mount(ConfirmDialog, { attachTo: document.body })
@@ -39,7 +39,17 @@ describe('ConfirmDialog + useConfirm', () => {
     const second = useConfirm().confirm({ ...options, title: 'Autre' })
     await expect(first).resolves.toBe(false)
     expect(useConfirm().request.value?.title).toBe('Autre')
-    useConfirm().request.value?.resolve(true)
+    useConfirm().request.value?.resolve('confirm')
     await expect(second).resolves.toBe(true)
   })
+
+  it('troisième choix : résout « extra »', async () => {
+    const wrapper = mount(ConfirmDialog, { attachTo: document.body })
+    const answer = useConfirm().choose({ ...options, extraLabel: 'Importer en copie' })
+    await nextTick(); await nextTick()
+    await wrapper.find('[data-confirm-extra]').trigger('click')
+    await expect(answer).resolves.toBe('extra')
+    wrapper.unmount()
+  })
 })
+

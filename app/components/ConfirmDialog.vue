@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import { useConfirm } from '~/composables/useConfirm'
+import { useConfirm, type ConfirmAnswer } from '~/composables/useConfirm'
 
 const { request } = useConfirm()
 const dialog = ref<HTMLDialogElement>()
@@ -22,8 +22,8 @@ watch(request, async (next) => {
   ;(next.danger ? cancelButton.value : confirmButton.value)?.focus()
 })
 
-function answer(confirmed: boolean): void {
-  request.value?.resolve(confirmed)
+function answer(choice: ConfirmAnswer): void {
+  request.value?.resolve(choice)
 }
 </script>
 
@@ -33,7 +33,7 @@ function answer(confirmed: boolean): void {
     class="confirm-dialog font-body m-auto w-[min(100%-2rem,28rem)] border border-gold/40 bg-charcoal p-0 text-parchment shadow-[0_0_40px_rgba(0,0,0,0.8)]"
     aria-labelledby="confirm-title"
     aria-describedby="confirm-message"
-    @cancel.prevent="answer(false)"
+    @cancel.prevent="answer('cancel')"
   >
     <div v-if="request" class="p-6">
       <h2 id="confirm-title" class="font-display text-lg tracking-wider-2 text-gold-bright uppercase mb-3">{{ request.title }}</h2>
@@ -43,7 +43,7 @@ function answer(confirmed: boolean): void {
           ref="cancelButton"
           type="button"
           class="min-h-11 border border-gold/30 bg-charcoal/50 px-4 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright transition-colors"
-          @click="answer(false)"
+          @click="answer('cancel')"
         >{{ request.cancelLabel }}</button>
         <button
           ref="confirmButton"
@@ -53,8 +53,15 @@ function answer(confirmed: boolean): void {
             ? 'border-ember bg-blood/60 text-parchment hover:bg-blood'
             : 'border-gold/50 bg-gold/15 text-gold-bright hover:bg-gold/25'"
           data-confirm
-          @click="answer(true)"
+          @click="answer('confirm')"
         >{{ request.confirmLabel }}</button>
+        <button
+          v-if="request.extraLabel"
+          type="button"
+          class="min-h-11 border border-gold/50 bg-charcoal px-4 font-display text-sm tracking-wider-2 uppercase text-gold-bright hover:bg-gold/15 transition-colors"
+          data-confirm-extra
+          @click="answer('extra')"
+        >{{ request.extraLabel }}</button>
       </div>
     </div>
   </dialog>

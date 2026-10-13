@@ -1,13 +1,61 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+import { importCharacter, useImportConflict } from '~/composables/useCharacterImport'
 import { useCharacterList } from '~/composables/useCharacters'
-import { t, tCount } from '~/composables/useT'
+import { t, tCount, type MessageKey } from '~/composables/useT'
+import { seeds } from '~/data/characters'
+import { fetchPortrait, restoreBuiltin } from '~/db/seed'
+import { readCharacterFile } from '~/utils/characterFile'
 
-const { characters, status } = useCharacterList()
+const { characters, status, refresh } = useCharacterList()
 
 useSeoMeta({
   title: t('home.seo.title'),
   description: t('home.seo.description'),
 })
+
+// Import d'une fiche (fichier .codex.json reçu par email, message, Fichiers…)
+const importInput = ref<HTMLInputElement>()
+const importError = ref<MessageKey>()
+const importing = ref(false)
+const resolveConflict = useImportConflict()
+
+async function onImport(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  importing.value = true
+  importError.value = undefined
+  try {
+    const result = await readCharacterFile(file)
+    if (!result.ok) {
+      importError.value = result.error
+      return
+    }
+    const id = await importCharacter(result.value, resolveConflict)
+    if (id) await navigateTo(`/personnages/${id}`)
+  }
+  catch (error) {
+    console.error(error)
+    importError.value = 'import.error.failed'
+  }
+  finally {
+    importing.value = false
+  }
+}
+
+// Fiches de départ supprimées par le joueur, restaurables
+const deletedSeeds = computed(() => status.value === 'ready'
+  ? seeds.filter(seed => !characters.value.some(c => c.id === seed.slug))
+  : [])
+
+async function restore(slug: string): Promise<void> {
+  const seed = seeds.find(s => s.slug === slug)
+  if (!seed) return
+  await restoreBuiltin(seed, fetchPortrait)
+  await refresh()
+}
 </script>
 
 <template>
@@ -28,6 +76,25 @@ useSeoMeta({
         >
           <span aria-hidden="true">+</span> {{ t('actions.newCharacter') }}
         </NuxtLink>
+        <button
+          v-if="status === 'ready'"
+          type="button"
+          class="mt-3 ml-0 inline-flex min-h-11 items-center gap-2 border border-gold/30 px-5 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright hover:border-gold/60 transition-colors disabled:opacity-50 sm:mt-6 sm:ml-3"
+          :disabled="importing"
+          data-import-button
+          @click="importInput?.click()"
+        >{{ t('import.button') }}</button>
+        <input
+          ref="importInput"
+          type="file"
+          accept=".json,application/json"
+          class="sr-only"
+          tabindex="-1"
+          aria-hidden="true"
+          data-import-input
+          @change="onImport"
+        >
+        <p v-if="importError" role="alert" class="mx-auto mt-4 max-w-md text-ember-light" data-import-error>{{ t(importError) }}</p>
         <p v-else-if="status === 'error'" class="mt-4 text-ember-light italic" role="alert">
           {{ t('home.loadError') }}
         </p>
@@ -51,6 +118,19 @@ useSeoMeta({
           </NuxtLink>
         </li>
       </ul>
+
+      <section v-if="deletedSeeds.length" aria-labelledby="deleted-seeds" class="mt-12 border-t border-gold/30 pt-6">
+        <h2 id="deleted-seeds" class="font-display text-sm tracking-wider-3 text-gold uppercase mb-3">{{ t('home.deletedSeeds') }}</h2>
+        <ul class="flex flex-wrap gap-3">
+          <li v-for="seed in deletedSeeds" :key="seed.slug">
+            <button
+              type="button"
+              class="min-h-11 border border-gold/40 px-4 font-display text-sm tracking-wider-2 uppercase text-gold hover:text-gold-bright hover:border-gold transition-colors"
+              @click="restore(seed.slug)"
+            >{{ t('home.restoreSeed', { name: `${seed.firstName}${seed.lastName ? ` ${seed.lastName}` : ''}` }) }}</button>
+          </li>
+        </ul>
+      </section>
     </div>
   </main>
 </template>
