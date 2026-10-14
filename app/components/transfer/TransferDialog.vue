@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, useId, watch } from 'vue'
-import { sendCharacter, type SentTransfer } from '~/composables/useTransfer'
+import { sendCharacterOnce, type SentTransfer } from '~/composables/useTransfer'
 import { t, type MessageKey } from '~/composables/useT'
 import { formatCode } from '~/utils/transferCode'
 
@@ -22,14 +22,13 @@ onMounted(() => {
 })
 
 async function send(): Promise<void> {
-  // Boîte refermée puis rouverte pendant un envoi : on attend celui en cours, sans second code
-  if (sending.value) return
   sending.value = true
   sent.value = undefined
   error.value = undefined
   status.value = undefined
   try {
-    const result = await sendCharacter(props.characterId)
+    // Boîte refermée puis rouverte pendant l'envoi : même envoi, même code
+    const result = await sendCharacterOnce(props.characterId)
     if (result.ok) sent.value = result.value
     else error.value = result.error
   }

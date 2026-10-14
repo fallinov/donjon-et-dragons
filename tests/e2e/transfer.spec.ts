@@ -8,8 +8,11 @@ async function otherPhone(browser: Browser): Promise<Page> {
 
 /** Ouvre « ⋯ » → Transférer et renvoie le code affiché. */
 async function transfer(page: Page, id: string): Promise<string> {
-  await page.goto(`/personnages/${id}`)
+  // Pas de rechargement si la fiche est déjà ouverte : il couperait la dernière écriture des PV
+  if (!page.url().endsWith(`/personnages/${id}`)) await page.goto(`/personnages/${id}`)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  const profil = page.getByRole('button', { name: 'Profil', exact: true })
+  if (await profil.isVisible()) await profil.dispatchEvent('click')
   await page.getByRole('button', { name: 'Autres actions' }).filter({ visible: true }).click()
   await page.getByRole('button', { name: 'Transférer' }).filter({ visible: true }).click()
   const code = page.locator('dialog[open] [data-transfer-code]')

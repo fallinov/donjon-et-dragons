@@ -100,6 +100,19 @@ export async function sendCharacter(id: string, options: TransferOptions = {}): 
   return uploadTransfer(JSON.stringify(serializeCharacter(bundle.character, bundle)), options)
 }
 
+// Envoi en cours par fiche, hors des composants : le menu « ⋯ » et sa boîte peuvent être recréés
+// (onglet Profil, passage mobile / ordinateur) pendant l'envoi ; un seul dépôt, un seul code
+const pending = new Map<string, Promise<TransferResult<SentTransfer>>>()
+
+/** Comme `sendCharacter`, mais un envoi déjà en cours pour cette fiche est réutilisé (un seul code). */
+export function sendCharacterOnce(id: string, options: TransferOptions = {}): Promise<TransferResult<SentTransfer>> {
+  const running = pending.get(id)
+  if (running) return running
+  const promise = sendCharacter(id, options).finally(() => pending.delete(id))
+  pending.set(id, promise)
+  return promise
+}
+
 /** Reçoit une fiche : téléchargement, déchiffrement puis lecture stricte (donnée non fiable). */
 export async function receiveCharacter(input: string, options: TransferOptions = {}): Promise<TransferResult<ImportedCharacter>> {
   const downloaded = await downloadTransfer(input, options)

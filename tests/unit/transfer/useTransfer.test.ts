@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { downloadTransfer, receiveCharacter, sendCharacter, uploadTransfer } from '~/composables/useTransfer'
+import { downloadTransfer, receiveCharacter, sendCharacter, sendCharacterOnce, uploadTransfer } from '~/composables/useTransfer'
 import { putCharacter } from '~/db/characterRepository'
 import { transferId } from '~/utils/transferCrypto'
 import { darethBrumeval } from '../../helpers/characters'
@@ -90,6 +90,18 @@ describe('transfert d\'une fiche', () => {
     if (!received.ok) throw new Error(received.error)
     expect(received.value.character.firstName).toBe('Dareth')
     expect(new Uint8Array(received.value.character.portrait.data)).toEqual(new Uint8Array(darethBrumeval.portrait.data))
+  })
+
+  it('envois simultanés de la même fiche : un seul dépôt, le même code', async () => {
+    await putCharacter(darethBrumeval)
+    const relay = fakeRelay()
+    const options = { fetch: relay.fetch, generate: codes('K7P4QX9M', 'ZZZZZZZZ'), iterations: FAST }
+    const [a, b] = await Promise.all([sendCharacterOnce(darethBrumeval.id, options), sendCharacterOnce(darethBrumeval.id, options)])
+    expect(a).toEqual(b)
+    expect(relay.store.size).toBe(1)
+    // Envoi terminé : un nouvel appui donne un nouveau code
+    const again = await sendCharacterOnce(darethBrumeval.id, options)
+    expect(again).toMatchObject({ ok: true, value: { code: 'ZZZZZZZZ' } })
   })
 
   it('fiche absente de l\'appareil : échec', async () => {
