@@ -15,7 +15,7 @@ export interface RaceRules {
 const DWARF_WEAPONS: WeaponId[] = ['battleaxe', 'handaxe', 'light-hammer', 'warhammer']
 const ELF_WEAPONS: WeaponId[] = ['longsword', 'shortsword', 'shortbow', 'longbow']
 
-const base = { darkvision: 0, size: 'medium', weapons: [], armor: [], hpPerLevel: 0 } as const
+const base: Omit<RaceRules, 'speed'> = { darkvision: 0, size: 'medium', weapons: [], armor: [], hpPerLevel: 0 }
 
 /** Races et sous-races du Manuel des joueurs 2014 (SRD 5.1 et PHB). */
 export const RACES: Record<RaceId, RaceRules> = {
