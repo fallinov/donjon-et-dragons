@@ -116,16 +116,17 @@ test.describe('Transfert de fiche par code', () => {
   })
 
   test('fermer puis rouvrir pendant l\'envoi : un seul dépôt, un seul code', async ({ page }) => {
-    // Relais lent : la boîte est fermée puis rouverte pendant l'envoi. Retard ajouté dans la page :
-    // sous WebKit, page.route + continue() peut envoyer la requête deux fois (409, puis second code)
+    // Dépôt retenu jusqu'à la réouverture (`__release`) : sinon, sur une CI lente, le premier envoi
+    // peut finir avant la réouverture et un nouveau code est alors légitime
     await page.addInitScript(() => {
       const original = window.fetch.bind(window)
-      const w = window as unknown as { __deposits: string[] }
+      const w = window as unknown as { __deposits: string[], __release: () => void }
       w.__deposits = []
+      const held = new Promise<void>((resolve) => { w.__release = resolve })
       window.fetch = async (input, init) => {
         if (String(input).endsWith('/api/transfers') && init?.method === 'POST') {
           w.__deposits.push((JSON.parse(String(init.body)) as { id: string }).id)
-          await new Promise(resolve => setTimeout(resolve, 1500))
+          await held
         }
         return original(input, init)
       }
@@ -139,6 +140,10 @@ test.describe('Transfert de fiche par code', () => {
     await page.locator('dialog[open]').getByRole('button', { name: 'Fermer' }).click()
     await expect(page.locator('dialog[open]')).toHaveCount(0)
     await openTransfer()
+    await expect(page.locator('dialog[open]')).toContainText('Chiffrement et envoi')
+    // Laisse à un éventuel second envoi le temps de dériver sa clé et d'appeler le relais
+    await page.waitForTimeout(1000)
+    await page.evaluate(() => (window as unknown as { __release: () => void }).__release())
     await expect(page.locator('dialog[open] [data-transfer-code]')).toBeVisible({ timeout: 15_000 })
     expect(await page.evaluate(() => (window as unknown as { __deposits: string[] }).__deposits)).toHaveLength(1)
   })
