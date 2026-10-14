@@ -91,3 +91,11 @@ Pattern utilisé :
 **Correction** : une simple fonction interchangeable (`let impl = async () => …`), réaffectée dans chaque test, appelée par la fabrique de `vi.mock`.
 
 **Règle** : pour simuler un **échec asynchrone**, ne pas passer par un `vi.fn` reconfiguré ; utiliser une fonction ordinaire. Garder `vi.fn` pour compter les appels des cas qui réussissent.
+
+## Typecheck : `vue-tsc --noEmit` ne vérifie rien dans ce projet (14.10.2026)
+
+**Erreur** : pendant plusieurs PR (#37, #45, #46), le typecheck a été lancé avec `pnpm vue-tsc --noEmit` et annoncé « OK ». Une erreur volontaire placée dans `server/` puis dans `app/` n'était pas signalée : le `tsconfig.json` racine a `"files": []` et ne fait que référencer `.nuxt/tsconfig.*.json`.
+
+**Correction** : `pnpm typecheck` (`nuxt typecheck`), qui suit les références. Vérifié avec une sonde d'erreur volontaire.
+
+**Règle** : avant de croire un outil de vérification, lui faire échouer un cas connu (sonde). Commande du projet : `pnpm typecheck`.
