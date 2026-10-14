@@ -4,7 +4,8 @@
 - Nuxt 4 + Vue 3 + TypeScript strict + Tailwind CSS v4
 - Fiches stockées sur l'appareil dans IndexedDB (`app/db/`, lib `idb`), rendu client uniquement (`ssr: false`)
 - Fiches de départ (seeds) en fichiers TypeScript typés (`app/data/characters/`), importées au premier lancement par `app/plugins/db.client.ts`. Une fiche supprimée ne revient pas
-- Types partagés dans `shared/types/character.ts`
+- Types partagés dans `shared/types/character.ts` et `shared/types/rules.ts` (identifiants des classes, races, armures, armes, compétences)
+- Moteur de règles D&D 5e 2014 (phase 2, #26) : `app/rules/dnd5e-2014/` (tables PHB dans `data/`, calculs purs dans `compute.ts`), choisi par `getRuleset()` (`app/rules/index.ts`). Les tables ne contiennent que des mécanismes ; les noms français sont dans le catalogue (`rules.class.*`, `rules.race.*`, `rules.armor.*`, `rules.weapon.*`, `rules.skill.*`). Source : SRD 5.1 et PHB 2014, jamais de valeur inventée
 - État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort), store IndexedDB `states`
 - Sac (équipement, argent, notes) : composable `useInventory`, store IndexedDB `inventories`. Seul sac : le sac de départ des seeds y est copié au premier lancement
 - Persistance des états partagés : `persistState()` (écriture à chaque changement) ; toujours passer par `toPlain()` avant d'écrire un objet réactif dans IndexedDB

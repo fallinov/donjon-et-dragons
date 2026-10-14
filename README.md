@@ -52,6 +52,11 @@ donjon-et-dragons/
 │   │   ├── migrations.ts            # migration des documents selon `schemaVersion`
 │   │   ├── seed.ts                  # import des fiches de départ (et de leur sac) au premier lancement
 │   │   └── legacy.ts                # reprise des données des versions précédentes (localStorage, format v1)
+│   ├── rules/
+│   │   ├── index.ts                 # getRuleset(id) : moteur de règles d'une fiche (`dnd5e-2014`)
+│   │   └── dnd5e-2014/
+│   │       ├── compute.ts           # calculs purs : modificateurs, maîtrise, compétences, CA, sorts, emplacements, PV moyens, armes
+│   │       └── data/                # tables PHB 2014 : classes, races, armures, armes, compétences, emplacements
 │   ├── plugins/
 │   │   └── db.client.ts             # seed + demande de stockage persistant avant le premier rendu
 │   ├── i18n/

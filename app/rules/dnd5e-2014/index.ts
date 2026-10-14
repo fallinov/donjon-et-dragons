@@ -1,0 +1,6 @@
+export * from './compute'
+export { CLASSES, CLASS_IDS, THIRD_CASTER_CLASSES } from './data/classes'
+export { RACES, RACE_IDS } from './data/races'
+export { ARMORS, ARMOR_IDS, SHIELD_BONUS } from './data/armors'
+export { WEAPONS, WEAPON_IDS } from './data/weapons'
+export { SKILLS, SKILL_KEYS } from './data/skills'
