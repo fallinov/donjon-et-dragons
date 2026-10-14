@@ -1,5 +1,5 @@
 import { ref, getCurrentInstance, type Ref } from 'vue'
-import type { Character } from '~~/shared/types/character'
+import type { Character, SpellSlotLevel } from '~~/shared/types/character'
 import { getState, putState } from '~/db/characterRepository'
 import { persistState } from '~/composables/persistState'
 import { deepEqual } from '~/utils/deepEqual'
@@ -68,6 +68,20 @@ export function normalizeState(character: Character, saved: CharacterState): Cha
  * État mutable d'un personnage, partagé via `useState` Nuxt (singleton par fiche),
  * persisté sur l'appareil dans IndexedDB.
  */
+/**
+ * Emplacement à consommer pour un sort de niveau `spellLevel` : le plus petit niveau
+ * d'emplacement ≥ au sort qui a encore un emplacement libre (lancement à niveau supérieur,
+ * magie de pacte de l'occultiste). Renvoie l'index dans `slotLevels`, -1 si aucun.
+ */
+export function slotIndexForSpell(slotLevels: SpellSlotLevel[], used: number[], spellLevel: number): number {
+  let best = -1
+  slotLevels.forEach((sl, i) => {
+    if (sl.level < spellLevel || (used[i] ?? 0) >= sl.slots) return
+    if (best < 0 || sl.level < slotLevels[best]!.level) best = i
+  })
+  return best
+}
+
 export function useCharacterState(character: Character) {
   const state = useStateSafe<CharacterState>(
     `character-state:${character.id}`,
@@ -158,8 +172,7 @@ export function useCharacterState(character: Character) {
     if (spell.cost === 'daily') return useDailySpell(spell.title)
     if (spell.cost === 'slot') {
       const levels = character.spellcasting?.slotLevels ?? []
-      const levelIndex = levels.findIndex(sl => sl.level === spell.level)
-      return consumeSlot(levelIndex)
+      return consumeSlot(slotIndexForSpell(levels, state.value.spellSlotsUsed, spell.level))
     }
     return false
   }

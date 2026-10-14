@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useCharacterState, computePassivePerception, normalizeState } from '~/composables/useCharacterState'
+import { useCharacterState, computePassivePerception, normalizeState, slotIndexForSpell } from '~/composables/useCharacterState'
 import { darethBrumeval, zanna } from '../helpers/characters'
 
 describe('computePassivePerception', () => {
@@ -187,5 +187,45 @@ describe('normalizeState — état sauvegardé avant une montée de niveau', () 
     expect(result.hpCurrent).toBe(20)
     expect(result.inspiration).toBe(1)
     expect(result.hitDiceUsed).toBe(2)
+  })
+})
+
+describe('slotIndexForSpell — lancement à niveau supérieur', () => {
+  const levels = [{ level: 1, slots: 4 }, { level: 2, slots: 2 }]
+
+  it('prend le niveau exact quand il reste un emplacement', () => {
+    expect(slotIndexForSpell(levels, [0, 0], 1)).toBe(0)
+    expect(slotIndexForSpell(levels, [0, 0], 2)).toBe(1)
+  })
+
+  it('passe au plus petit niveau supérieur libre', () => {
+    expect(slotIndexForSpell(levels, [4, 0], 1)).toBe(1)
+  })
+
+  it('ne descend jamais sous le niveau du sort', () => {
+    expect(slotIndexForSpell(levels, [0, 2], 2)).toBe(-1)
+  })
+
+  it('renvoie -1 sans emplacement de niveau suffisant', () => {
+    expect(slotIndexForSpell(levels, [4, 2], 1)).toBe(-1)
+    expect(slotIndexForSpell(levels, [0, 0], 3)).toBe(-1)
+  })
+
+  it('ne dépend pas de l\'ordre des niveaux', () => {
+    expect(slotIndexForSpell([{ level: 3, slots: 1 }, { level: 2, slots: 1 }], [0, 0], 1)).toBe(1)
+  })
+})
+
+describe('castSpell — magie de pacte (Zanna)', () => {
+  beforeEach(() => {
+    if (typeof window !== 'undefined') window.localStorage.clear()
+  })
+
+  it('un sort de niveau 1 consomme un emplacement de pacte de niveau 2', () => {
+    const { state, castSpell } = useCharacterState(zanna)
+    expect(castSpell({ title: 'Sommeil', level: 1, cost: 'slot' })).toBe(true)
+    expect(castSpell({ title: 'Sommeil', level: 1, cost: 'slot' })).toBe(true)
+    expect(state.value.spellSlotsUsed[0]).toBe(2)
+    expect(castSpell({ title: 'Sommeil', level: 1, cost: 'slot' })).toBe(false)
   })
 })

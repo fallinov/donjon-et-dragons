@@ -68,6 +68,19 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.locator('#slots-count-1')).toHaveText('0 / 4')
   })
 
+  test('magie de pacte : Zanna lance un sort de niveau 1 avec un emplacement de niveau 2', async ({ page }) => {
+    await page.goto('/personnages/zanna', { waitUntil: 'networkidle' })
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    const sortsTab = page.getByRole('button', { name: /^Sorts$/i })
+    if (await sortsTab.isVisible()) { await sortsTab.dispatchEvent('click'); await page.waitForTimeout(500) }
+    await expect(page.getByText('Sorts de niveau 1').filter({ visible: true })).toBeVisible()
+    await expect(page.locator('#slots-count-2')).toHaveText('2 / 2')
+
+    const sleep = page.getByRole('listitem').filter({ hasText: 'Sommeil', visible: true })
+    await sleep.getByRole('button', { name: 'Lancer' }).dispatchEvent('click')
+    await expect(page.locator('#slots-count-2')).toHaveText('1 / 2')
+  })
+
   test('skip link cible le contenu principal', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval')
     const skip = page.getByRole('link', { name: /Aller au contenu/i })

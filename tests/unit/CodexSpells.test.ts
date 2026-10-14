@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import CodexSpells from '~/components/codex/CodexSpells.vue'
-import { darethBrumeval } from '../helpers/characters'
+import { darethBrumeval, zanna } from '../helpers/characters'
 
 describe('CodexSpells', () => {
   beforeEach(() => {
@@ -43,16 +43,33 @@ describe('CodexSpells', () => {
     expect(wrapper.text()).toContain('3 / 4')
   })
 
-  it('désactive Lancer quand plus d\'emplacements', async () => {
+  it('épuise le niveau 1 puis lance le sort de niveau 1 avec un emplacement de niveau 2', async () => {
     const wrapper = mount(CodexSpells, { props: { character: darethBrumeval } })
-    const launchButtons = wrapper.findAll('button').filter(b => b.text() === 'Lancer')
-    // Consommer les 4 emplacements de niveau 1
-    for (let i = 0; i < 4; i++) {
-      await launchButtons[0]!.trigger('click')
-    }
-    expect(wrapper.text()).toContain('0 / 4')
-    // Les boutons Lancer doivent être disabled
-    const btn = wrapper.findAll('button').find(b => b.text() === 'Lancer')
-    expect(btn?.attributes('disabled')).toBeDefined()
+    const launch = () => wrapper.findAll('button').find(b => b.text() === 'Lancer')!
+    for (let i = 0; i < 4; i++) await launch().trigger('click')
+    expect(wrapper.find('#slots-count-1').text()).toBe('0 / 4')
+    expect(wrapper.find('#slots-count-2').text()).toBe('2 / 2')
+    await launch().trigger('click')
+    expect(wrapper.find('#slots-count-2').text()).toBe('1 / 2')
+  })
+
+  it('désactive Lancer quand plus aucun emplacement suffisant', async () => {
+    const wrapper = mount(CodexSpells, { props: { character: darethBrumeval } })
+    const launch = () => wrapper.findAll('button').find(b => b.text() === 'Lancer')!
+    for (let i = 0; i < 6; i++) await launch().trigger('click')
+    const buttons = wrapper.findAll('button').filter(b => b.text() === 'Lancer')
+    expect(buttons.length).toBeGreaterThan(0)
+    for (const b of buttons) expect(b.attributes('disabled')).toBeDefined()
+  })
+
+  it('magie de pacte : Zanna voit ses sorts de niveau 1 et les lance avec ses emplacements de niveau 2', async () => {
+    const wrapper = mount(CodexSpells, { props: { character: zanna } })
+    expect(wrapper.text()).toContain('Sorts de niveau 1')
+    expect(wrapper.text()).toContain('Sorts de niveau 2')
+    expect(wrapper.text()).toContain('Sommeil')
+    expect(wrapper.text()).toContain('Armure du mage')
+    const sleepRow = wrapper.findAll('li').find(li => li.text().includes('Sommeil'))!
+    await sleepRow.find('button').trigger('click')
+    expect(wrapper.find('#slots-count-2').text()).toBe('1 / 2')
   })
 })
