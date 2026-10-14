@@ -20,6 +20,7 @@ const status = ref<MessageKey>()
 let statusTimer: ReturnType<typeof setTimeout> | undefined
 
 const shareSupported = ref(false)
+const transferOpen = ref(false)
 const seed = computed(() => getSeed(props.character.id))
 const fullName = computed(() => `${props.character.firstName}${props.character.lastName ? ` ${props.character.lastName}` : ''}`.trim() || t('actions.unnamed'))
 
@@ -58,6 +59,11 @@ async function buildFile(kind: CharacterFileKind = 'export'): Promise<File | nul
   if (!bundle) return null
   const json = JSON.stringify(serializeCharacter(bundle.character, bundle))
   return new File([json], characterFileName(bundle.character, kind), { type: CHARACTER_FILE_KINDS[kind].mime })
+}
+
+function transfer(): void {
+  close()
+  transferOpen.value = true
 }
 
 async function share(): Promise<void> {
@@ -135,6 +141,7 @@ const itemClass = 'flex min-h-11 w-full items-center px-4 text-left font-display
       class="absolute right-0 top-full z-40 mt-1 w-64 border border-gold/40 bg-charcoal py-1 shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
       data-actions-menu
     >
+      <button type="button" :class="[itemClass, 'text-gold-bright']" data-transfer @click="transfer">{{ t('actions.transfer') }}</button>
       <button v-if="shareSupported" type="button" :class="[itemClass, 'text-gold-bright']" @click="share">{{ t('actions.share') }}</button>
       <button type="button" :class="[itemClass, 'text-gold-bright']" @click="exportFile">{{ t('actions.export') }}</button>
       <button v-if="seed" type="button" :class="[itemClass, 'text-parchment']" @click="restore">{{ t('actions.restore') }}</button>
@@ -147,5 +154,7 @@ const itemClass = 'flex min-h-11 w-full items-center px-4 text-left font-display
       class="absolute right-0 top-full z-30 mt-1 w-64 text-right text-sm text-gold-bright"
       :class="{ 'sr-only': !status || open }"
     >{{ status ? t(status) : '' }}</p>
+
+    <TransferDialog v-model:open="transferOpen" :character-id="character.id" :name="fullName" />
   </div>
 </template>

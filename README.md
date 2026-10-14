@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 224 tests) + Playwright (e2e, 98 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 267 tests) + Playwright (e2e, 132 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -45,6 +45,7 @@ donjon-et-dragons/
 │   │   ├── useObjectUrl.ts          # URL blob: d'un portrait, révoquée automatiquement
 │   │   ├── useMobileTab.ts          # onglet actif mobile (Profil, Combat, Sorts, Sac, Stats)
 │   │   ├── useT.ts                  # t() / tCount() : textes de l'interface
+│   │   ├── useTransfer.ts           # transfert par code : envoi chiffré, réception, erreurs traduites
 │   │   └── useIsDesktop.ts          # détecte le viewport >= lg
 │   ├── db/
 │   │   ├── schema.ts                # base IndexedDB `codex` : stores characters, states, inventories, meta
@@ -68,11 +69,15 @@ donjon-et-dragons/
 │   │   ├── vitals.ts                # libellés CA / initiative / vitesse lus par l'en-tête
 │   │   ├── deepEqual.ts             # détection des modifications du brouillon
 │   │   ├── newId.ts                 # UUID v4, aussi en http (réseau local)
+│   │   ├── transferCode.ts          # code de transfert base32 Crockford, saisie tolérante
+│   │   ├── transferCrypto.ts        # chiffrement AES-GCM, clé PBKDF2 dérivée du code
+│   │   ├── platform.ts              # iPhone / app installée (écran d'accueil)
 │   │   └── swipe.ts                 # logique pure du swipe mobile (verrouillage d'axe)
 │   ├── components/
 │   │   ├── PrintButton.vue
 │   │   ├── ConfirmDialog.vue        # boîte de confirmation du codex (useConfirm), remplace confirm()
 │   │   ├── pwa/                     # PwaUpdateToast (nouvelle version), PwaInstallHint (installation)
+│   │   ├── transfer/                # TransferDialog : code de transfert, copier, partager le lien
 │   │   ├── edit/                    # éditeur : EditForm, sections (identité, stats, caractéristiques, compétences, aptitudes, attaques, sorts, rites, langues, personnalité), champs (EditText, EditNumber, EditList repliable…)
 │   │   ├── mobile/
 │   │   │   ├── MobileMiniHeader.vue
@@ -104,6 +109,7 @@ donjon-et-dragons/
 │   │   └── kael-draven.ts
 │   └── pages/
 │       ├── index.vue                # liste des codex
+│       ├── recevoir.vue             # recevoir une fiche par code ou lien
 │       └── personnages/
 │           ├── nouveau.vue          # création d'une fiche
 │           └── [id]/
@@ -139,11 +145,11 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 224 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 267 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 98 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 132 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
-pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne (port 3211)
+pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne, /api hors service worker (port 3211)
 ```
 
 Le serveur e2e tourne sur le port **3210** pour éviter les collisions avec un dev server existant. Le setup Vitest (`tests/setup.ts`) stubbe le hook `useState` de Nuxt et fournit une base IndexedDB neuve à chaque test (`fake-indexeddb`). `tests/helpers/characters.ts` construit des fiches stockées à partir des seeds.
@@ -168,7 +174,7 @@ Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.t
 
 ## Export, import et partage
 
-Menu « ⋯ » d'une fiche : **Partager** (menu natif du téléphone : Mail, Messages, WhatsApp, Fichiers… ; masqué si le navigateur ne sait pas partager de fichiers), **Exporter (fichier)** (téléchargement), **Restaurer l'original** (fiches de départ) et **Supprimer**. Sur l'accueil : **Importer une fiche** et restauration des fiches de départ supprimées.
+Menu « ⋯ » d'une fiche : **Transférer** (code à 8 caractères, voir [Relais de transfert](#relais-de-transfert)), **Partager** (menu natif du téléphone : Mail, Messages, WhatsApp, Fichiers… ; masqué si le navigateur ne sait pas partager de fichiers), **Exporter (fichier)** (téléchargement), **Restaurer l'original** (fiches de départ) et **Supprimer**. Sur l'accueil : **Importer une fiche**, **Recevoir une fiche** (page `/recevoir`) et restauration des fiches de départ supprimées.
 
 Format `*.codex.json` (export). **Partager** envoie le même contenu nommé `*.codex.txt` (`text/plain`), car Chrome Android refuse de partager un `.json` ; s'il refuse quand même, la fiche est téléchargée en `.codex.json`. L'import accepte les deux extensions :
 
@@ -189,10 +195,17 @@ L'import refuse un fichier qui n'est pas une fiche du codex, d'une version plus 
 
 Transfert d'une fiche (photo comprise) avec un code de 8 caractères, valable 24 h. Le téléphone chiffre la fiche avant l'envoi : le serveur ne reçoit que l'empreinte du code et un contenu illisible.
 
+**Parcours** : sur sa fiche, « ⋯ » → **Transférer** affiche le code (`K7P4-QX9M`), avec **Copier le code** et **Partager le lien** (`/recevoir#K7P4QX9M` : le code reste après le `#`, jamais envoyé au serveur). Le destinataire touche **Recevoir une fiche** sur l'accueil, saisit le code ou ouvre le lien, puis **Recevoir** : la fiche passe par la même lecture stricte que l'import de fichier, avec le même choix en cas de doublon (Remplacer / Importer en copie / Annuler). Rien n'est importé sans appui sur **Recevoir**.
+
+**iPhone** : un lien s'ouvre dans Safari, dont les fiches sont séparées de celles de l'app installée. Dans Safari, la page `/recevoir` rappelle d'ouvrir l'app installée et d'y saisir le code (bouton **Copier le code**), et propose **Recevoir dans Safari** sinon.
+
 | Élément | Rôle |
 |---|---|
 | `app/utils/transferCode.ts` | code base32 de Crockford (`K7P4-QX9M`), saisie tolérante |
 | `app/utils/transferCrypto.ts` | identifiant = SHA-256 du code ; AES-GCM 256, clé PBKDF2-SHA256 (600 000 itérations) |
+| `app/composables/useTransfer.ts` | `sendCharacter` (chiffrement + dépôt, nouveau code si 409), `receiveCharacter` (lecture + déchiffrement + `parseCharacterFile`), erreurs traduites |
+| `app/components/transfer/TransferDialog.vue` | boîte « Transférer » : code, échéance, copier, partager le lien, réessayer |
+| `app/pages/recevoir.vue` | saisie du code (prérempli depuis le lien), rappel iPhone dans Safari |
 | `server/api/transfers/index.post.ts` | dépôt `{ id, data }` → `{ expiresAt }` (400, 409, 413, 429, 503) |
 | `server/api/transfers/[id].get.ts` | lecture `{ data, expiresAt }` (404 si inconnu ou expiré) |
 | `server/api/cron/transfers-cleanup.get.ts` | nettoyage quotidien (Cron Vercel, 3 h UTC) |

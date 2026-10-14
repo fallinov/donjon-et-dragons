@@ -67,4 +67,24 @@ test.describe('Application installable', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Hors-ligne')
     await context.setOffline(false)
   })
+
+  test('recevoir hors ligne : la page s\'ouvre et indique qu\'il faut Internet', async ({ page, context }) => {
+    await page.goto('/')
+    await waitForServiceWorker(page)
+    await context.setOffline(true)
+    await page.goto('/recevoir#K7P4QX9M')
+    await expect(page.getByRole('heading', { level: 1, name: 'Recevoir une fiche' })).toBeVisible()
+    await page.getByRole('button', { name: 'Recevoir' }).click()
+    await expect(page.locator('[data-receive-error]')).toHaveText('Pas de connexion : le transfert nécessite Internet.')
+    await context.setOffline(false)
+  })
+
+  test('le service worker laisse passer /api (pas de page de l\'app à la place)', async ({ page }) => {
+    await page.goto('/')
+    await waitForServiceWorker(page)
+    const response = await page.goto(`/api/transfers/${'0'.repeat(64)}`)
+    // Repli de navigation du service worker : il aurait servi l'app (200) à la place du serveur
+    expect(response?.fromServiceWorker()).toBe(false)
+    expect(response?.status()).toBe(404)
+  })
 })

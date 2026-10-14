@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { t } from '~/composables/useT'
+import { isIos, isStandalone } from '~/utils/platform'
 
 const IOS_DISMISSED_KEY = 'codex:ios-install-dismissed'
 
 const { $pwa } = useNuxtApp()
 const iosHint = ref(false)
-
-/** iPhone / iPad (y compris iPadOS qui se présente comme un Mac tactile). */
-function isIos(): boolean {
-  const ua = navigator.userAgent
-  return /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1)
-}
-
-function isStandalone(): boolean {
-  const legacy = (navigator as Navigator & { standalone?: boolean }).standalone
-  return legacy === true || window.matchMedia('(display-mode: standalone)').matches
-}
 
 onMounted(() => {
   try {

@@ -84,6 +84,12 @@ async function restore(slug: string): Promise<void> {
           data-import-button
           @click="importInput?.click()"
         >{{ t('import.button') }}</button>
+        <NuxtLink
+          v-if="status === 'ready'"
+          to="/recevoir"
+          class="mt-3 ml-0 inline-flex min-h-11 items-center gap-2 border border-gold/30 px-5 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright hover:border-gold/60 transition-colors sm:mt-6 sm:ml-3"
+          data-receive-link
+        >{{ t('transfer.receive.button') }}</NuxtLink>
         <input
           ref="importInput"
           type="file"
