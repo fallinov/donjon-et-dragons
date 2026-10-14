@@ -5,7 +5,7 @@ import { useCharacterList } from '~/composables/useCharacters'
 import { t, tCount, type MessageKey } from '~/composables/useT'
 import { seeds } from '~/data/characters'
 import { fetchPortrait, restoreBuiltin } from '~/db/seed'
-import { readCharacterFile } from '~/utils/characterFile'
+import { CHARACTER_FILE_ACCEPT, readCharacterFile } from '~/utils/characterFile'
 
 const { characters, status, refresh } = useCharacterList()
 
@@ -87,7 +87,7 @@ async function restore(slug: string): Promise<void> {
         <input
           ref="importInput"
           type="file"
-          accept=".json,application/json"
+          :accept="CHARACTER_FILE_ACCEPT"
           class="sr-only"
           tabindex="-1"
           aria-hidden="true"

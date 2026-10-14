@@ -4,7 +4,7 @@ export type ShareOutcome = 'shared' | 'downloaded' | 'cancelled'
 export function canShareFiles(): boolean {
   if (typeof navigator === 'undefined' || typeof navigator.canShare !== 'function') return false
   try {
-    return navigator.canShare({ files: [new File(['{}'], 'test.json', { type: 'application/json' })] })
+    return navigator.canShare({ files: [new File(['{}'], 'test.txt', { type: 'text/plain' })] })
   }
   catch {
     return false
@@ -24,8 +24,8 @@ export function downloadFile(file: File): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
-/** Ouvre le menu de partage natif ; à défaut, télécharge le fichier. */
-export async function shareOrDownload(file: File, title: string): Promise<ShareOutcome> {
+/** Ouvre le menu de partage natif ; à défaut, télécharge `fallback` (par défaut le fichier partagé). */
+export async function shareOrDownload(file: File, title: string, fallback: File = file): Promise<ShareOutcome> {
   if (canShareFiles()) {
     try {
       await navigator.share({ files: [file], title })
@@ -36,6 +36,6 @@ export async function shareOrDownload(file: File, title: string): Promise<ShareO
       // Partage refusé (ex. type de fichier) : on retombe sur le téléchargement
     }
   }
-  downloadFile(file)
+  downloadFile(fallback)
   return 'downloaded'
 }

@@ -72,6 +72,11 @@ function stopRepeat(): void {
   if (repeatInterval) { clearInterval(repeatInterval); repeatInterval = null }
 }
 
+/** Clavier et lecteurs d'écran : `click` sans pointeur ; le toucher passe par `pointerdown` (appui long). */
+function onKeyboardClick(event: MouseEvent, action: () => void): void {
+  if (event.detail === 0) action()
+}
+
 onUnmounted(stopRepeat)
 </script>
 
@@ -157,7 +162,7 @@ onUnmounted(stopRepeat)
       <!-- Bloc HP desktop -->
       <div class="border border-gold/40 p-5 transition-colors" :class="isDown ? 'bg-blood/30 border-ember' : 'bg-charcoal/60'">
         <div class="flex items-center justify-center gap-4 mb-3">
-          <button type="button" :disabled="isDown" class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-light flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.decrease', { label: t('status.hp').toLowerCase() })" @pointerdown.prevent="startRepeat(() => damage(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          <button type="button" :disabled="isDown" class="h-14 w-14 rounded-full border-2 border-ember bg-blood/40 text-ember-light flex items-center justify-center hover:bg-blood/60 active:bg-blood/80 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.decrease', { label: t('status.hp').toLowerCase() })" @pointerdown.prevent="startRepeat(() => damage(1))" @click="onKeyboardClick($event, () => damage(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
           <div class="text-center min-w-[120px]" aria-live="polite" aria-atomic="true">
             <p class="font-display text-sm tracking-wider-4 text-gold uppercase mb-1">{{ t('status.hp') }}</p>
             <p class="font-display tabular-nums leading-none" :class="isDown ? 'text-ember-light' : hpPercent > 50 ? 'text-gold-bright' : hpPercent > 25 ? 'text-ember-light' : 'text-ember-light'">
@@ -165,7 +170,7 @@ onUnmounted(stopRepeat)
             </p>
             <p v-if="state.hpTemp > 0" class="text-sm text-gold-bright font-display mt-1">{{ t('status.hpTemp', { value: state.hpTemp }) }}</p>
           </div>
-          <button type="button" :disabled="isFull" class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.increase', { label: t('status.hp').toLowerCase() })" @pointerdown.prevent="startRepeat(() => heal(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+          <button type="button" :disabled="isFull" class="h-14 w-14 rounded-full border-2 border-gold bg-gold/15 text-gold-bright flex items-center justify-center hover:bg-gold/25 active:bg-gold/35 disabled:opacity-30 transition-colors select-none" :aria-label="t('counter.increase', { label: t('status.hp').toLowerCase() })" @pointerdown.prevent="startRepeat(() => heal(1))" @click="onKeyboardClick($event, () => heal(1))" @pointerup="stopRepeat" @pointerleave="stopRepeat"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
         </div>
         <div v-if="!isDown" class="h-3 bg-obsidian border border-gold/30 overflow-hidden" role="progressbar" :aria-valuenow="state.hpCurrent" :aria-valuemin="0" :aria-valuemax="character.maxHp" :aria-label="t('status.hpProgress', { current: state.hpCurrent, max: character.maxHp })">
           <div class="h-full transition-all duration-300" :class="hpPercent > 50 ? 'bg-gold-bright' : hpPercent > 25 ? 'bg-ember-bright' : 'bg-ember motion-safe:animate-ember'" :style="{ width: `${hpPercent}%` }" />

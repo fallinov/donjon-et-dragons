@@ -6,7 +6,7 @@ import { t, type MessageKey } from '~/composables/useT'
 import { getSeed } from '~/data/characters'
 import { deleteCharacter, getCharacterBundle } from '~/db/characterRepository'
 import { fetchPortrait, restoreBuiltin } from '~/db/seed'
-import { characterFileName, serializeCharacter } from '~/utils/characterFile'
+import { CHARACTER_FILE_KINDS, characterFileName, serializeCharacter, type CharacterFileKind } from '~/utils/characterFile'
 import { canShareFiles, downloadFile, shareOrDownload } from '~/utils/share'
 
 const props = defineProps<{ character: Character }>()
@@ -53,18 +53,20 @@ onBeforeUnmount(() => {
   clearTimeout(statusTimer)
 })
 
-async function buildFile(): Promise<File | null> {
+async function buildFile(kind: CharacterFileKind = 'export'): Promise<File | null> {
   const bundle = await getCharacterBundle(props.character.id)
   if (!bundle) return null
   const json = JSON.stringify(serializeCharacter(bundle.character, bundle))
-  return new File([json], characterFileName(bundle.character), { type: 'application/json' })
+  return new File([json], characterFileName(bundle.character, kind), { type: CHARACTER_FILE_KINDS[kind].mime })
 }
 
 async function share(): Promise<void> {
   close()
-  const file = await buildFile()
+  const file = await buildFile('share')
   if (!file) return announce('actions.exportError')
-  const outcome = await shareOrDownload(file, fullName.value)
+  // Téléchargement de repli au format d'export habituel
+  const fallback = new File([file], characterFileName(props.character), { type: CHARACTER_FILE_KINDS.export.mime })
+  const outcome = await shareOrDownload(file, fullName.value, fallback)
   if (outcome === 'shared') announce('actions.shared')
   else if (outcome === 'downloaded') announce('actions.exported')
 }
