@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
+import { savedHp } from './storage'
 
 /** Ouvre le menu « ⋯ » de la fiche (en-tête mobile ou fil d'Ariane selon l'écran). */
 async function openMenu(page: Page): Promise<void> {
@@ -38,6 +39,7 @@ test.describe('Export, import et restauration', () => {
     await page.goto('/personnages/dareth-brumeval')
     await lowerHp(page, 3)
     await expect(hpBar(page)).toHaveAttribute('aria-valuenow', '46')
+    await expect.poll(() => savedHp(page, 'dareth-brumeval')).toBe(46)
     const { path, json } = await exportCharacter(page, 'dareth-brumeval')
     expect(path).toBeTruthy()
     expect(json).toMatchObject({ format: 'codex-dnd/character', schemaVersion: 2, state: { hpCurrent: 46 } })
@@ -50,6 +52,7 @@ test.describe('Export, import et restauration', () => {
   test('supprimer puis réimporter : fiche, portrait et PV restaurés', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval')
     await lowerHp(page, 2)
+    await expect.poll(() => savedHp(page, 'dareth-brumeval')).toBe(47)
     const { path } = await exportCharacter(page, 'dareth-brumeval')
 
     await openMenu(page)

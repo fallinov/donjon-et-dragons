@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { savedHp } from './storage'
 
 test.describe('Codex Donjon et Dragons', () => {
   // Reset localStorage au premier chargement de chaque test pour éviter la pollution d'état.
@@ -195,6 +196,7 @@ test.describe('Codex Donjon et Dragons', () => {
     for (let i = 0; i < 5; i++) await minusBtn.click()
     const hpBar = page.getByRole('progressbar', { name: /points de vie/ })
     await expect(hpBar).toHaveAttribute('aria-valuenow', '44')
+    await expect.poll(() => savedHp(page, 'dareth-brumeval')).toBe(44)
 
     await page.reload({ waitUntil: 'networkidle' })
     await openCombat()
