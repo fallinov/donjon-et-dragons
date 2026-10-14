@@ -100,10 +100,37 @@ test.describe('Transfert de fiche par code', () => {
 
   test('iPhone dans Safari : rappel d\'ouvrir l\'app installée', async ({ page }) => {
     const iphone = test.info().project.name === 'mobile-safari'
+    // Sans code : rappel seul, sans bouton Copier
+    await page.goto('/recevoir')
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    await expect(page.locator('[data-ios-standalone-hint]')).toHaveCount(iphone ? 1 : 0)
+    await expect(page.getByRole('button', { name: 'Copier le code' })).toHaveCount(0)
     await page.goto('/recevoir#K7P4QX9M')
     await expect(page.getByRole('textbox', { name: 'Code de transfert' })).toHaveValue('K7P4-QX9M')
     await expect(page.locator('[data-ios-standalone-hint]')).toHaveCount(iphone ? 1 : 0)
+    await expect(page.getByRole('button', { name: 'Copier le code' })).toHaveCount(iphone ? 1 : 0)
     await expect(page.getByRole('button', { name: iphone ? 'Recevoir dans Safari' : 'Recevoir', exact: true })).toBeVisible()
+  })
+
+  test('fermer puis rouvrir pendant l\'envoi : un seul dépôt, un seul code', async ({ page }) => {
+    const deposits: string[] = []
+    page.on('request', (req) => { if (req.method() === 'POST' && req.url().endsWith('/api/transfers')) deposits.push(req.url()) })
+    // Relais lent : la boîte est fermée puis rouverte pendant l'envoi
+    await page.route('**/api/transfers', async (route) => {
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      await route.continue()
+    })
+    await page.goto('/personnages/zanna')
+    const openTransfer = async () => {
+      await page.getByRole('button', { name: 'Autres actions' }).filter({ visible: true }).click()
+      await page.getByRole('button', { name: 'Transférer' }).filter({ visible: true }).click()
+    }
+    await openTransfer()
+    await page.locator('dialog[open]').getByRole('button', { name: 'Fermer' }).click()
+    await expect(page.locator('dialog[open]')).toHaveCount(0)
+    await openTransfer()
+    await expect(page.locator('dialog[open] [data-transfer-code]')).toBeVisible({ timeout: 15_000 })
+    expect(deposits).toHaveLength(1)
   })
 
   test('relais indisponible : erreur et bouton Réessayer', async ({ page }) => {

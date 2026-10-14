@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 267 tests) + Playwright (e2e, 132 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 268 tests) + Playwright (e2e, 134 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -145,9 +145,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 267 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 268 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 132 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 134 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
 pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne, /api hors service worker (port 3211)
 ```

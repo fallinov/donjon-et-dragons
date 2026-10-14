@@ -22,6 +22,8 @@ onMounted(() => {
 })
 
 async function send(): Promise<void> {
+  // Boîte refermée puis rouverte pendant un envoi : on attend celui en cours, sans second code
+  if (sending.value) return
   sending.value = true
   sent.value = undefined
   error.value = undefined
@@ -50,6 +52,8 @@ watch(open, async (isOpen) => {
   }
   returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
   await nextTick()
+  // Fermée entre-temps (double appui rapide) : ne pas la rouvrir
+  if (!open.value) return
   if (!dialog.value?.open) dialog.value?.showModal()
   closeButton.value?.focus()
   await send()
@@ -100,6 +104,7 @@ const buttonClass = 'min-h-11 border px-4 font-display text-sm tracking-wider-2 
     ref="dialog"
     class="transfer-dialog font-body m-auto w-[min(100%-2rem,28rem)] border border-gold/40 bg-charcoal p-0 text-parchment shadow-[0_0_40px_rgba(0,0,0,0.8)]"
     :aria-labelledby="titleId"
+    :aria-busy="sending"
     data-transfer-dialog
     @cancel.prevent="close"
   >

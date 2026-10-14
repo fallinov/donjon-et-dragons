@@ -243,7 +243,7 @@ export const fr = {
   'transfer.receive.loading': 'Réception et déchiffrement…',
   'transfer.receive.back': 'Retour au codex',
   'transfer.receive.iosTitle': "L'app Codex est installée ?",
-  'transfer.receive.iosText': "Sur iPhone, l'app installée et Safari ne partagent pas leurs fiches. Copie le code, ouvre l'app Codex depuis l'écran d'accueil, touche « Recevoir une fiche » et colle-le.",
+  'transfer.receive.iosText': "Sur iPhone, l'app installée et Safari ne partagent pas leurs fiches. Ouvre l'app Codex depuis l'écran d'accueil, touche « Recevoir une fiche » et saisis-y le code.",
   'transfer.receive.iosSafari': "Sinon, tu peux recevoir la fiche ici, dans Safari : elle n'apparaîtra pas dans l'app.",
   'home.deletedSeeds': 'Fiches de départ supprimées',
   'home.restoreSeed': 'Restaurer {name}',

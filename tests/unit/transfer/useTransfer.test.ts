@@ -62,6 +62,14 @@ describe('transfert : dépôt et récupération', () => {
     expect(await downloadTransfer('AAAAAAAA', { fetch: offline, iterations: FAST })).toEqual({ ok: false, error: 'transfer.error.offline' })
   })
 
+  it('réponse illisible (page d\'erreur d\'un proxy) : échec propre, sans exception', async () => {
+    const html = fakeRelay(() => new Response('<html>', { status: 200, headers: { 'Content-Type': 'text/html' } })).fetch
+    expect(await uploadTransfer('x', { fetch: html, generate: codes('AAAAAAAA'), iterations: FAST })).toEqual({ ok: false, error: 'transfer.error.failed' })
+    expect(await downloadTransfer('AAAAAAAA', { fetch: html, iterations: FAST })).toEqual({ ok: false, error: 'transfer.error.failed' })
+    const empty = fakeRelay(() => Response.json({})).fetch
+    expect(await downloadTransfer('AAAAAAAA', { fetch: empty, iterations: FAST })).toEqual({ ok: false, error: 'transfer.error.failed' })
+  })
+
   it('code inconnu, mal formé ou contenu illisible', async () => {
     const relay = fakeRelay()
     expect(await downloadTransfer('AAAAAAAA', { fetch: relay.fetch, iterations: FAST })).toEqual({ ok: false, error: 'transfer.error.notFound' })

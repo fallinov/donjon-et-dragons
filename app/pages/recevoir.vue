@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useId } from 'vue'
+import { onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import { importCharacter, useImportConflict } from '~/composables/useCharacterImport'
 import { receiveCharacter } from '~/composables/useTransfer'
 import { t, type MessageKey } from '~/composables/useT'
@@ -17,12 +17,19 @@ const copied = ref<MessageKey>()
 const iosBrowser = ref(false)
 const resolveConflict = useImportConflict()
 
-onMounted(() => {
-  iosBrowser.value = isIos() && !isStandalone()
-  // Lien partagé : /recevoir#K7P4QX9M (le code ne quitte jamais le téléphone)
+/** Lien partagé : /recevoir#K7P4QX9M (le code ne quitte jamais le téléphone). */
+function readCodeFromLink(): void {
   const fromLink = normalizeCode(decodeURIComponent(window.location.hash.slice(1)))
   if (isValidCode(fromLink)) code.value = formatCode(fromLink)
+}
+
+onMounted(() => {
+  iosBrowser.value = isIos() && !isStandalone()
+  readCodeFromLink()
+  // Second lien ouvert alors que la page est déjà affichée
+  window.addEventListener('hashchange', readCodeFromLink)
 })
+onBeforeUnmount(() => window.removeEventListener('hashchange', readCodeFromLink))
 
 async function receive(): Promise<void> {
   if (receiving.value) return
@@ -48,7 +55,7 @@ async function receive(): Promise<void> {
 
 async function copyCode(): Promise<void> {
   try {
-    await navigator.clipboard.writeText(code.value)
+    await navigator.clipboard.writeText(formatCode(normalizeCode(code.value)))
     copied.value = 'transfer.codeCopied'
   }
   catch {
@@ -72,20 +79,22 @@ const buttonClass = 'min-h-11 border px-5 font-display text-sm tracking-wider-2 
       <p class="text-parchment-dim leading-snug mb-6">{{ t('transfer.receive.intro') }}</p>
 
       <aside
-        v-if="iosBrowser && isValidCode(normalizeCode(code))"
+        v-if="iosBrowser"
         class="mb-6 border border-gold/40 bg-charcoal/60 p-4"
         :aria-label="t('transfer.receive.iosTitle')"
         data-ios-standalone-hint
       >
         <p class="font-display text-sm tracking-wider-3 text-gold-bright uppercase mb-2">{{ t('transfer.receive.iosTitle') }}</p>
         <p class="text-parchment leading-snug mb-3">{{ t('transfer.receive.iosText') }}</p>
-        <p class="font-display text-3xl tracking-wider-2 text-gold-bright mb-3">{{ formatCode(normalizeCode(code)) }}</p>
-        <button type="button" :class="[buttonClass, 'border-gold/50 bg-gold/15 text-gold-bright hover:bg-gold/25']" @click="copyCode">{{ t('transfer.copyCode') }}</button>
-        <p role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-gold-bright">{{ copied ? t(copied) : '' }}</p>
+        <template v-if="isValidCode(normalizeCode(code))">
+          <p class="font-display text-3xl tracking-wider-2 text-gold-bright mb-3">{{ formatCode(normalizeCode(code)) }}</p>
+          <button type="button" :class="[buttonClass, 'border-gold/50 bg-gold/15 text-gold-bright hover:bg-gold/25']" @click="copyCode">{{ t('transfer.copyCode') }}</button>
+          <p role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-gold-bright">{{ copied ? t(copied) : '' }}</p>
+        </template>
         <p class="mt-2 text-sm text-parchment-dim">{{ t('transfer.receive.iosSafari') }}</p>
       </aside>
 
-      <form novalidate @submit.prevent="receive">
+      <form novalidate :aria-busy="receiving" @submit.prevent="receive">
         <label :for="inputId" class="block font-display text-sm tracking-wider-2 text-gold uppercase mb-1">{{ t('transfer.receive.codeLabel') }}</label>
         <input
           :id="inputId"

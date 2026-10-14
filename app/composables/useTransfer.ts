@@ -41,6 +41,16 @@ async function request(doFetch: typeof fetch, url: string, init?: RequestInit): 
   }
 }
 
+/** Corps JSON d'une réponse ; `null` s'il est illisible (page d'erreur d'un proxy…). */
+async function readJson<T>(response: Response): Promise<T | null> {
+  try {
+    return await response.json() as T
+  }
+  catch {
+    return null
+  }
+}
+
 /** Chiffre un texte avec un nouveau code et le dépose sur le relais. */
 export async function uploadTransfer(text: string, options: TransferOptions = {}): Promise<TransferResult<SentTransfer>> {
   const { fetch: doFetch = fetch, generate = generateCode, iterations = PBKDF2_ITERATIONS } = options
@@ -55,7 +65,8 @@ export async function uploadTransfer(text: string, options: TransferOptions = {}
     if (!response) return fail('transfer.error.offline')
     if (response.status === 409) continue
     if (!response.ok) return fail(httpError(response.status))
-    const body = await response.json() as { expiresAt: string }
+    const body = await readJson<{ expiresAt?: unknown }>(response)
+    if (typeof body?.expiresAt !== 'string') return fail('transfer.error.failed')
     return { ok: true, value: { code, expiresAt: body.expiresAt } }
   }
   return fail('transfer.error.failed')
@@ -69,7 +80,8 @@ export async function downloadTransfer(input: string, options: TransferOptions =
   const response = await request(doFetch, `/api/transfers/${await transferId(code)}`, { cache: 'no-store' })
   if (!response) return fail('transfer.error.offline')
   if (!response.ok) return fail(httpError(response.status))
-  const body = await response.json() as { data: string }
+  const body = await readJson<{ data?: unknown }>(response)
+  if (typeof body?.data !== 'string') return fail('transfer.error.failed')
   let data: ArrayBuffer
   try {
     data = base64ToArrayBuffer(body.data)
