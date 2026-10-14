@@ -117,7 +117,10 @@ test.describe('Transfert de fiche par code', () => {
 
   test('fermer puis rouvrir pendant l\'envoi : un seul dépôt, un seul code', async ({ page }) => {
     const deposits: string[] = []
-    page.on('request', (req) => { if (req.method() === 'POST' && req.url().endsWith('/api/transfers')) deposits.push(req.url()) })
+    // Identifiants déposés (un par code) : WebKit peut signaler deux fois une requête interceptée
+    page.on('request', (req) => {
+      if (req.method() === 'POST' && req.url().endsWith('/api/transfers')) deposits.push((req.postDataJSON() as { id: string }).id)
+    })
     // Relais lent : la boîte est fermée puis rouverte pendant l'envoi
     await page.route('**/api/transfers', async (route) => {
       await new Promise(resolve => setTimeout(resolve, 1500))
@@ -133,7 +136,7 @@ test.describe('Transfert de fiche par code', () => {
     await expect(page.locator('dialog[open]')).toHaveCount(0)
     await openTransfer()
     await expect(page.locator('dialog[open] [data-transfer-code]')).toBeVisible({ timeout: 15_000 })
-    expect(deposits).toHaveLength(1)
+    expect(new Set(deposits).size).toBe(1)
   })
 
   test('relais indisponible : erreur et bouton Réessayer', async ({ page }) => {
