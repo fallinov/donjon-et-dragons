@@ -44,12 +44,27 @@ export function serializeCharacter(character: StoredCharacter, extras: { state?:
   }
 }
 
-/** Nom de fichier lisible et sûr : « dareth-brumeval.codex.json ». */
-export function characterFileName(character: Pick<StoredCharacter, 'firstName' | 'lastName' | 'id'>): string {
+/**
+ * Variantes du fichier : `export` en JSON ; `share` en texte, car Chrome Android refuse
+ * de partager un fichier .json (« Permission denied ») alors qu'il accepte le .txt.
+ * Le contenu est identique, l'import lit les deux.
+ */
+export const CHARACTER_FILE_KINDS = {
+  export: { extension: '.codex.json', mime: 'application/json' },
+  share: { extension: '.codex.txt', mime: 'text/plain' },
+} as const
+
+export type CharacterFileKind = keyof typeof CHARACTER_FILE_KINDS
+
+/** Extensions et types acceptés par le sélecteur de fichier de l'import. */
+export const CHARACTER_FILE_ACCEPT = '.json,.txt,application/json,text/plain'
+
+/** Nom de fichier lisible et sûr : « dareth-brumeval.codex.json » (ou « .codex.txt » pour le partage). */
+export function characterFileName(character: Pick<StoredCharacter, 'firstName' | 'lastName' | 'id'>, kind: CharacterFileKind = 'export'): string {
   const base = `${character.firstName} ${character.lastName ?? ''}`
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  return `${base || character.id}.codex.json`
+  return `${base || character.id}${CHARACTER_FILE_KINDS[kind].extension}`
 }
 
 const fail = (error: MessageKey): ParseResult => ({ ok: false, error })

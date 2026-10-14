@@ -24,6 +24,9 @@ describe('characterFileName', () => {
   it('retire accents et caractères spéciaux', () => {
     expect(characterFileName({ firstName: 'Éowyn', lastName: "d'Edoras", id: 'x' })).toBe('eowyn-d-edoras.codex.json')
   })
+  it('partage en .codex.txt (Chrome Android refuse le .json)', () => {
+    expect(characterFileName({ firstName: 'Dareth', lastName: 'Brumeval', id: 'x' }, 'share')).toBe('dareth-brumeval.codex.txt')
+  })
   it('se rabat sur l\'identifiant sans nom', () => {
     expect(characterFileName({ firstName: '  ', lastName: '', id: 'abc' })).toBe('abc.codex.json')
   })

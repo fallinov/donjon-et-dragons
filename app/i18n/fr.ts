@@ -161,7 +161,7 @@ export const fr = {
   'pwa.installTitle': "Installer l'application",
   'pwa.installText': "Ajoutez le codex à l'écran d'accueil : il s'ouvre comme une app, fonctionne hors ligne et vos fiches sont mieux protégées.",
   'pwa.install': 'Installer',
-  'pwa.iosText': "Sur iPhone : touchez le bouton Partager, puis « Sur l'écran d'accueil ».",
+  'pwa.iosText': "Sur iPhone : touchez le bouton Partager (dans le menu ⋯ depuis iOS 26), puis « Sur l'écran d'accueil ».",
   'pwa.dismiss': 'Masquer',
 
   // Navigation mobile

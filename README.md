@@ -170,7 +170,7 @@ Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.t
 
 Menu « ⋯ » d'une fiche : **Partager** (menu natif du téléphone : Mail, Messages, WhatsApp, Fichiers… ; masqué si le navigateur ne sait pas partager de fichiers), **Exporter (fichier)** (téléchargement), **Restaurer l'original** (fiches de départ) et **Supprimer**. Sur l'accueil : **Importer une fiche** et restauration des fiches de départ supprimées.
 
-Format `*.codex.json` :
+Format `*.codex.json` (export). **Partager** envoie le même contenu nommé `*.codex.txt` (`text/plain`), car Chrome Android refuse de partager un `.json` ; s'il refuse quand même, la fiche est téléchargée en `.codex.json`. L'import accepte les deux extensions :
 
 ```jsonc
 {

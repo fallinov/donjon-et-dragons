@@ -39,6 +39,16 @@ function startPlus(): void {
   }
 }
 
+/**
+ * Clavier (Entrée, Espace) et lecteurs d'écran : un `click` sans pointeur (`detail === 0`).
+ * Le toucher et la souris passent par `pointerdown` (appui long), on ignore alors leur `click`.
+ */
+function onKeyboardClick(event: MouseEvent, action: 'minus' | 'plus'): void {
+  if (event.detail !== 0) return
+  if (action === 'minus') emit('minus')
+  else emit('plus')
+}
+
 function stopRepeat(): void {
   if (repeatTimer) { clearTimeout(repeatTimer); repeatTimer = null }
   if (repeatInterval) { clearInterval(repeatInterval); repeatInterval = null }
@@ -57,6 +67,7 @@ onUnmounted(stopRepeat)
         class="h-14 w-14 shrink-0 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
         :aria-label="t('counter.decrease', { label: label.toLowerCase() })"
         @pointerdown.prevent="startMinus"
+        @click="onKeyboardClick($event, 'minus')"
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
       >
@@ -79,6 +90,7 @@ onUnmounted(stopRepeat)
         class="h-14 w-14 shrink-0 rounded-full border-2 border-gold/50 bg-gold/10 text-gold-bright flex items-center justify-center hover:bg-gold/20 active:bg-gold/30 disabled:opacity-30 transition-colors select-none"
         :aria-label="t('counter.increase', { label: label.toLowerCase() })"
         @pointerdown.prevent="startPlus"
+        @click="onKeyboardClick($event, 'plus')"
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
       >

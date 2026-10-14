@@ -66,6 +66,40 @@ test.describe('Export, import et restauration', () => {
     await expect(hpBar(page)).toHaveAttribute('aria-valuenow', '47')
   })
 
+  test('partage : fichier .codex.txt ; refusé par le navigateur, téléchargement du .json', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __shared: { name: string, type: string }[] }
+      w.__shared = []
+      Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value: async (data: ShareData) => {
+          w.__shared.push(...(data.files ?? []).map(f => ({ name: f.name, type: f.type })))
+          throw new DOMException('Permission denied', 'NotAllowedError')
+        },
+      })
+    })
+    await page.goto('/personnages/dareth-brumeval')
+    await openMenu(page)
+    const download = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Partager' }).filter({ visible: true }).click()
+    expect((await download).suggestedFilename()).toBe('dareth-brumeval.codex.json')
+    expect(await page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared))
+      .toEqual([{ name: 'dareth-brumeval.codex.txt', type: 'text/plain' }])
+  })
+
+  test('import d\'un fichier partagé en .codex.txt', async ({ page }) => {
+    const { path } = await exportCharacter(page, 'kael-draven')
+    await openMenu(page)
+    await page.getByRole('button', { name: 'Supprimer', exact: true }).filter({ visible: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Supprimer' }).click()
+    await expect(page.getByText('5 personnages consignés')).toBeVisible()
+
+    await page.locator('[data-import-input]').setInputFiles({ name: 'kael-draven.codex.txt', mimeType: 'text/plain', buffer: await readFile(path) })
+    await expect(page).toHaveURL(/\/personnages\/kael-draven$/)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Kael')
+  })
+
   test('fiche déjà présente : importer en copie ou remplacer', async ({ page }) => {
     const { path } = await exportCharacter(page, 'zanna')
 

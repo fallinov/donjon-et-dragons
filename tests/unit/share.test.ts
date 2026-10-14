@@ -37,4 +37,13 @@ describe('shareOrDownload', () => {
     stubNavigator(async () => { throw new DOMException('refusé', 'NotAllowedError') })
     expect(await shareOrDownload(file, 'Dareth')).toBe('downloaded')
   })
+
+  it('télécharge le fichier de repli quand il est fourni', async () => {
+    const shared = new File(['{}'], 'dareth.codex.txt', { type: 'text/plain' })
+    const created: Blob[] = []
+    vi.mocked(URL.createObjectURL).mockImplementation((blob) => { created.push(blob as Blob); return 'blob:x' })
+    stubNavigator(async () => { throw new DOMException('refusé', 'NotAllowedError') })
+    expect(await shareOrDownload(shared, 'Dareth', file)).toBe('downloaded')
+    expect(created.at(-1)).toBe(file)
+  })
 })

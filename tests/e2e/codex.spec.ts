@@ -81,6 +81,21 @@ test.describe('Codex Donjon et Dragons', () => {
     await expect(page.locator('#slots-count-2')).toHaveText('1 / 2')
   })
 
+  test('clavier : Entrée sur « − » et « + » change les PV', async ({ page }) => {
+    await page.goto('/personnages/dareth-brumeval', { waitUntil: 'networkidle' })
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    const combat = page.getByRole('button', { name: 'Combat', exact: true })
+    if (await combat.isVisible()) { await combat.dispatchEvent('click'); await page.waitForTimeout(300) }
+    const hp = page.getByRole('progressbar', { name: /points de vie/ })
+    const before = Number(await hp.getAttribute('aria-valuenow'))
+    await page.getByRole('button', { name: 'Diminuer points de vie' }).focus()
+    await page.keyboard.press('Enter')
+    await expect(hp).toHaveAttribute('aria-valuenow', String(before - 1))
+    await page.getByRole('button', { name: 'Augmenter points de vie' }).focus()
+    await page.keyboard.press('Space')
+    await expect(hp).toHaveAttribute('aria-valuenow', String(before))
+  })
+
   test('skip link cible le contenu principal', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval')
     const skip = page.getByRole('link', { name: /Aller au contenu/i })
