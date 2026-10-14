@@ -116,15 +116,19 @@ test.describe('Transfert de fiche par code', () => {
   })
 
   test('fermer puis rouvrir pendant l\'envoi : un seul dépôt, un seul code', async ({ page }) => {
-    const deposits: string[] = []
-    // Identifiants déposés (un par code) : WebKit peut signaler deux fois une requête interceptée
-    page.on('request', (req) => {
-      if (req.method() === 'POST' && req.url().endsWith('/api/transfers')) deposits.push((req.postDataJSON() as { id: string }).id)
-    })
-    // Relais lent : la boîte est fermée puis rouverte pendant l'envoi
-    await page.route('**/api/transfers', async (route) => {
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      await route.continue()
+    // Relais lent : la boîte est fermée puis rouverte pendant l'envoi. Retard ajouté dans la page :
+    // sous WebKit, page.route + continue() peut envoyer la requête deux fois (409, puis second code)
+    await page.addInitScript(() => {
+      const original = window.fetch.bind(window)
+      const w = window as unknown as { __deposits: string[] }
+      w.__deposits = []
+      window.fetch = async (input, init) => {
+        if (String(input).endsWith('/api/transfers') && init?.method === 'POST') {
+          w.__deposits.push((JSON.parse(String(init.body)) as { id: string }).id)
+          await new Promise(resolve => setTimeout(resolve, 1500))
+        }
+        return original(input, init)
+      }
     })
     await page.goto('/personnages/zanna')
     const openTransfer = async () => {
@@ -136,7 +140,7 @@ test.describe('Transfert de fiche par code', () => {
     await expect(page.locator('dialog[open]')).toHaveCount(0)
     await openTransfer()
     await expect(page.locator('dialog[open] [data-transfer-code]')).toBeVisible({ timeout: 15_000 })
-    expect(new Set(deposits).size).toBe(1)
+    expect(await page.evaluate(() => (window as unknown as { __deposits: string[] }).__deposits)).toHaveLength(1)
   })
 
   test('relais indisponible : erreur et bouton Réessayer', async ({ page }) => {
