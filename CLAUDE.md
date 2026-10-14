@@ -15,6 +15,7 @@
 - Portrait : photo de la galerie ou de l'appareil (`<input type="file" accept="image/*">` sans `capture`), réduite par `resizePortrait` (`app/utils/image.ts`) : côté long 1024 px, JPEG qualité 0,85, source refusée au-delà de 25 Mo (limites validées par Steve)
 - Export/import : format `codex-dnd/character` (`app/utils/characterFile.ts`), lecture stricte (`hasCharacterShape` + `migrateDocument` + `validateCharacter`) : un fichier importé est une donnée non fiable. Toute évolution du modèle doit rester importable (migration). Écriture fiche + état + sac par `replaceCharacterData` (transaction unique)
 - Confirmations : `useConfirm()` / `choose()` (troisième choix `extraLabel`) + `<ConfirmDialog>` (jamais `confirm()` natif)
+- Sorts à emplacement : affichés par niveau du sort ; « Lancer » consomme le plus petit emplacement libre de niveau ≥ au sort (`slotIndexForSpell`, lancement à niveau supérieur et magie de pacte, validé par Steve)
 - CA, initiative et vitesse : toujours via `findVital()` / `VITAL_LABELS` (`app/utils/vitals.ts`), jamais en comparant un libellé en dur
 - Composants auto-importés : Nuxt préfixe par le dossier (`edit/EditForm.vue` → `EditForm`, `codex/CodexActions.vue` → `CodexActions`). Nommer les fichiers avec ce préfixe
 - Textes de l'interface : catalogue `app/i18n/fr.ts` + `t()` / `tCount()` (`app/composables/useT.ts`), jamais de texte en dur dans un composant

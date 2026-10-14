@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Character, Spell } from '~~/shared/types/character'
-import { useCharacterState } from '~/composables/useCharacterState'
+import { slotIndexForSpell, useCharacterState } from '~/composables/useCharacterState'
 import CodexSpellInfo from '~/components/codex/CodexSpellInfo.vue'
 import { t } from '~/composables/useT'
 import { useConfirm } from '~/composables/useConfirm'
@@ -37,17 +37,10 @@ function isDailyUsed(spell: Spell): boolean {
   return state.value.dailySpellsUsed.includes(spell.title)
 }
 
-function slotLevelIndex(spellLevel: number): number {
-  return sc.value.slotLevels.findIndex(sl => sl.level === spellLevel)
-}
-
 function canCast(spell: Spell): boolean {
   if (spell.cost === 'cantrip') return true
   if (spell.cost === 'daily') return !isDailyUsed(spell)
-  if (spell.cost === 'slot') {
-    const idx = slotLevelIndex(spell.level)
-    return idx >= 0 && slotsRemaining(idx) > 0
-  }
+  if (spell.cost === 'slot') return slotIndexForSpell(sc.value.slotLevels, state.value.spellSlotsUsed, spell.level) >= 0
   return false
 }
 
@@ -57,6 +50,11 @@ function cast(spell: Spell): void {
 
 const cantrips = computed(() => sc.value.spells.filter(s => s.cost === 'cantrip'))
 const dailySpells = computed(() => sc.value.spells.filter(s => s.cost === 'daily'))
+
+/** Niveaux des sorts à emplacement, groupés par niveau du sort et non par niveau d'emplacement (magie de pacte). */
+const spellLevels = computed(() =>
+  [...new Set(sc.value.spells.filter(s => s.cost === 'slot').map(s => s.level))].sort((a, b) => a - b),
+)
 
 function spellsByLevel(level: number): Spell[] {
   return sc.value.spells.filter(s => s.level === level && s.cost === 'slot')
@@ -118,10 +116,10 @@ function costLabel(spell: Spell): string {
     </div>
 
     <!-- ═══ Sorts par niveau (slot) ═══ -->
-    <div v-for="slotLevel in sc.slotLevels" :key="`spells-${slotLevel.level}`">
-      <p class="font-display text-xs tracking-wider-3 text-gold uppercase mb-2">{{ t('spells.levelTitle', { level: slotLevel.level }) }}</p>
+    <div v-for="level in spellLevels" :key="`spells-${level}`">
+      <p class="font-display text-xs tracking-wider-3 text-gold uppercase mb-2">{{ t('spells.levelTitle', { level }) }}</p>
       <ul class="space-y-1">
-        <li v-for="spell in spellsByLevel(slotLevel.level)" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
+        <li v-for="spell in spellsByLevel(level)" :key="spell.title" class="flex items-start justify-between gap-2 py-2.5 border-b border-gold/5 last:border-0">
           <CodexSpellInfo :spell="spell" />
           <button
             type="button"

@@ -154,7 +154,7 @@ Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharac
 
 - **Persistance** : store IndexedDB `states`, clé = identifiant de la fiche. Écriture à chaque changement : une écriture différée serait perdue si l'app se ferme juste après
 - **Singleton** : via `useState` Nuxt pour que `CodexStatusBar` et `CodexSpells` partagent le même state
-- **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
+- **Règles D&D 5e** : `damage` / `heal` (HP temp d'abord, reset jets de mort si > 0), `castSpell` (plus petit emplacement libre de niveau ≥ au sort : lancement à niveau supérieur, magie de pacte), `shortRest` (slots occultiste), `longRest` (tout reset, moitié des dés de vie récupérés)
 - **Helper** : `computePassivePerception(character)` calcule 10 + mod sagesse + bonus maîtrise si Perception est maîtrisée
 
 ### Sac du personnage
