@@ -185,6 +185,23 @@ Format `*.codex.json` (export). **Partager** envoie le même contenu nommé `*.c
 
 L'import refuse un fichier qui n'est pas une fiche du codex, d'une version plus récente de l'app, de plus de 15 Mo, ou dont un champ a un type inattendu ; un état de jeu ou un sac abîmés sont ignorés. Si la fiche existe déjà sur l'appareil : **Remplacer**, **Importer en copie** (nouvel identifiant, nom suivi de « (copie) ») ou **Annuler**, avec l'indication de la version la plus récente.
 
+## Relais de transfert
+
+Transfert d'une fiche (photo comprise) avec un code de 8 caractères, valable 24 h. Le téléphone chiffre la fiche avant l'envoi : le serveur ne reçoit que l'empreinte du code et un contenu illisible.
+
+| Élément | Rôle |
+|---|---|
+| `app/utils/transferCode.ts` | code base32 de Crockford (`K7P4-QX9M`), saisie tolérante |
+| `app/utils/transferCrypto.ts` | identifiant = SHA-256 du code ; AES-GCM 256, clé PBKDF2-SHA256 (600 000 itérations) |
+| `server/api/transfers/index.post.ts` | dépôt `{ id, data }` → `{ expiresAt }` (400, 409, 413, 429, 503) |
+| `server/api/transfers/[id].get.ts` | lecture `{ data, expiresAt }` (404 si inconnu ou expiré) |
+| `server/api/cron/transfers-cleanup.get.ts` | nettoyage quotidien (Cron Vercel, 3 h UTC) |
+| `server/utils/transferStore.ts` | stockage Neon Postgres (`DATABASE_URL`) ou mémoire (local, e2e) |
+
+Limites : 2 Mo, 20 dépôts et 60 lectures par heure et par adresse IP (stockée hachée). Fonctions Vercel en région `fra1`, base Neon à Francfort.
+
+**Mise en service** : Vercel → Storage → Create → Neon (région Frankfurt), connecter le projet en Production et Preview (injecte `DATABASE_URL`). Les tables sont créées au premier appel. Optionnel : `CRON_SECRET` pour réserver le nettoyage à la tâche Cron.
+
 ## Déploiement
 
 Déploiement automatique sur Vercel via Git (branche `main`).

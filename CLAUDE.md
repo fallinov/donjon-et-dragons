@@ -4,6 +4,7 @@
 - Nuxt 4 + Vue 3 + TypeScript strict + Tailwind CSS v4
 - Fiches stockées sur l'appareil dans IndexedDB (`app/db/`, lib `idb`), rendu client uniquement (`ssr: false`)
 - Fiches de départ (seeds) en fichiers TypeScript typés (`app/data/characters/`), importées au premier lancement par `app/plugins/db.client.ts`. Une fiche supprimée ne revient pas
+- Relais de transfert (`server/`, fonctions Vercel en `fra1`) : `POST /api/transfers`, `GET /api/transfers/:id`, nettoyage quotidien `/api/cron/transfers-cleanup` (Cron Vercel). Fiche chiffrée sur le téléphone (`app/utils/transferCrypto.ts`, clé PBKDF2 dérivée du code) : le serveur ne voit jamais le code ni le contenu. Stockage Neon si `DATABASE_URL` est défini (intégration Vercel, ne jamais lire ni afficher sa valeur), mémoire en local et en e2e, 503 en production sans base. 24 h, 2 Mo, 20 dépôts et 60 lectures par heure et par IP (désactivé si `NUXT_E2E=true` hors Vercel)
 - Types partagés dans `shared/types/character.ts`
 - État interactif : composable `useCharacterState` (HP, slots, repos, jets de mort), store IndexedDB `states`
 - Sac (équipement, argent, notes) : composable `useInventory`, store IndexedDB `inventories`. Seul sac : le sac de départ des seeds y est copié au premier lancement
@@ -57,7 +58,7 @@ type SpellCost = 'cantrip' | 'slot' | 'daily'
 4. **Générer le portrait** en utilisant le prompt template de `prompts/character-portrait.md`. Adapter uniquement la section `[PERSONNALISATION]` au nouveau personnage. Convertir en JPEG qualité 85 et sauvegarder dans `public/img/{slug}.jpg`.
    - Méthode privilégiée : skill `/nano-banana`.
    - Fallback : API Gemini directe avec le modèle `gemini-2.5-flash-image` (responseModalities `["TEXT", "IMAGE"]`).
-5. Vérifier que les types compilent (`vue-tsc --noEmit`).
+5. Vérifier que les types compilent (`pnpm typecheck`, jamais `vue-tsc --noEmit` qui ne vérifie rien : la config racine ne fait que référencer `.nuxt/tsconfig.*`).
 6. Lancer les tests : `pnpm test && pnpm test:e2e`.
 
 ### Style des portraits
