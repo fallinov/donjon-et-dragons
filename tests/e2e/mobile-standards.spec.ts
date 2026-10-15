@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { apiLogin, ensureMaster, MASTER, uniqueName } from './accounts'
 
 /**
  * Normes smartphone vérifiées sur chaque écran, à 360 px (petit Android) :
@@ -128,6 +129,24 @@ const screens: { name: string, url: string, prepare?: (page: Page) => Promise<vo
     await p.getByRole('button', { name: /^Recevoir/ }).click()
     await p.locator('[data-receive-error]').waitFor()
   } },
+  { name: 'connexion (erreur)', url: '/connexion', prepare: async (p) => {
+    await p.getByRole('button', { name: 'Se connecter' }).click()
+    await p.locator('[data-auth-error]').waitFor()
+  } },
+  { name: 'installation (déjà faite)', url: '/installation', prepare: p => p.locator('[data-setup-done]').waitFor() },
+  { name: 'comptes (mot de passe provisoire affiché)', url: '/', prepare: async (p) => {
+    await apiLogin(p.request, MASTER.username, MASTER.password)
+    await p.goto('/comptes')
+    await p.getByLabel('Identifiant du joueur').fill(uniqueName('normes'))
+    await p.getByRole('button', { name: 'Créer le compte' }).click()
+    await p.locator('[data-issued-password]').waitFor()
+  } },
+  { name: 'changer le mot de passe (erreur)', url: '/', prepare: async (p) => {
+    await apiLogin(p.request, MASTER.username, MASTER.password)
+    await p.goto('/mot-de-passe')
+    await p.getByRole('button', { name: 'Enregistrer' }).click()
+    await p.locator('[data-auth-error]').waitFor()
+  } },
   { name: 'accueil avec fiche de départ supprimée et erreur d\'import', url: '/', prepare: async (p) => {
     await p.goto('/personnages/zanna')
     await p.getByRole('button', { name: 'Autres actions' }).click()
@@ -140,7 +159,8 @@ const screens: { name: string, url: string, prepare?: (page: Page) => Promise<vo
 
 test.describe('Normes smartphone', () => {
   for (const screen of screens) {
-    test(screen.name, async ({ page }) => {
+    test(screen.name, async ({ page, request }) => {
+      await ensureMaster(request)
       await page.goto(screen.url)
       await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
       await screen.prepare?.(page)
