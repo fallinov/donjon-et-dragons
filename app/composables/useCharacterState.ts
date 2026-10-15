@@ -3,7 +3,7 @@ import type { Character, SpellSlotLevel } from '~~/shared/types/character'
 import { getState, putState } from '~/db/characterRepository'
 import { persistState } from '~/composables/persistState'
 import { deepEqual } from '~/utils/deepEqual'
-import { isValidState, normalizeState, type CharacterState } from '~/utils/characterParts'
+import { defaultState, isValidState, normalizeState, type CharacterState } from '~/utils/characterParts'
 export { isValidState, normalizeState } from '~/utils/characterParts'
 export type { CharacterState } from '~/utils/characterParts'
 
@@ -14,17 +14,6 @@ export const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
   return ref(factory()) as Ref<T>
 }
 
-function defaultState(character: Character): CharacterState {
-  return {
-    hpCurrent: character.maxHp,
-    hpTemp: 0,
-    inspiration: 0,
-    hitDiceUsed: 0,
-    deathSaves: { successes: 0, failures: 0 },
-    spellSlotsUsed: (character.spellcasting?.slotLevels ?? []).map(() => 0),
-    dailySpellsUsed: [],
-  }
-}
 
 /**
  * État mutable d'un personnage, partagé via `useState` Nuxt (singleton par fiche),
@@ -57,6 +46,7 @@ export function useCharacterState(character: Character) {
     if (!deepEqual(aligned, state.value)) state.value = aligned
 
     persistState(state, {
+      key: `character-state:${character.id}`,
       load: async () => {
         const saved = await getState(character.id)
         return isValidState(saved) ? normalizeState(character, saved) : undefined

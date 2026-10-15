@@ -1,4 +1,4 @@
-import { test, expect, type APIRequestContext, type Page } from '@playwright/test'
+import { test, expect, type APIRequestContext, type Page } from './fixtures'
 import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { apiLogin, createPlayer, ensureMaster, MASTER } from './accounts'
@@ -39,9 +39,9 @@ async function pullAll(request: APIRequestContext): Promise<{ id: string, ownerI
 }
 
 test.describe('API de synchronisation', () => {
-  test('droits : le master écrit partout, un joueur sur ses fiches seulement', async ({ page, playwright }) => {
+  test('droits : le master écrit partout, un joueur sur ses fiches seulement', async ({ page, api }) => {
     const base = await exportFile(page, 'zanna')
-    const ctx = () => playwright.request.newContext({ baseURL: 'http://localhost:3210' })
+    const ctx = api
     const master = await ctx()
     const myriam = await ctx()
     const juan = await ctx()
@@ -95,7 +95,6 @@ test.describe('API de synchronisation', () => {
     // Compte supprimé : ses fiches reviennent au groupe
     expect((await master.delete(`/api/users/${accounts[1]!.id}`)).status()).toBe(200)
     expect((await pullAll(master)).find(r => r.id === own)).toMatchObject({ ownerId: null })
-    for (const request of [master, myriam, juan]) await request.dispose()
   })
 
   test('dernière modification gagnante, curseur, portrait avec ETag', async ({ page, request }) => {
@@ -136,13 +135,12 @@ test.describe('API de synchronisation', () => {
     expect((await request.get(`/api/portraits/${id}`)).status()).toBe(404)
   })
 
-  test('sans session : 401 ; corps invalide : 400', async ({ request, playwright }) => {
-    const anonymous = await playwright.request.newContext({ baseURL: 'http://localhost:3210' })
+  test('sans session : 401 ; corps invalide : 400', async ({ request, api }) => {
+    const anonymous = await api()
     expect((await anonymous.get('/api/sync')).status()).toBe(401)
     expect((await anonymous.post('/api/sync', { data: { changes: [] } })).status()).toBe(401)
     expect((await anonymous.get('/api/members')).status()).toBe(401)
     expect((await anonymous.get('/api/portraits/zanna')).status()).toBe(401)
-    await anonymous.dispose()
 
     await ensureMaster(request)
     await apiLogin(request, MASTER.username, MASTER.password)

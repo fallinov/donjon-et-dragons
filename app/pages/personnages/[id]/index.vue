@@ -24,6 +24,18 @@ useSeoMeta({
   },
 })
 
+// Fiche d'un autre joueur : lecture seule (PV, sorts, repos, sac)
+const { canEdit, ownerName } = useOwnership()
+const locked = computed(() => !canEdit(id.value))
+const owner = computed(() => ownerName(id.value))
+const { user } = useAuth()
+/** Propriétaire affiché quand ce n'est pas soi : « Fiche de myriam », « Fiche du groupe ». */
+const ownerNotice = computed(() => {
+  if (owner.value === undefined || owner.value === user.value?.username) return ''
+  const whose = owner.value === null ? t('sync.groupSheet') : t('sync.ownerSheet', { username: owner.value })
+  return locked.value ? t('sync.readonly', { whose }) : whose
+})
+
 const { activeTab, setTab } = useMobileTab()
 const isDesktop = useIsDesktop()
 
@@ -52,6 +64,8 @@ setTab('profil')
       id="contenu"
       class="codex font-body text-parchment text-base leading-relaxed min-h-screen px-4 py-3 sm:px-8 sm:py-12 lg:px-10 lg:py-16 relative z-10 max-w-6xl mx-auto pb-24 lg:pb-16"
     >
+      <p v-if="ownerNotice" class="no-print mb-3 text-center text-sm text-parchment-dim italic" data-owner-notice>{{ ownerNotice }}</p>
+
       <!-- Breadcrumb (desktop uniquement, mobile = dans mini-header) -->
       <nav v-if="isDesktop" :aria-label="t('common.breadcrumb')" class="no-print mb-6 flex items-center justify-between gap-4">
         <NuxtLink
@@ -104,7 +118,7 @@ setTab('profil')
 
           <!-- Onglet Combat (+ Rites) -->
           <div v-if="activeTab === 'combat'" class="space-y-6">
-            <CodexStatusBar :character="character" />
+            <CodexLock :locked="locked"><CodexStatusBar :character="character" /></CodexLock>
             <CodexSection id="arsenal-title-m" :title="t('character.section.attacks')">
               <CodexAttacks :attacks="character.attacks" />
             </CodexSection>
@@ -113,14 +127,14 @@ setTab('profil')
 
           <!-- Onglet Sorts -->
           <div v-if="activeTab === 'sorts'" class="space-y-6">
-            <CodexSpells v-if="character.spellcasting" :character="character" />
+            <CodexLock v-if="character.spellcasting" :locked="locked"><CodexSpells :character="character" /></CodexLock>
             <p v-else class="text-parchment-mute italic text-center py-8">{{ t('character.noSpells') }}</p>
           </div>
 
           <!-- Onglet Sac -->
           <div v-if="activeTab === 'sac'" class="space-y-6">
             <CodexSection id="sac-title-m" :title="t('character.section.bag')" class="no-print">
-              <CodexInventory :character="character" />
+              <CodexLock :locked="locked"><CodexInventory :character="character" /></CodexLock>
             </CodexSection>
           </div>
 
@@ -139,7 +153,7 @@ setTab('profil')
       <!-- ═══════════════════════════════════════════════════════ -->
       <div v-if="isDesktop">
         <CodexHero :character="character" />
-        <CodexStatusBar :character="character" />
+        <CodexLock :locked="locked"><CodexStatusBar :character="character" /></CodexLock>
 
         <div class="print-body-grid grid grid-cols-[260px_1fr_1fr] gap-10 motion-safe:animate-rise">
           <CodexAbilityScores :abilities="character.abilities" />
@@ -161,7 +175,7 @@ setTab('profil')
               <CodexAttacks :attacks="character.attacks" />
             </CodexSection>
             <CodexSection v-if="character.spellcasting" id="incant-title" :title="t('character.section.spells')">
-              <CodexSpells :character="character" />
+              <CodexLock :locked="locked"><CodexSpells :character="character" /></CodexLock>
             </CodexSection>
             <CodexSection id="langues-title" :title="t('character.section.languages')">
               <CodexLanguages :languages="character.languages" />
@@ -172,7 +186,7 @@ setTab('profil')
         <CodexRituals :rituals="character.rituals" :note="character.ritualsNote" />
 
         <CodexSection id="sac-title" :title="t('character.section.bag')" class="no-print mt-16">
-          <CodexInventory :character="character" />
+          <CodexLock :locked="locked"><CodexInventory :character="character" /></CodexLock>
         </CodexSection>
 
         <footer class="mt-16 pt-8 border-t border-gold/30 text-center text-parchment-mute italic text-sm tracking-wider-2">

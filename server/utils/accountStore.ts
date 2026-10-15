@@ -1,6 +1,8 @@
+import type { H3Event } from 'h3'
 import { randomUUID } from 'node:crypto'
 import type { AccountSummary, PublicUser, Role } from '~~/shared/types/account'
 import { ensureSchema, hitRateLimit, useSql, type Sql } from './database'
+import { e2eTenant, tenantStore } from './e2eTenant'
 import { rateWindow } from './transferRules'
 
 export interface StoredUser extends PublicUser {
@@ -286,9 +288,12 @@ export function createNeonAccountStore(sql: Sql): AccountStore {
 }
 
 let store: AccountStore | null | undefined
+const tenants = new Map<string, AccountStore>()
 
 /** Même règle que le relais : Neon si `DATABASE_URL`, null sur Vercel sans base (503), mémoire sinon. */
-export function useAccountStore(): AccountStore | null {
+export function useAccountStore(event?: H3Event): AccountStore | null {
+  const tenant = e2eTenant(event)
+  if (tenant) return tenantStore(tenants, tenant, createMemoryAccountStore)
   if (store !== undefined) return store
   const sql = useSql()
   if (sql) store = createNeonAccountStore(sql)

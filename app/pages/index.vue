@@ -33,7 +33,7 @@ async function onImport(event: Event): Promise<void> {
       importError.value = result.error
       return
     }
-    const id = await importCharacter(result.value, resolveConflict)
+    const id = await importCharacter(result.value, resolveConflict, { canWrite: canEdit })
     if (id) await navigateTo(`/personnages/${id}`)
   }
   catch (error) {
@@ -45,8 +45,10 @@ async function onImport(event: Event): Promise<void> {
   }
 }
 
-// Fiches de départ supprimées par le joueur, restaurables
-const deletedSeeds = computed(() => status.value === 'ready'
+// Fiches de départ supprimées, restaurables par un master (lui seul peut les recréer sur le serveur)
+const { user } = useAuth()
+const { canEdit } = useOwnership()
+const deletedSeeds = computed(() => status.value === 'ready' && user.value?.role === 'master'
   ? seeds.filter(seed => !characters.value.some(c => c.id === seed.slug))
   : [])
 

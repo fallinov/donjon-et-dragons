@@ -6,7 +6,7 @@ import { publicUser, requireAccountStore, requireMaster } from '../../utils/sess
 export default defineEventHandler(async (event) => {
   // Réponse contenant un mot de passe provisoire : jamais mise en cache
   setResponseHeader(event, 'Cache-Control', 'no-store')
-  const store = requireAccountStore()
+  const store = requireAccountStore(event)
   await requireMaster(event, store)
   const { username } = (await readBody(event) ?? {}) as Record<string, unknown>
   const normalized = typeof username === 'string' ? normalizeUsername(username) : ''

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page } from './fixtures'
 
 /** Sur mobile, ouvre l'onglet demandé de la fiche ; sur ordinateur tout est déjà affiché. */
 async function openTab(page: Page, name: string): Promise<void> {

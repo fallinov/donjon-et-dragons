@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { webcrypto } from 'node:crypto'
 
 /** Identifiant aléatoire au format attendu (empreinte SHA-256 hexadécimale). */

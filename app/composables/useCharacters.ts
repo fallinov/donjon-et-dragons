@@ -1,6 +1,13 @@
-import { ref, shallowRef, toValue, watch, type MaybeRefOrGetter } from 'vue'
+import { getCurrentScope, onScopeDispose, ref, shallowRef, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import type { StoredCharacter } from '~~/shared/types/character'
 import { getCharacter, listCharacters } from '~/db/characterRepository'
+import { onChange } from '~/db/changes'
+
+/** Recharge quand des fiches arrivent du serveur, tant que le composant est affiché. */
+function onRemote(listener: (ids: string[]) => void): void {
+  const stop = onChange('remote', listener)
+  if (getCurrentScope()) onScopeDispose(stop)
+}
 
 export type LoadStatus = 'pending' | 'ready' | 'error'
 
@@ -21,6 +28,7 @@ export function useCharacterList() {
   }
 
   void refresh()
+  onRemote(() => void refresh())
   return { characters, status, refresh }
 }
 
@@ -29,8 +37,9 @@ export function useCharacter(id: MaybeRefOrGetter<string>) {
   const character = shallowRef<StoredCharacter>()
   const status = ref<LoadStatus | 'missing'>('pending')
 
-  async function load(target: string): Promise<void> {
-    status.value = 'pending'
+  async function load(target: string, quiet = false): Promise<void> {
+    // Rechargement après une réception du serveur : la fiche reste affichée pendant la lecture
+    if (!quiet) status.value = 'pending'
     try {
       const found = await getCharacter(target)
       // Ignore une réponse arrivée après un changement d'identifiant
@@ -45,5 +54,8 @@ export function useCharacter(id: MaybeRefOrGetter<string>) {
   }
 
   watch(() => toValue(id), target => load(target), { immediate: true })
+  onRemote((ids) => {
+    if (ids.includes(toValue(id))) void load(toValue(id), true)
+  })
   return { character, status, refresh: () => load(toValue(id)) }
 }

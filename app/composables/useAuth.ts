@@ -1,5 +1,8 @@
 import type { AccountSummary, PublicUser, Role } from '~~/shared/types/account'
 import type { MessageKey } from '~/composables/useT'
+import { resetPersistedStates } from '~/composables/persistState'
+import { stopSync } from '~/composables/useSync'
+import { clearLocalData, getMeta, getSessionCache, setSessionCache } from '~/db/syncRepository'
 
 export type AuthResult<T = undefined> = { ok: true, value: T } | { ok: false, error: MessageKey, status?: number }
 
@@ -36,32 +39,70 @@ export async function callApi<T>(path: string, method = 'GET', body?: unknown): 
   }
 }
 
-/** Compte connecté : `undefined` tant qu'il n'est pas connu, `null` sans session (ou hors ligne). */
+/**
+ * Compte connecté : `undefined` tant qu'il n'est pas connu, `null` sans session. Le compte est gardé
+ * sur l'appareil : l'app s'ouvre hors ligne avec le dernier compte connu, puis le serveur confirme.
+ */
 export function useAuth() {
   const user = useState<PublicUser | null | undefined>('auth:user', () => undefined)
   const loading = useState<Promise<void> | null>('auth:loading', () => null)
 
-  async function fetchUser(): Promise<void> {
-    const result = await callApi<{ user: PublicUser | null }>('/api/auth/me')
-    user.value = result.ok ? result.value.user : null
+  async function remember(value: PublicUser | null): Promise<void> {
+    user.value = value
+    await setSessionCache(value).catch(console.error)
   }
 
-  /** Charge le compte une seule fois (appels simultanés regroupés). */
+  /** Demande le compte au serveur ; hors ligne, le compte gardé sur l'appareil reste valable. */
+  async function fetchUser(): Promise<void> {
+    const result = await callApi<{ user: PublicUser | null }>('/api/auth/me')
+    if (result.ok) await remember(result.value.user)
+    else if (user.value === undefined) user.value = null
+  }
+
+  /** Charge le compte une seule fois (appels simultanés regroupés) : d'abord l'appareil, puis le serveur. */
   function ensureUser(): Promise<void> {
     if (user.value !== undefined) return Promise.resolve()
-    return loading.value ??= fetchUser().finally(() => { loading.value = null })
+    return loading.value ??= (async () => {
+      const cached = await getSessionCache().catch(() => undefined)
+      if (cached) {
+        user.value = cached
+        void fetchUser()
+      }
+      else {
+        await fetchUser()
+      }
+    })().finally(() => { loading.value = null })
+  }
+
+  /** Efface les fiches de l'appareil et les états en mémoire (autre compte, déconnexion). */
+  async function forgetDevice(): Promise<void> {
+    // Une synchronisation en cours réécrirait les fiches après l'effacement
+    await stopSync()
+    await clearLocalData()
+    resetPersistedStates()
+    clearNuxtState(key => key.startsWith('character-state:') || key.startsWith('inventory:'))
   }
 
   async function login(username: string, password: string): Promise<AuthResult<PublicUser>> {
     const result = await callApi<{ user: PublicUser }>('/api/auth/login', 'POST', { username, password })
     if (!result.ok) return result
-    user.value = result.value.user
+    // Fiches d'un autre compte encore sur l'appareil (session expirée sans déconnexion) : elles partent
+    const previous = await getMeta('sync').catch(() => undefined)
+    if (previous && previous.userId !== result.value.user.id) await forgetDevice()
+    await remember(result.value.user)
     return { ok: true, value: result.value.user }
   }
 
-  async function logout(): Promise<void> {
-    await callApi('/api/auth/logout', 'POST', {})
+  /**
+   * Déconnexion : la session est fermée sur le serveur, puis les fiches de l'appareil sont effacées
+   * (un appareil peut être partagé). Hors ligne, rien n'est effacé : la session resterait ouverte.
+   */
+  async function logout(): Promise<AuthResult> {
+    const result = await callApi('/api/auth/logout', 'POST', {})
+    if (!result.ok) return result
+    await forgetDevice()
     user.value = null
+    return { ok: true, value: undefined }
   }
 
   async function changePassword(current: string, next: string): Promise<AuthResult<PublicUser>> {
@@ -69,10 +110,10 @@ export function useAuth() {
     if (!result.ok) {
       if (result.status === 403) return fail('auth.error.currentWrong', 403)
       if (result.status === 400) return fail(next === current ? 'auth.error.unchanged' : 'auth.error.tooShort', 400)
-      if (result.status === 401) user.value = null
+      if (result.status === 401) await remember(null)
       return result
     }
-    user.value = result.value.user
+    await remember(result.value.user)
     return { ok: true, value: result.value.user }
   }
 
@@ -88,11 +129,11 @@ export function useAuth() {
       if (result.status === 400) return fail('auth.error.username', 400)
       return result
     }
-    user.value = result.value.user
+    await remember(result.value.user)
     return { ok: true, value: result.value.user }
   }
 
-  return { user, ensureUser, fetchUser, login, logout, changePassword, setupStatus, setup }
+  return { user, ensureUser, fetchUser, remember, login, logout, changePassword, setupStatus, setup }
 }
 
 /** Gestion des comptes par le master. */

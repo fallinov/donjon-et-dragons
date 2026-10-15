@@ -4,7 +4,7 @@ import { checkSetupCode, enforceSetupLimit, publicUser, requireAccountStore, sta
 
 /** Premier compte master `{ setupCode, username, password }`, seulement si aucun compte n'existe. */
 export default defineEventHandler(async (event) => {
-  const store = requireAccountStore()
+  const store = requireAccountStore(event)
   await enforceSetupLimit(event, store)
   const body = await readBody(event)
   if (!checkSetupCode((body as { setupCode?: unknown } | null)?.setupCode)) {

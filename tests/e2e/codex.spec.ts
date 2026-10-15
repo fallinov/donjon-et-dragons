@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { savedHp } from './storage'
 
 test.describe('Codex Donjon et Dragons', () => {

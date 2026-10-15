@@ -17,6 +17,19 @@ export interface CharacterState {
   dailySpellsUsed: string[]
 }
 
+/** État de jeu d'une fiche jamais jouée : PV au maximum, rien de consommé. */
+export function defaultState(character: Character): CharacterState {
+  return {
+    hpCurrent: character.maxHp,
+    hpTemp: 0,
+    inspiration: 0,
+    hitDiceUsed: 0,
+    deathSaves: { successes: 0, failures: 0 },
+    spellSlotsUsed: (character.spellcasting?.slotLevels ?? []).map(() => 0),
+    dailySpellsUsed: [],
+  }
+}
+
 export function isValidState(value: unknown): value is CharacterState {
   if (typeof value !== 'object' || value === null) return false
   const s = value as Record<string, unknown>

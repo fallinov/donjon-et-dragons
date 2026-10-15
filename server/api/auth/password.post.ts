@@ -4,7 +4,7 @@ import { enforcePasswordLimit, publicUser, requireAccountStore, requireSession }
 
 /** Changement de mot de passe `{ current, next }` ; ferme les autres sessions du compte. */
 export default defineEventHandler(async (event) => {
-  const store = requireAccountStore()
+  const store = requireAccountStore(event)
   const { user, tokenHash } = await requireSession(event, store, { allowMustChange: true })
   const { current, next } = (await readBody(event) ?? {}) as Record<string, unknown>
   await enforcePasswordLimit(store, user.id)

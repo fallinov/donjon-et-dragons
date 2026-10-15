@@ -2,11 +2,26 @@
 import { onMounted, ref } from 'vue'
 import type { AccountSummary } from '~~/shared/types/account'
 import { t, type MessageKey } from '~/composables/useT'
+import { useCharacterList } from '~/composables/useCharacters'
+import { syncNow } from '~/composables/useSync'
 import { AUTH_PRIMARY, AUTH_SECONDARY } from '~/utils/authUi'
 
 useSeoMeta({ title: t('accounts.seo') })
 
 const { user } = useAuth()
+const { characters } = useCharacterList()
+const { remote } = useOwnership()
+const ownerMessage = ref<MessageKey>()
+const ownerError = ref(false)
+
+/** Attribue une fiche (valeur vide : fiche du groupe), puis synchronise pour l'afficher partout. */
+async function assign(characterId: string, ownerId: string): Promise<void> {
+  ownerMessage.value = undefined
+  const result = await callApi(`/api/characters/${encodeURIComponent(characterId)}/owner`, 'PATCH', { ownerId: ownerId || null })
+  ownerError.value = !result.ok
+  ownerMessage.value = result.ok ? 'accounts.ownerSaved' : result.error === 'auth.error.offline' ? 'accounts.ownerOffline' : result.error
+  if (result.ok) await syncNow()
+}
 const { confirm } = useConfirm()
 const accounts = ref<AccountSummary[]>()
 const listError = ref<MessageKey>()
@@ -193,6 +208,25 @@ async function copyPassword(): Promise<void> {
           </div>
         </li>
       </ul>
+    </section>
+
+    <section aria-labelledby="sheets-owners" class="mt-10" data-sheet-owners>
+      <h2 id="sheets-owners" class="font-display text-sm tracking-wider-3 text-gold uppercase mb-2">{{ t('accounts.sheets') }}</h2>
+      <p class="mb-4 text-sm text-parchment-dim">{{ t('accounts.sheetsIntro') }}</p>
+      <p v-if="ownerMessage" role="status" class="mb-3 text-sm" :class="ownerError ? 'text-ember-light' : 'text-gold-bright'" data-owner-message>{{ t(ownerMessage) }}</p>
+      <ul v-if="characters.some(c => remote.has(c.id))" class="divide-y divide-gold/20 border-y border-gold/20">
+        <template v-for="character in characters" :key="character.id">
+          <li v-if="remote.has(character.id)" class="py-3" :data-sheet-owner="character.id">
+            <EditSelect
+              :model-value="remote.get(character.id)?.ownerId ?? ''"
+              :label="t('accounts.ownerLabel', { name: `${character.firstName}${character.lastName ? ` ${character.lastName}` : ''}` })"
+              :options="[{ value: '', label: t('accounts.ownerGroup') }, ...(accounts ?? []).map(a => ({ value: a.id, label: a.username }))]"
+              @update:model-value="assign(character.id, String($event))"
+            />
+          </li>
+        </template>
+      </ul>
+      <p v-else class="text-parchment-dim italic">{{ t('accounts.noSheets') }}</p>
     </section>
   </AuthPage>
 </template>

@@ -1,5 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-import { apiLogin, ensureMaster, MASTER, uniqueName } from './accounts'
+import { test, expect, type Page } from './fixtures'
+import { apiLogin, createPlayer, ensureMaster, MASTER, uniqueName } from './accounts'
 
 /**
  * Normes smartphone vérifiées sur chaque écran, à 360 px (petit Android) :
@@ -140,6 +140,20 @@ const screens: { name: string, url: string, prepare?: (page: Page) => Promise<vo
     await p.getByLabel('Identifiant du joueur').fill(uniqueName('normes'))
     await p.getByRole('button', { name: 'Créer le compte' }).click()
     await p.locator('[data-issued-password]').waitFor()
+  } },
+  { name: 'fiche d\'un autre joueur (lecture seule)', url: '/', prepare: async (p) => {
+    // Fiches de départ envoyées par le master, puis connexion d'un joueur sur ce téléphone
+    await expect.poll(async () => (await (await p.request.get('/api/sync?since=0')).json() as { rows: unknown[] }).rows.length, { timeout: 20_000 }).toBe(6)
+    const player = await createPlayer(p.request, 'lecteur')
+    await apiLogin(p.request, player.username, player.password)
+    await p.request.post('/api/auth/password', { data: { current: player.password, next: 'lecteur-du-codex' } })
+    await p.goto('/personnages/dareth-brumeval')
+    await p.locator('[data-owner-notice]').waitFor({ timeout: 20_000 })
+  } },
+  { name: 'comptes : attribution des fiches', url: '/', prepare: async (p) => {
+    await expect.poll(async () => (await (await p.request.get('/api/sync?since=0')).json() as { rows: unknown[] }).rows.length, { timeout: 20_000 }).toBe(6)
+    await p.goto('/comptes')
+    await p.locator('[data-sheet-owner="zanna"]').waitFor()
   } },
   { name: 'changer le mot de passe (erreur)', url: '/', prepare: async (p) => {
     await apiLogin(p.request, MASTER.username, MASTER.password)

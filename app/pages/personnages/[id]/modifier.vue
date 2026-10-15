@@ -21,8 +21,19 @@ const fullName = computed(() => {
 })
 useSeoMeta({ title: () => t('editor.seo.edit', { name: fullName.value }) })
 
+// Brouillon démarré une fois par fiche : une version reçue du serveur pendant l'édition ne l'écrase
+// pas (l'enregistrement, plus récent, gagnera)
+let startedFor: string | undefined
 watch(character, (loaded) => {
-  if (loaded) start(loaded)
+  if (!loaded || startedFor === loaded.id) return
+  startedFor = loaded.id
+  start(loaded)
+}, { immediate: true })
+
+// Fiche d'un autre joueur : pas d'édition
+const { canEdit } = useOwnership()
+watch([id, () => canEdit(id.value)], ([current, allowed]) => {
+  if (!allowed) void navigateTo(`/personnages/${current}`, { replace: true })
 }, { immediate: true })
 
 async function save(): Promise<void> {

@@ -6,7 +6,7 @@ import { requireAccountStore, requireMaster } from '../../../utils/session'
 export default defineEventHandler(async (event) => {
   // Réponse contenant un mot de passe provisoire : jamais mise en cache
   setResponseHeader(event, 'Cache-Control', 'no-store')
-  const store = requireAccountStore()
+  const store = requireAccountStore(event)
   const { user: master } = await requireMaster(event, store)
   const id = getRouterParam(event, 'id') ?? ''
   if (!isUserId(id)) throw createError({ statusCode: 404, statusMessage: 'Compte introuvable' })

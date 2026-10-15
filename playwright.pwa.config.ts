@@ -19,6 +19,8 @@ export default defineConfig({
   ],
   webServer: {
     command: 'NITRO_PRESET=node-server pnpm build && PORT=3211 node .output/server/index.mjs',
+    // Build de production : l'installation exige un code (valeur de test, serveur local en mémoire)
+    env: { SETUP_CODE: 'code-installation-pwa' },
     url: 'http://localhost:3211',
     reuseExistingServer: false,
     timeout: 300_000,
