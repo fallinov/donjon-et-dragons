@@ -1,5 +1,5 @@
-import { neon } from '@neondatabase/serverless'
 import { createHash } from 'node:crypto'
+import { ensureSchema, hitRateLimit, useSql, type Sql } from './database'
 import { rateWindow, type RateAction } from './transferRules'
 
 export interface StoredTransfer {
@@ -52,24 +52,8 @@ export function createMemoryStore(): TransferStore {
   }
 }
 
-export function createNeonStore(databaseUrl: string): TransferStore {
-  const sql = neon(databaseUrl)
-  let ready: Promise<unknown> | undefined
-  // Tables créées au premier appel ; de vraies migrations viendront avec les comptes
-  const schema = () => ready ??= sql.transaction([
-    sql`CREATE TABLE IF NOT EXISTS transfers (
-      id text PRIMARY KEY,
-      data text NOT NULL,
-      expires_at timestamptz NOT NULL,
-      created_at timestamptz NOT NULL DEFAULT now()
-    )`,
-    sql`CREATE TABLE IF NOT EXISTS rate_limits (
-      key text NOT NULL,
-      window_start timestamptz NOT NULL,
-      count integer NOT NULL,
-      PRIMARY KEY (key, window_start)
-    )`,
-  ]).catch((error) => { ready = undefined; throw error })
+export function createNeonStore(sql: Sql): TransferStore {
+  const schema = () => ensureSchema(sql)
 
   return {
     async put(id, data, expires) {
@@ -98,14 +82,7 @@ export function createNeonStore(databaseUrl: string): TransferStore {
       ])
     },
     async hit(key, now) {
-      await schema()
-      const rows = await sql.query(
-        `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, $2, 1)
-         ON CONFLICT (key, window_start) DO UPDATE SET count = rate_limits.count + 1
-         RETURNING count`,
-        [key, rateWindow(now).toISOString()],
-      )
-      return Number((rows[0] as { count: number }).count)
+      return hitRateLimit(sql, key, now)
     },
   }
 }
@@ -119,8 +96,8 @@ let store: TransferStore | null | undefined
  */
 export function useTransferStore(): TransferStore | null {
   if (store !== undefined) return store
-  const databaseUrl = process.env.DATABASE_URL
-  if (databaseUrl) store = createNeonStore(databaseUrl)
+  const sql = useSql()
+  if (sql) store = createNeonStore(sql)
   else if (process.env.VERCEL) store = null
   else store = createMemoryStore()
   return store

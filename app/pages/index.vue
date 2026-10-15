@@ -137,6 +137,8 @@ async function restore(slug: string): Promise<void> {
           </li>
         </ul>
       </section>
+
+      <AuthBar />
     </div>
   </main>
 </template>

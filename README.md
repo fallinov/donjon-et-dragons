@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 269 tests) + Playwright (e2e, 134 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 289 tests) + Playwright (e2e, 158 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -145,9 +145,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 269 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 289 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 134 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 158 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
 pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne, /api hors service worker (port 3211)
 ```
@@ -213,7 +213,32 @@ Transfert d'une fiche (photo comprise) avec un code de 8 caractères, valable 24
 
 Limites : 2 Mo, 20 dépôts et 60 lectures par heure et par adresse IP (stockée hachée). Fonctions Vercel en région `fra1`, base Neon à Francfort.
 
-**Mise en service** : Vercel → Storage → Create → Neon (région Frankfurt), connecter le projet en Production et Preview (injecte `DATABASE_URL`). Les tables sont créées au premier appel. Optionnel : `CRON_SECRET` pour réserver le nettoyage à la tâche Cron.
+**Mise en service** : Vercel → Storage → Create → Neon (région Frankfurt), connecter le projet en Production et Preview (injecte `DATABASE_URL`). Le schéma est créé et mis à jour au premier appel (migrations de `server/utils/database.ts`). Optionnel : `CRON_SECRET` pour réserver le nettoyage à la tâche Cron.
+
+## Comptes
+
+Connexion par identifiant et mot de passe (issue #53). Le **master** crée les comptes des joueurs (aucune inscription publique) et réinitialise les mots de passe oubliés (aucune adresse email enregistrée). La synchronisation des fiches arrivera dans une prochaine version : pour l'instant, se connecter ne change rien aux fiches de l'appareil.
+
+**Parcours** :
+1. **Installation**, une seule fois : `/installation` crée le compte master. En ligne, le code d'installation est demandé (variable `SETUP_CODE` à définir dans Vercel) ; la page ne fonctionne plus dès qu'un compte existe.
+2. **Comptes** (`/comptes`, master) : créer un compte joueur affiche un mot de passe provisoire (`K7P4-QX9M-3HDE`), une seule fois. Sur chaque compte : **Renommer** (le sien compris), **Passer master** / **Passer joueur** (le groupe garde toujours au moins un master), **Réinitialiser** (nouveau mot de passe provisoire, déconnexion de tous ses appareils) et **Supprimer**. Tous les masters ont les mêmes droits ; un master ne peut ni se supprimer ni réinitialiser son propre mot de passe.
+3. **Connexion** (`/connexion`, lien en bas de l'accueil). Avec un mot de passe provisoire, l'app impose d'abord d'en choisir un nouveau (`/mot-de-passe`).
+
+**Sécurité** :
+- mot de passe haché avec scrypt (`node:crypto`, sel aléatoire), 8 caractères minimum ;
+- session : jeton aléatoire dans un cookie `httpOnly`, `Secure` en ligne, `SameSite=Lax`, valable 90 jours et prolongé à l'usage ; le serveur n'en garde que l'empreinte ;
+- par heure : 10 essais de connexion par identifiant et adresse IP, 30 par adresse IP, 100 par identifiant ; 10 essais du code d'installation par adresse IP ; 10 essais du mot de passe actuel par compte. Même réponse pour un identifiant inconnu ou un mauvais mot de passe ;
+- sans `SETUP_CODE`, l'installation n'est possible qu'en développement local (`pnpm dev`) ;
+- requêtes de modification : même origine et JSON obligatoires (protection CSRF, `server/middleware/csrf.ts`).
+
+| Élément | Rôle |
+|---|---|
+| `server/utils/database.ts` | client Neon partagé, migrations numérotées (`schema_migrations`), compteurs de limitation |
+| `server/utils/accountStore.ts` | comptes et sessions, Neon ou mémoire (local, e2e) |
+| `server/utils/accountRules.ts`, `password.ts`, `session.ts` | règles (identifiant, mot de passe, durées), scrypt, cookie de session et contrôles d'accès |
+| `server/api/setup.*`, `server/api/auth/*`, `server/api/users/*` | installation, connexion, déconnexion, compte courant, mot de passe, gestion des comptes (création, renommage, rôle, réinitialisation, suppression) |
+| `app/composables/useAuth.ts` | compte connecté (`useState`), appels à l'API, erreurs traduites |
+| `app/pages/connexion.vue`, `mot-de-passe.vue`, `installation.vue`, `comptes.vue` | pages des comptes ; `app/middleware/auth.global.ts` protège `/comptes` et impose le changement d'un mot de passe provisoire |
 
 ## Déploiement
 
