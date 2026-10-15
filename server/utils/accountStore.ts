@@ -231,7 +231,8 @@ export function createNeonAccountStore(sql: Sql): AccountStore {
           sql.query(
             `UPDATE users SET username = COALESCE($2, username), role = COALESCE($3, role)
              WHERE id = $1 AND NOT (
-               role = 'master' AND $3 = 'player'
+               -- COALESCE : sans changement de rôle, $3 est NULL et la garde doit valoir faux, pas NULL
+               role = 'master' AND COALESCE($3, '') = 'player'
                AND (SELECT count(*) FROM users WHERE role = 'master') <= 1
              )
              RETURNING ${USER_COLUMNS}`,

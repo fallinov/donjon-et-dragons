@@ -107,7 +107,8 @@ export const accountsApi = {
   resetPassword: (id: string) => callApi<{ password: string }>(`/api/users/${encodeURIComponent(id)}/reset-password`, 'POST', {}),
   async update(id: string, changes: { username?: string, role?: Role }): Promise<AuthResult<{ user: PublicUser }>> {
     const result = await callApi<{ user: PublicUser }>(`/api/users/${encodeURIComponent(id)}`, 'PATCH', changes)
-    if (!result.ok && result.status === 409) return fail(changes.username ? 'accounts.error.taken' : 'accounts.error.lastMaster', 409)
+    if (!result.ok && result.status === 409) return fail('accounts.error.taken', 409)
+    if (!result.ok && result.status === 422) return fail('accounts.error.lastMaster', 422)
     if (!result.ok && result.status === 400) return fail('auth.error.username', 400)
     return result
   },

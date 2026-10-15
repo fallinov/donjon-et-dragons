@@ -26,6 +26,6 @@ export default defineEventHandler(async (event) => {
   const result = await store.updateUser(id, changes)
   if (result === null) throw createError({ statusCode: 404, statusMessage: 'Compte introuvable' })
   if (result === 'taken') throw createError({ statusCode: 409, statusMessage: 'Identifiant déjà pris' })
-  if (result === 'lastMaster') throw createError({ statusCode: 409, statusMessage: 'Dernier master' })
+  if (result === 'lastMaster') throw createError({ statusCode: 422, statusMessage: 'Dernier master' })
   return { user: publicUser(result) }
 })
