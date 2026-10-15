@@ -1,6 +1,5 @@
 import { CHARACTER_SCHEMA_VERSION, type StoredCharacter } from '~~/shared/types/character'
-import { isValidState, normalizeState, type CharacterState } from '~/composables/useCharacterState'
-import { parseInventory, type InventoryState } from '~/composables/useInventory'
+import { isValidState, normalizeState, parseInventory, type CharacterState, type InventoryState } from '~/utils/characterParts'
 import type { MessageKey } from '~/composables/useT'
 import { migrateDocument } from '~/db/migrations'
 import { arrayBufferToBase64, base64ToArrayBuffer } from '~/utils/base64'

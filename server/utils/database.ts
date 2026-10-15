@@ -42,6 +42,32 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
     )`,
     'CREATE INDEX IF NOT EXISTS sessions_user_id ON sessions (user_id)',
   ],
+  // 3. Fiches synchronisées : une ligne par fiche, trois parties datées (fiche, état de jeu, sac),
+  // portrait à part ; `rev` croissant sert de curseur de synchronisation
+  [
+    'CREATE SEQUENCE IF NOT EXISTS character_rev',
+    `CREATE TABLE IF NOT EXISTS characters (
+      id text PRIMARY KEY,
+      owner_id uuid REFERENCES users (id) ON DELETE SET NULL,
+      sheet jsonb,
+      sheet_at timestamptz,
+      state jsonb,
+      state_at timestamptz,
+      inventory jsonb,
+      inventory_at timestamptz,
+      portrait_hash text,
+      deleted_at timestamptz,
+      updated_by uuid,
+      rev bigint NOT NULL DEFAULT nextval('character_rev')
+    )`,
+    'CREATE INDEX IF NOT EXISTS characters_rev ON characters (rev)',
+    `CREATE TABLE IF NOT EXISTS portraits (
+      character_id text PRIMARY KEY REFERENCES characters (id) ON DELETE CASCADE,
+      hash text NOT NULL,
+      mime text NOT NULL,
+      base64 text NOT NULL
+    )`,
+  ],
 ]
 
 /** Verrou pris pendant chaque migration : une seule fonction à la fois modifie le schéma. */

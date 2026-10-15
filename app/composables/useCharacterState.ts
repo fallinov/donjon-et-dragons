@@ -3,24 +3,15 @@ import type { Character, SpellSlotLevel } from '~~/shared/types/character'
 import { getState, putState } from '~/db/characterRepository'
 import { persistState } from '~/composables/persistState'
 import { deepEqual } from '~/utils/deepEqual'
+import { isValidState, normalizeState, type CharacterState } from '~/utils/characterParts'
+export { isValidState, normalizeState } from '~/utils/characterParts'
+export type { CharacterState } from '~/utils/characterParts'
 
 // Fallback si useState Nuxt n'est pas dispo (contexte test pur)
 export const useStateSafe = <T>(key: string, factory: () => T): Ref<T> => {
   const nuxtUseState = (globalThis as unknown as { useState?: <U>(key: string, factory: () => U) => Ref<U> }).useState
   if (nuxtUseState) return nuxtUseState<T>(key, factory)
   return ref(factory()) as Ref<T>
-}
-
-export interface CharacterState {
-  hpCurrent: number
-  hpTemp: number
-  inspiration: number
-  hitDiceUsed: number
-  deathSaves: { successes: number, failures: number }
-  /** Emplacements consommés par niveau (index 0 = niv 1, etc.) */
-  spellSlotsUsed: number[]
-  /** Sorts daily déjà utilisés (titres) */
-  dailySpellsUsed: string[]
 }
 
 function defaultState(character: Character): CharacterState {
@@ -32,35 +23,6 @@ function defaultState(character: Character): CharacterState {
     deathSaves: { successes: 0, failures: 0 },
     spellSlotsUsed: (character.spellcasting?.slotLevels ?? []).map(() => 0),
     dailySpellsUsed: [],
-  }
-}
-
-export function isValidState(value: unknown): value is CharacterState {
-  if (typeof value !== 'object' || value === null) return false
-  const s = value as Record<string, unknown>
-  return (
-    typeof s.hpCurrent === 'number'
-    && typeof s.hpTemp === 'number'
-    && typeof s.inspiration === 'number'
-    && typeof s.hitDiceUsed === 'number'
-    && Array.isArray(s.spellSlotsUsed)
-    && typeof s.deathSaves === 'object'
-    && s.deathSaves !== null
-  )
-}
-
-/**
- * Aligne un état sauvegardé sur la fiche actuelle, après une montée de niveau
- * ou une modification dans l'éditeur : niveaux d'emplacements complétés avec 0,
- * compteurs bornés aux nouveaux maximums (emplacements, PV, dés de vie utilisés).
- */
-export function normalizeState(character: Character, saved: CharacterState): CharacterState {
-  const levels = character.spellcasting?.slotLevels ?? []
-  return {
-    ...saved,
-    hpCurrent: Math.min(saved.hpCurrent, character.maxHp),
-    hitDiceUsed: Math.min(saved.hitDiceUsed, character.hitDice.total),
-    spellSlotsUsed: levels.map((sl, i) => Math.min(saved.spellSlotsUsed[i] ?? 0, sl.slots)),
   }
 }
 
