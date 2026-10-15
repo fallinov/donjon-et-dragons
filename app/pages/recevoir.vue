@@ -16,6 +16,7 @@ const copied = ref<MessageKey>()
 // iPhone dans Safari : l'app installée a son propre stockage, la fiche reçue ici n'y apparaîtrait pas
 const iosBrowser = ref(false)
 const resolveConflict = useImportConflict()
+const { canEdit } = useOwnership()
 
 /** Lien partagé : /recevoir#K7P4QX9M (le code ne quitte jamais le téléphone). */
 function readCodeFromLink(): void {
@@ -41,7 +42,7 @@ async function receive(): Promise<void> {
       error.value = result.error
       return
     }
-    const id = await importCharacter(result.value, resolveConflict)
+    const id = await importCharacter(result.value, resolveConflict, { canWrite: canEdit })
     if (id) await navigateTo(`/personnages/${id}`, { replace: true })
   }
   catch (cause) {

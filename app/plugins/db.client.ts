@@ -8,18 +8,21 @@ import { migrateLegacyStorage } from '~/db/legacy'
  * et demande de stockage persistant (Safari purge sinon les données d'un site
  * non installé après 7 jours d'inactivité).
  */
-export default defineNuxtPlugin(async () => {
-  try {
-    await seedBuiltins(seeds, fetchPortrait)
-  }
-  catch (error) {
-    console.error('Import des fiches de départ impossible', error)
-  }
-  try {
-    await migrateLegacyStorage()
-  }
-  catch (error) {
-    console.error('Reprise des anciennes données impossible', error)
-  }
-  void navigator.storage?.persist?.().catch(() => false)
+export default defineNuxtPlugin({
+  name: 'codex-db',
+  async setup() {
+    try {
+      await seedBuiltins(seeds, fetchPortrait)
+    }
+    catch (error) {
+      console.error('Import des fiches de départ impossible', error)
+    }
+    try {
+      await migrateLegacyStorage()
+    }
+    catch (error) {
+      console.error('Reprise des anciennes données impossible', error)
+    }
+    void navigator.storage?.persist?.().catch(() => false)
+  },
 })

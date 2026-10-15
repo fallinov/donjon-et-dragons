@@ -8,18 +8,39 @@ import { newId } from '~/utils/newId'
 export type ConflictChoice = 'replace' | 'copy' | 'cancel'
 export type ConflictResolver = (existing: StoredCharacter, incoming: StoredCharacter) => Promise<ConflictChoice>
 
+export interface ImportOptions {
+  /**
+   * Droit d'écrire la fiche de cet identifiant (synchronisation) : sans lui, la fiche importée devient
+   * une copie à soi au lieu de remplacer (ou de créer) la fiche d'un autre. Par défaut, tout est permis.
+   */
+  canWrite?: (id: string) => boolean
+  now?: Date
+}
+
 /**
  * Enregistre une fiche importée. Si une fiche de même identifiant existe sur
  * l'appareil, `resolve` décide : remplacer (provenance et date de création
  * conservées), importer en copie (nouvel identifiant) ou annuler.
  * Retourne l'identifiant de la fiche enregistrée, ou null si annulé.
  */
-export async function importCharacter(imported: ImportedCharacter, resolve: ConflictResolver, now: Date = new Date()): Promise<string | null> {
+export async function importCharacter(imported: ImportedCharacter, resolve: ConflictResolver, options: ImportOptions | Date = {}): Promise<string | null> {
+  const { canWrite = () => true, now = new Date() } = options instanceof Date ? { now: options } : options
   const incoming = imported.character
   const existing = await getCharacter(incoming.id)
   let character: StoredCharacter
 
-  if (!existing) {
+  if (!canWrite(incoming.id)) {
+    // Fiche d'un autre (ou fiche de départ pour un joueur) : copie à soi, sans question
+    character = {
+      ...incoming,
+      id: newId(),
+      firstName: existing ? t('import.copyName', { name: incoming.firstName }) : incoming.firstName,
+      origin: 'import',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    }
+  }
+  else if (!existing) {
     character = { ...incoming, origin: 'import', createdAt: now.toISOString() }
   }
   else {

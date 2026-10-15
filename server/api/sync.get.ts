@@ -9,8 +9,8 @@ import { requireAccountStore, requireSession } from '../utils/session'
  */
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'no-store')
-  await requireSession(event, requireAccountStore())
-  const store = requireSyncStore()
+  await requireSession(event, requireAccountStore(event))
+  const store = requireSyncStore(event)
   const since = Number(getQuery(event).since ?? 0)
   if (!Number.isSafeInteger(since) || since < 0) throw createError({ statusCode: 400, statusMessage: 'Curseur invalide' })
   const records = await store.listSince(since, SYNC_PAGE_SIZE)

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page } from './fixtures'
 import { apiLogin, createPlayer, ensureMaster, MASTER, uniqueName } from './accounts'
 
 async function loginWithForm(page: Page, username: string, password: string): Promise<void> {
@@ -6,6 +6,9 @@ async function loginWithForm(page: Page, username: string, password: string): Pr
   await page.getByLabel('Mot de passe', { exact: true }).fill(password)
   await page.getByRole('button', { name: 'Se connecter' }).click()
 }
+
+// Parcours de connexion : le test commence sans session, le master est créé par l'API
+test.use({ signedIn: false })
 
 test.beforeEach(async ({ request }) => {
   await ensureMaster(request)
@@ -18,7 +21,7 @@ test.describe('Comptes', () => {
     await expect(page.locator('[data-setup-form]')).toHaveCount(0)
   })
 
-  test('le master crée un compte ; le joueur change son mot de passe provisoire puis se déconnecte', async ({ page, browser }) => {
+  test('le master crée un compte ; le joueur change son mot de passe provisoire puis se déconnecte', async ({ page, newDevice }) => {
     await page.goto('/comptes')
     await expect(page).toHaveURL(/\/connexion\?suite=\/comptes$/)
     await loginWithForm(page, MASTER.username, MASTER.password)
@@ -34,8 +37,7 @@ test.describe('Comptes', () => {
     await expect(page.locator(`[data-account="${name}"]`)).toContainText('Mot de passe provisoire')
 
     // Le joueur, sur son propre téléphone
-    const context = await browser.newContext()
-    const player = await context.newPage()
+    const player = await (await newDevice({ signedIn: false })).newPage()
     await player.goto('/connexion')
     await loginWithForm(player, `  ${name} `, password)
     await expect(player).toHaveURL(/\/mot-de-passe$/)
@@ -59,11 +61,14 @@ test.describe('Comptes', () => {
     await expect(bar.getByRole('link', { name: 'Comptes' })).toHaveCount(0)
 
     await bar.getByRole('button', { name: 'Se déconnecter' }).click()
-    await expect(bar.getByRole('link', { name: 'Se connecter' })).toBeVisible()
-    await player.goto('/connexion')
+    await expect(player.getByRole('dialog')).toContainText('Les fiches seront retirées de cet appareil')
+    await player.getByRole('dialog').getByRole('button', { name: 'Se déconnecter' }).click()
+    await expect(player).toHaveURL(/\/connexion$/)
+    // Sans compte, l'app renvoie à la connexion
+    await player.goto('/')
+    await expect(player).toHaveURL(/\/connexion$/)
     await loginWithForm(player, name, 'zanna-la-barde')
     await expect(player).toHaveURL(/\/$/)
-    await context.close()
 
     await page.reload()
     await expect(page.locator(`[data-account="${name}"]`)).not.toContainText('Mot de passe provisoire')
@@ -78,11 +83,10 @@ test.describe('Comptes', () => {
     await expect(page).toHaveURL(/\/connexion$/)
   })
 
-  test('un joueur n\'accède pas aux comptes (page et API)', async ({ page, playwright }) => {
-    const master = await playwright.request.newContext({ baseURL: 'http://localhost:3210' })
+  test('un joueur n\'accède pas aux comptes (page et API)', async ({ page, api }) => {
+    const master = await api()
     await apiLogin(master, MASTER.username, MASTER.password)
     const player = await createPlayer(master)
-    await master.dispose()
 
     await apiLogin(page.request, player.username, player.password)
     await page.request.post('/api/auth/password', { data: { current: player.password, next: 'nouveau-mdp' } })
@@ -92,8 +96,8 @@ test.describe('Comptes', () => {
     await expect(page).toHaveURL(/\/$/)
   })
 
-  test('réinitialisation : sessions du joueur fermées, ancien mot de passe refusé ; suppression du compte', async ({ page, playwright }) => {
-    const player = await playwright.request.newContext({ baseURL: 'http://localhost:3210' })
+  test('réinitialisation : sessions du joueur fermées, ancien mot de passe refusé ; suppression du compte', async ({ page, api }) => {
+    const player = await api()
     await apiLogin(page.request, MASTER.username, MASTER.password)
     const account = await createPlayer(page.request, 'sandra')
     await apiLogin(player, account.username, account.password)
@@ -120,14 +124,13 @@ test.describe('Comptes', () => {
     // Identifiant malformé : introuvable, pas d'erreur serveur
     expect((await page.request.delete('/api/users/abc')).status()).toBe(404)
     expect((await page.request.post('/api/users/abc/reset-password', { data: {} })).status()).toBe(404)
-    await player.dispose()
   })
 
-  test('le master renomme un joueur puis le passe master, et inversement', async ({ page, playwright }) => {
+  test('le master renomme un joueur puis le passe master, et inversement', async ({ page, api }) => {
     await apiLogin(page.request, MASTER.username, MASTER.password)
     const account = await createPlayer(page.request, 'kael')
     const other = await createPlayer(page.request, 'jerome')
-    const player = await playwright.request.newContext({ baseURL: 'http://localhost:3210' })
+    const player = await api()
     await apiLogin(player, account.username, account.password)
     expect((await player.post('/api/auth/password', { data: { current: account.password, next: 'kael-draven' } })).status()).toBe(200)
 
@@ -159,7 +162,6 @@ test.describe('Comptes', () => {
     await page.getByRole('dialog').getByRole('button', { name: 'Passer joueur' }).click()
     await expect(renamedRow).toContainText('Joueur')
     expect((await player.get('/api/users')).status()).toBe(403)
-    await player.dispose()
   })
 
   test('protection CSRF : autre origine refusée, JSON obligatoire', async ({ request }) => {

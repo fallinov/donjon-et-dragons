@@ -1,4 +1,18 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test as base, expect, type Page } from '@playwright/test'
+
+const MASTER = { username: 'mj-pwa', password: 'mot-de-passe-pwa' }
+
+/**
+ * Connexion obligatoire : chaque test démarre connecté en master. Le serveur de production n'a
+ * pas de groupes de test : les tests (en série) partagent un seul compte et ses fiches.
+ */
+const test = base.extend({
+  context: async ({ context }, use) => {
+    const setup = await context.request.post('/api/setup', { data: { ...MASTER, setupCode: 'code-installation-pwa' } })
+    if (setup.status() !== 200) expect((await context.request.post('/api/auth/login', { data: MASTER })).status()).toBe(200)
+    await use(context)
+  },
+})
 
 /** Attend que le service worker contrôle la page (première visite : un rechargement est nécessaire). */
 async function waitForServiceWorker(page: Page): Promise<void> {

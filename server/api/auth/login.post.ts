@@ -4,7 +4,7 @@ import { endSession, enforceLoginLimit, publicUser, requireAccountStore, startSe
 
 /** Connexion `{ username, password }` ; même réponse que l'identifiant existe ou non. */
 export default defineEventHandler(async (event) => {
-  const store = requireAccountStore()
+  const store = requireAccountStore(event)
   const credentials = readCredentials(await readBody(event))
   if (!credentials.ok) throw createError({ statusCode: 400, statusMessage: 'Identifiant ou mot de passe manquant' })
   await enforceLoginLimit(event, store, credentials.username)

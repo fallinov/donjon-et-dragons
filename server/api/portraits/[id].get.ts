@@ -4,9 +4,9 @@ import { requireAccountStore, requireSession } from '../../utils/session'
 
 /** Portrait d'une fiche (compte connecté), avec son empreinte en ETag. */
 export default defineEventHandler(async (event) => {
-  await requireSession(event, requireAccountStore())
+  await requireSession(event, requireAccountStore(event))
   const id = getRouterParam(event, 'id') ?? ''
-  const portrait = isCharacterId(id) ? await requireSyncStore().getPortrait(id) : null
+  const portrait = isCharacterId(id) ? await requireSyncStore(event).getPortrait(id) : null
   if (!portrait) throw createError({ statusCode: 404, statusMessage: 'Portrait introuvable' })
   const etag = `"${portrait.hash}"`
   setResponseHeaders(event, {

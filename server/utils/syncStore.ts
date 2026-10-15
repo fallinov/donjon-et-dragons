@@ -1,5 +1,7 @@
+import type { H3Event } from 'h3'
 import type { SyncPart, SyncRow } from '~~/shared/types/sync'
 import { ensureSchema, useSql, type Sql } from './database'
+import { e2eTenant, tenantStore } from './e2eTenant'
 import type { PortraitData } from './syncRules'
 
 /** Fiche stockée : comme `SyncRow`, avec des dates. */
@@ -240,9 +242,12 @@ export function createNeonSyncStore(sql: Sql): SyncStore {
 }
 
 let store: SyncStore | null | undefined
+const tenants = new Map<string, SyncStore>()
 
 /** Même règle que les comptes : Neon si `DATABASE_URL`, null sur Vercel sans base (503), mémoire sinon. */
-export function useSyncStore(): SyncStore | null {
+export function useSyncStore(event?: H3Event): SyncStore | null {
+  const tenant = e2eTenant(event)
+  if (tenant) return tenantStore(tenants, tenant, createMemorySyncStore)
   if (store !== undefined) return store
   const sql = useSql()
   if (sql) store = createNeonSyncStore(sql)

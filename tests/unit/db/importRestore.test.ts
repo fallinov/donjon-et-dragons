@@ -41,22 +41,24 @@ describe('importCharacter', () => {
 })
 
 describe('replaceCharacterData', () => {
-  it('efface l\'état et le sac absents du remplacement', async () => {
+  it('remet l\'état de départ et efface le sac absent du remplacement', async () => {
     await replaceCharacterData(darethBrumeval, state, inventory)
     await replaceCharacterData(darethBrumeval)
-    expect(await getState('dareth-brumeval')).toBeUndefined()
+    // État de départ écrit (et synchronisé) : l'ancien état du serveur ne revient pas
+    expect(await getState('dareth-brumeval')).toMatchObject({ hpCurrent: darethBrumeval.maxHp, hitDiceUsed: 0, spellSlotsUsed: [0, 0] })
     expect(await getInventory('dareth-brumeval')).toBeUndefined()
   })
 })
 
 describe('restoreBuiltin', () => {
-  it('remet la fiche, le portrait et le sac de départ, efface l\'état de jeu', async () => {
+  it('remet la fiche, le portrait, le sac et l\'état de jeu de départ', async () => {
     await putCharacter({ ...darethBrumeval, level: 12, firstName: 'Autre', createdAt: '2026-01-01T00:00:00.000Z' })
     await putState('dareth-brumeval', state)
     const restored = await restoreBuiltin(seeds[0]!, async () => fakePortrait(4), now)
     expect(restored).toMatchObject({ firstName: 'Dareth', level: 6, origin: 'builtin', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: now.toISOString() })
     expect([...new Uint8Array((await getCharacter('dareth-brumeval'))!.portrait.data)]).toEqual([4, 4, 4])
-    expect(await getState('dareth-brumeval')).toBeUndefined()
+    // État de départ écrit (et synchronisé) : l'ancien état du serveur ne revient pas
+    expect(await getState('dareth-brumeval')).toMatchObject({ hpCurrent: darethBrumeval.maxHp, hitDiceUsed: 0, spellSlotsUsed: [0, 0] })
     expect((await getInventory('dareth-brumeval') as { coins: { gp: number } }).coins.gp).toBe(360)
   })
 

@@ -38,6 +38,7 @@ export function useInventory(character: Character) {
 
   if (getCurrentInstance()) {
     persistState(state, {
+      key: `inventory:${character.id}`,
       load: async () => parseInventory(await getInventory(character.id)) ?? undefined,
       save: value => putInventory(character.id, value),
     })

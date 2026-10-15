@@ -1,9 +1,8 @@
-import { test, expect, type Browser, type Page } from '@playwright/test'
+import { test, expect, type BrowserContext, type Page } from './fixtures'
 
-/** Un autre téléphone : contexte de navigateur séparé, avec ses propres fiches (IndexedDB). */
-async function otherPhone(browser: Browser): Promise<Page> {
-  const context = await browser.newContext(test.info().project.use)
-  return context.newPage()
+/** Un autre téléphone du même groupe : contexte de navigateur séparé, avec ses propres fiches (IndexedDB). */
+async function otherPhone(newDevice: () => Promise<BrowserContext>): Promise<Page> {
+  return (await newDevice()).newPage()
 }
 
 /** Ouvre « ⋯ » → Transférer et renvoie le code affiché. */
@@ -45,7 +44,7 @@ test.describe('Transfert de fiche par code', () => {
     await expect(items.first()).toHaveText('Transférer')
   })
 
-  test('transférer Zanna vers un autre téléphone : Remplacer, PV et portrait repris', async ({ page, browser }) => {
+  test('transférer Zanna vers un autre téléphone : Remplacer, PV et portrait repris', async ({ page, newDevice }) => {
     const errors: string[] = []
     page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) })
 
@@ -56,7 +55,7 @@ test.describe('Transfert de fiche par code', () => {
     const code = await transfer(page, 'zanna')
     await expect(page.locator('dialog[open]')).toContainText('Valable jusqu\'au')
 
-    const other = await otherPhone(browser)
+    const other = await otherPhone(newDevice)
     await receive(other, code)
     const dialog = other.getByRole('dialog')
     await expect(dialog).toContainText('Cette fiche existe déjà')
@@ -67,14 +66,13 @@ test.describe('Transfert de fiche par code', () => {
     await expect.poll(() => portrait.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBeGreaterThan(0)
     await lowerHp(other, 0)
     await expect(hpBar(other)).toHaveAttribute('aria-valuenow', hp!)
-    await other.context().close()
     expect(errors).toEqual([])
   })
 
-  test('lien partagé /recevoir#code : code prérempli, fiche absente importée directement', async ({ page, browser }) => {
+  test('lien partagé /recevoir#code : code prérempli, fiche absente importée directement', async ({ page, newDevice }) => {
     const code = await transfer(page, 'kael-draven')
 
-    const other = await otherPhone(browser)
+    const other = await otherPhone(newDevice)
     await other.goto('/personnages/kael-draven')
     await other.getByRole('button', { name: 'Autres actions' }).filter({ visible: true }).click()
     await other.getByRole('button', { name: 'Supprimer', exact: true }).filter({ visible: true }).click()
@@ -88,7 +86,6 @@ test.describe('Transfert de fiche par code', () => {
     await expect(other.getByRole('heading', { level: 1 })).toContainText('Kael')
     await other.goto('/')
     await expect(other.getByText('6 personnages consignés')).toBeVisible()
-    await other.context().close()
   })
 
   test('code inconnu ou mal formé : message clair, aucune fiche ajoutée', async ({ page }) => {

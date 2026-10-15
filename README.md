@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 310 tests) + Playwright (e2e, 164 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 328 tests) + Playwright (e2e, 172 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -145,9 +145,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 310 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 328 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 164 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 172 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
 pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne, /api hors service worker (port 3211)
 ```
@@ -217,7 +217,7 @@ Limites : 2 Mo, 20 dépôts et 60 lectures par heure et par adresse IP (stockée
 
 ## Comptes
 
-Connexion par identifiant et mot de passe (issue #53). Le **master** crée les comptes des joueurs (aucune inscription publique) et réinitialise les mots de passe oubliés (aucune adresse email enregistrée). La synchronisation des fiches arrivera dans une prochaine version : pour l'instant, se connecter ne change rien aux fiches de l'appareil.
+Connexion par identifiant et mot de passe, **obligatoire** (issue #53). Le **master** crée les comptes des joueurs (aucune inscription publique) et réinitialise les mots de passe oubliés (aucune adresse email enregistrée). Une fois connecté, chacun retrouve toutes les fiches du groupe sur tous ses appareils ; il modifie les siennes, celles des autres sont en lecture seule.
 
 **Parcours** :
 1. **Installation**, une seule fois : `/installation` crée le compte master. En ligne, le code d'installation est demandé (variable `SETUP_CODE` à définir dans Vercel) ; la page ne fonctionne plus dès qu'un compte existe.
@@ -240,9 +240,19 @@ Connexion par identifiant et mot de passe (issue #53). Le **master** crée les c
 | `app/composables/useAuth.ts` | compte connecté (`useState`), appels à l'API, erreurs traduites |
 | `app/pages/connexion.vue`, `mot-de-passe.vue`, `installation.vue`, `comptes.vue` | pages des comptes ; `app/middleware/auth.global.ts` protège `/comptes` et impose le changement d'un mot de passe provisoire |
 
+### Synchronisation dans l'app
+
+- **Connexion** : obligatoire ; le compte est gardé sur l'appareil, l'app s'ouvre donc hors ligne après une première connexion. Session expirée : retour à la connexion, les fiches restent sur l'appareil.
+- **Modifications** : chaque écriture (fiche, PV, sac, suppression) est notée dans l'outbox IndexedDB (`app/db/characterRepository.ts`), dans la même transaction. `useSync` (`app/composables/useSync.ts`) envoie l'outbox 2 s après une modification, au démarrage, au retour au premier plan, au retour du réseau et toutes les 60 s, puis reçoit ce qui a changé (curseur relu 50 révisions en arrière).
+- **Données reçues** : écrites par `app/db/syncRepository.ts` sans passer par l'outbox ; une partie qui a une modification locale en attente n'est pas touchée. Les PV et le sac affichés se mettent à jour sans être renvoyés (`applyExternal` de `persistState`).
+- **Droits** (`useOwnership`) : un master modifie tout ; un joueur, ses fiches. Fiche d'un autre : mention « Fiche de X — lecture seule », zone de jeu désactivée (`CodexLock`, un `fieldset disabled`), ni Modifier, ni Restaurer, ni Supprimer. Importer ou recevoir la fiche d'un autre en fait une copie à soi.
+- **Première connexion d'un compte sur l'appareil** : une fiche déjà présente et modifiée ici part sur le serveur si le compte peut l'écrire, sinon elle devient une copie à soi ; les autres prennent la version du serveur. Le premier master envoie les 6 fiches de départ.
+- **Attribution** : `/comptes` → section Fiches, un propriétaire par fiche (ou « Groupe (masters) »).
+- **Déconnexion** : les fiches sont retirées de l'appareil (il peut être partagé) ; confirmation, avec un avertissement si des modifications n'ont pas encore été envoyées.
+
 ### API de synchronisation (serveur)
 
-Les fiches sont stockées sur le serveur, une ligne par fiche. Une fiche a trois parties datées : la fiche elle-même, l'état de jeu (PV, emplacements…) et le sac. **La dernière modification gagne, partie par partie** : des PV joués à la table n'écrasent pas une fiche modifiée sur l'ordinateur. Le portrait est stocké à part ; un appareil ne le télécharge que si son empreinte a changé. L'app ne s'en sert pas encore : ce sera la PR 3 (#53).
+Les fiches sont stockées sur le serveur, une ligne par fiche. Une fiche a trois parties datées : la fiche elle-même, l'état de jeu (PV, emplacements…) et le sac. **La dernière modification gagne, partie par partie** : des PV joués à la table n'écrasent pas une fiche modifiée sur l'ordinateur. Le portrait est stocké à part ; un appareil ne le télécharge que si son empreinte a changé.
 
 | Route | Rôle |
 |---|---|

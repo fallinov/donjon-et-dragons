@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, ref } from 'vue'
-import { persistState } from '~/composables/persistState'
+import { applyExternal, persistState } from '~/composables/persistState'
 import { settle, waitFor } from '../helpers/characters'
 
 interface Counter { value: number }
@@ -123,5 +123,41 @@ describe('persistState', () => {
     await waitFor(() => save.mock.calls.length > 0)
     await new Promise(resolve => setTimeout(resolve, 40))
     expect(save).toHaveBeenCalledTimes(1)
+  })
+
+  it('un état partagé par clé : un seul chargement, une valeur identique n\'est pas réécrite', async () => {
+    const save = vi.fn(async (_value: Counter) => {})
+    const load = vi.fn(async () => ({ value: 2 }))
+    // Nuxt useState renvoie un nouveau ref à chaque appel : deux composants, deux refs, une clé
+    const shared = ref<Counter>({ value: 0 })
+    const a = ref(shared.value)
+    effectScope().run(() => persistState(a, { load, save, key: 'k' }))
+    effectScope().run(() => persistState(ref(shared.value), { load, save, key: 'k' }))
+    await settle()
+    expect(load).toHaveBeenCalledTimes(1)
+    a.value = { value: 2 }
+    await settle()
+    expect(save).not.toHaveBeenCalled()
+  })
+
+  it('valeur reçue du serveur : affichée sans être réenregistrée, même pendant le chargement', async () => {
+    const save = vi.fn(async (_value: Counter) => {})
+    let resolveLoad: (value: Counter | undefined) => void = () => {}
+    const load = () => new Promise<Counter | undefined>((resolve) => { resolveLoad = resolve })
+    const state = ref<Counter>({ value: 0 })
+    effectScope().run(() => persistState(state, { load, save, key: 'srv' }))
+    // Reçue pendant la lecture (qui renvoie une valeur plus ancienne) : elle l'emporte
+    applyExternal('srv', { value: 9 })
+    resolveLoad({ value: 1 })
+    await settle()
+    expect(state.value).toEqual({ value: 9 })
+    applyExternal('srv', { value: 12 })
+    await settle()
+    expect(state.value).toEqual({ value: 12 })
+    expect(save).not.toHaveBeenCalled()
+    // Une vraie modification ensuite est bien enregistrée
+    state.value = { value: 13 }
+    await waitFor(() => save.mock.calls.length > 0)
+    expect(save).toHaveBeenLastCalledWith({ value: 13 })
   })
 })

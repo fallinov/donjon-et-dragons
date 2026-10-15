@@ -11,6 +11,9 @@ import { canShareFiles, downloadFile, shareOrDownload } from '~/utils/share'
 
 const props = defineProps<{ character: Character }>()
 const { confirm } = useConfirm()
+// Fiche d'un autre joueur : ni modification, ni restauration, ni suppression
+const { canEdit } = useOwnership()
+const editable = computed(() => canEdit(props.character.id))
 
 const menuId = useId()
 const open = ref(false)
@@ -121,6 +124,7 @@ const itemClass = 'flex min-h-11 w-full items-center px-4 text-left font-display
 <template>
   <div ref="root" class="no-print relative flex items-center gap-2" role="group" :aria-label="t('actions.label')">
     <NuxtLink
+      v-if="editable"
       :to="`/personnages/${character.id}/modifier`"
       class="inline-flex min-h-11 items-center border border-gold/40 bg-charcoal/60 px-3 font-display text-sm tracking-wider-2 uppercase text-gold hover:text-gold-bright hover:border-gold transition-colors"
     >{{ t('actions.edit') }}</NuxtLink>
@@ -144,8 +148,8 @@ const itemClass = 'flex min-h-11 w-full items-center px-4 text-left font-display
       <button type="button" :class="[itemClass, 'text-gold-bright']" data-transfer @click="transfer">{{ t('actions.transfer') }}</button>
       <button v-if="shareSupported" type="button" :class="[itemClass, 'text-gold-bright']" @click="share">{{ t('actions.share') }}</button>
       <button type="button" :class="[itemClass, 'text-gold-bright']" @click="exportFile">{{ t('actions.export') }}</button>
-      <button v-if="seed" type="button" :class="[itemClass, 'text-parchment']" @click="restore">{{ t('actions.restore') }}</button>
-      <button type="button" :class="[itemClass, 'border-t border-gold/20 text-ember-light']" @click="remove">{{ t('actions.delete') }}</button>
+      <button v-if="seed && editable" type="button" :class="[itemClass, 'text-parchment']" @click="restore">{{ t('actions.restore') }}</button>
+      <button v-if="editable" type="button" :class="[itemClass, 'border-t border-gold/20 text-ember-light']" @click="remove">{{ t('actions.delete') }}</button>
     </div>
 
     <p

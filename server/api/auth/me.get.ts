@@ -3,6 +3,6 @@ import { publicUser, readSession, requireAccountStore } from '../../utils/sessio
 /** Compte connecté, ou `{ user: null }` sans session (cas normal, pas une erreur). */
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'no-store')
-  const session = await readSession(event, requireAccountStore())
+  const session = await readSession(event, requireAccountStore(event))
   return { user: session ? publicUser(session.user) : null }
 })

@@ -9,8 +9,8 @@ export const SESSION_COOKIE = 'codex_session'
 const sha256 = (value: string) => createHash('sha256').update(value).digest('hex')
 
 /** Comptes disponibles, sinon 503 (base non configurée en production). */
-export function requireAccountStore(): AccountStore {
-  const store = useAccountStore()
+export function requireAccountStore(event?: H3Event): AccountStore {
+  const store = useAccountStore(event)
   if (!store) throw createError({ statusCode: 503, statusMessage: 'Comptes indisponibles' })
   return store
 }

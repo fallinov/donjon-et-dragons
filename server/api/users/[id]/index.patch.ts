@@ -7,7 +7,7 @@ import { publicUser, requireAccountStore, requireMaster } from '../../../utils/s
  * le sien compris). Le groupe garde toujours au moins un master.
  */
 export default defineEventHandler(async (event) => {
-  const store = requireAccountStore()
+  const store = requireAccountStore(event)
   await requireMaster(event, store)
   const id = getRouterParam(event, 'id') ?? ''
   if (!isUserId(id)) throw createError({ statusCode: 404, statusMessage: 'Compte introuvable' })

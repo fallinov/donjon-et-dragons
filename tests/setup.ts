@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { closeCodexDB } from '~/db/schema'
+import { resetPersistedStates } from '~/composables/persistState'
 import { ref } from 'vue'
 
 type StateFactory<T> = () => T
@@ -21,6 +22,7 @@ const useStateStub = <T>(key: string, factory: StateFactory<T>) => {
 // Reset du cache entre chaque test pour éviter les fuites
 beforeEach(async () => {
   stateCache.clear()
+  resetPersistedStates()
   // Base IndexedDB neuve pour chaque test
   await closeCodexDB()
   globalThis.indexedDB = new IDBFactory()
