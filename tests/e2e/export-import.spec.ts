@@ -161,6 +161,23 @@ test.describe('Export, import et restauration', () => {
     await expect(page.getByRole('heading', { name: 'Fiches de départ supprimées' })).toHaveCount(0)
   })
 
+  test('accueil et menu : ni transfert ni réception de fiche ; import discret en bas de l\'accueil', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByText('6 personnages consignés')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Recevoir une fiche' })).toHaveCount(0)
+    const importButton = page.getByRole('button', { name: 'Importer une fiche' })
+    await expect(importButton).toBeVisible()
+    // Après la liste des fiches, pas dans l'en-tête
+    const header = page.locator('header').first()
+    expect(await header.getByRole('button', { name: 'Importer une fiche' }).count()).toBe(0)
+
+    await page.goto('/personnages/dareth-brumeval')
+    await openMenu(page)
+    const menu = page.locator('[data-actions-menu]').filter({ visible: true })
+    await expect(menu.getByRole('button', { name: 'Exporter (fichier)' })).toBeVisible()
+    await expect(menu.getByRole('button', { name: 'Transférer' })).toHaveCount(0)
+  })
+
   test('menu : Échap le ferme et rend le focus au bouton', async ({ page }) => {
     await page.goto('/personnages/dareth-brumeval')
     await openMenu(page)
