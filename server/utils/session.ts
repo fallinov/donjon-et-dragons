@@ -117,6 +117,11 @@ export async function enforceSetupLimit(event: H3Event, store: AccountStore, now
   await enforce(store, [[`setup:${sha256(`codex-setup:ip:${clientIp(event)}`)}`, LOGIN_LIMITS.setup]], now)
 }
 
+/** Limite par compte et par heure d'une action (ex. envois de synchronisation) ; 429 au-delà. */
+export async function enforceAccountLimit(store: AccountStore, action: string, userId: string, limit: number, now = new Date()): Promise<void> {
+  await enforce(store, [[`${action}:${sha256(`codex-${action}:${userId}`)}`, limit]], now)
+}
+
 /** Limite les essais du mot de passe actuel par compte (session volée). */
 export async function enforcePasswordLimit(store: AccountStore, userId: string, now = new Date()): Promise<void> {
   await enforce(store, [[`password:${sha256(`codex-password:${userId}`)}`, LOGIN_LIMITS.password]], now)

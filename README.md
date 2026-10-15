@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 289 tests) + Playwright (e2e, 158 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 310 tests) + Playwright (e2e, 164 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -145,9 +145,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 289 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 310 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 158 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 164 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
 pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne, /api hors service worker (port 3211)
 ```
@@ -239,6 +239,29 @@ Connexion par identifiant et mot de passe (issue #53). Le **master** crée les c
 | `server/api/setup.*`, `server/api/auth/*`, `server/api/users/*` | installation, connexion, déconnexion, compte courant, mot de passe, gestion des comptes (création, renommage, rôle, réinitialisation, suppression) |
 | `app/composables/useAuth.ts` | compte connecté (`useState`), appels à l'API, erreurs traduites |
 | `app/pages/connexion.vue`, `mot-de-passe.vue`, `installation.vue`, `comptes.vue` | pages des comptes ; `app/middleware/auth.global.ts` protège `/comptes` et impose le changement d'un mot de passe provisoire |
+
+### API de synchronisation (serveur)
+
+Les fiches sont stockées sur le serveur, une ligne par fiche. Une fiche a trois parties datées : la fiche elle-même, l'état de jeu (PV, emplacements…) et le sac. **La dernière modification gagne, partie par partie** : des PV joués à la table n'écrasent pas une fiche modifiée sur l'ordinateur. Le portrait est stocké à part ; un appareil ne le télécharge que si son empreinte a changé. L'app ne s'en sert pas encore : ce sera la PR 3 (#53).
+
+| Route | Rôle |
+|---|---|
+| `GET /api/sync?since=N` | fiches modifiées depuis le curseur `N` (0 : toutes), par pages de 20, avec propriétaire et dates |
+| `POST /api/sync` | modifications `{ id, part: sheet \| state \| inventory \| delete, data, changedAt }`, au plus 50 ; résultat par modification : `applied`, `stale` (plus ancienne que le serveur), `forbidden`, `invalid`, `notFound` |
+| `GET /api/portraits/:id` | portrait (ETag = empreinte ; `nosniff` et CSP `sandbox`) |
+| `PATCH /api/characters/:id/owner` | attribuer une fiche à un compte (master) ; `null` : fiche du groupe |
+| `GET /api/members` | membres du groupe (identifiant, rôle), pour afficher le propriétaire d'une fiche |
+
+Règles :
+- chaque compte connecté **lit** toutes les fiches ; un joueur **modifie** les siennes, un master toutes ;
+- une nouvelle fiche appartient à celui qui l'envoie ; les fiches de départ ne peuvent être créées que par un master ;
+- une fiche reçue passe par la même lecture stricte qu'un fichier importé (`parseCharacterFile`) ;
+- une date de modification à plus d'une minute dans le futur est ramenée à l'heure du serveur ;
+- plafonds : fiche 100 Ko (hors portrait), portrait 1,5 Mo (JPEG, PNG ou WebP reconnus à leur contenu, jamais de SVG), sac 50 Ko, 20 fiches par joueur, 1 200 envois par heure et par compte ; un joueur ne crée que des fiches à identifiant UUID ;
+- une suppression efface les données (la ligne reste pour prévenir les autres appareils) ; une fiche envoyée après la suppression la fait revenir ;
+- compte supprimé : ses fiches reviennent au groupe.
+
+Fichiers : `server/utils/syncRules.ts` (règles pures), `server/utils/syncStore.ts` (Neon ou mémoire), `shared/types/sync.ts`.
 
 ## Déploiement
 
