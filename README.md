@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 281 tests) + Playwright (e2e, 156 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 283 tests) + Playwright (e2e, 158 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -145,9 +145,9 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 281 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 283 tests (stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
-pnpm test:e2e         # Playwright e2e — 156 tests (chromium desktop + mobile safari)
+pnpm test:e2e         # Playwright e2e — 158 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
 pnpm test:e2e:pwa     # Playwright sur build de production : manifeste, hors ligne, /api hors service worker (port 3211)
 ```
@@ -221,7 +221,7 @@ Connexion par identifiant et mot de passe (issue #53). Le **master** crée les c
 
 **Parcours** :
 1. **Installation**, une seule fois : `/installation` crée le compte master. En ligne, le code d'installation est demandé (variable `SETUP_CODE` à définir dans Vercel) ; la page ne fonctionne plus dès qu'un compte existe.
-2. **Comptes** (`/comptes`, master) : créer un compte joueur affiche un mot de passe provisoire (`K7P4-QX9M-3HDE`), une seule fois. **Réinitialiser** en donne un nouveau et déconnecte le joueur de tous ses appareils ; **Supprimer** retire le compte.
+2. **Comptes** (`/comptes`, master) : créer un compte joueur affiche un mot de passe provisoire (`K7P4-QX9M-3HDE`), une seule fois. Sur chaque compte : **Renommer** (le sien compris), **Passer master** / **Passer joueur** (le groupe garde toujours au moins un master), **Réinitialiser** (nouveau mot de passe provisoire, déconnexion de tous ses appareils) et **Supprimer**. Tous les masters ont les mêmes droits ; un master ne peut ni se supprimer ni réinitialiser son propre mot de passe.
 3. **Connexion** (`/connexion`, lien en bas de l'accueil). Avec un mot de passe provisoire, l'app impose d'abord d'en choisir un nouveau (`/mot-de-passe`).
 
 **Sécurité** :
@@ -236,7 +236,7 @@ Connexion par identifiant et mot de passe (issue #53). Le **master** crée les c
 | `server/utils/database.ts` | client Neon partagé, migrations numérotées (`schema_migrations`), compteurs de limitation |
 | `server/utils/accountStore.ts` | comptes et sessions, Neon ou mémoire (local, e2e) |
 | `server/utils/accountRules.ts`, `password.ts`, `session.ts` | règles (identifiant, mot de passe, durées), scrypt, cookie de session et contrôles d'accès |
-| `server/api/setup.*`, `server/api/auth/*`, `server/api/users/*` | installation, connexion, déconnexion, compte courant, mot de passe, gestion des comptes |
+| `server/api/setup.*`, `server/api/auth/*`, `server/api/users/*` | installation, connexion, déconnexion, compte courant, mot de passe, gestion des comptes (création, renommage, rôle, réinitialisation, suppression) |
 | `app/composables/useAuth.ts` | compte connecté (`useState`), appels à l'API, erreurs traduites |
 | `app/pages/connexion.vue`, `mot-de-passe.vue`, `installation.vue`, `comptes.vue` | pages des comptes ; `app/middleware/auth.global.ts` protège `/comptes` et impose le changement d'un mot de passe provisoire |
 

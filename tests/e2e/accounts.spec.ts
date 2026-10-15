@@ -123,6 +123,45 @@ test.describe('Comptes', () => {
     await player.dispose()
   })
 
+  test('le master renomme un joueur puis le passe master, et inversement', async ({ page, playwright }) => {
+    await apiLogin(page.request, MASTER.username, MASTER.password)
+    const account = await createPlayer(page.request, 'kael')
+    const other = await createPlayer(page.request, 'jerome')
+    const player = await playwright.request.newContext({ baseURL: 'http://localhost:3210' })
+    await apiLogin(player, account.username, account.password)
+    expect((await player.post('/api/auth/password', { data: { current: account.password, next: 'kael-draven' } })).status()).toBe(200)
+
+    await page.goto('/comptes')
+    const row = page.locator(`[data-account="${account.username}"]`)
+    await row.getByRole('button', { name: 'Renommer' }).click()
+    const field = row.getByLabel(`Nouvel identifiant de ${account.username}`)
+    await field.fill(other.username)
+    await row.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(page.locator('[data-list-error]')).toHaveText('Cet identifiant est déjà pris.')
+
+    const renamed = `${account.username}-r`
+    await field.fill(renamed)
+    await row.getByRole('button', { name: 'Enregistrer' }).click()
+    const renamedRow = page.locator(`[data-account="${renamed}"]`)
+    await expect(renamedRow).toBeVisible()
+    // Le joueur reste connecté ; il se reconnecte avec son nouvel identifiant
+    expect(await (await player.get('/api/auth/me')).json()).toMatchObject({ user: { username: renamed } })
+    expect((await player.post('/api/auth/login', { data: { username: account.username, password: 'kael-draven' } })).status()).toBe(401)
+    await apiLogin(player, renamed, 'kael-draven')
+
+    expect((await player.get('/api/users')).status()).toBe(403)
+    await renamedRow.getByRole('button', { name: `Passer ${renamed} en master` }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Passer master' }).click()
+    await expect(renamedRow).toContainText('Master')
+    expect((await player.get('/api/users')).status()).toBe(200)
+
+    await renamedRow.getByRole('button', { name: `Passer ${renamed} en joueur` }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Passer joueur' }).click()
+    await expect(renamedRow).toContainText('Joueur')
+    expect((await player.get('/api/users')).status()).toBe(403)
+    await player.dispose()
+  })
+
   test('protection CSRF : autre origine refusée, JSON obligatoire', async ({ request }) => {
     const data = { username: MASTER.username, password: MASTER.password }
     expect((await request.post('/api/auth/login', { data, headers: { Origin: 'https://evil.example' } })).status()).toBe(403)

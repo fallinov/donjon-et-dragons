@@ -126,6 +126,29 @@ describe('stockage mémoire des comptes', () => {
   })
 })
 
+describe('renommer et changer de rôle', () => {
+  it('identifiant déjà pris refusé, renommage en lui-même accepté', async () => {
+    const store = createMemoryAccountStore()
+    const juan = (await store.createUser({ username: 'juan', passwordHash: 'h', role: 'player', mustChangePassword: false }))!
+    await store.createUser({ username: 'thunon', passwordHash: 'h', role: 'player', mustChangePassword: false })
+    expect(await store.updateUser(juan.id, { username: 'thunon' })).toBe('taken')
+    expect(await store.updateUser(juan.id, { username: 'juan' })).toMatchObject({ username: 'juan' })
+    expect(await store.updateUser(juan.id, { username: 'juan-t' })).toMatchObject({ username: 'juan-t', passwordHash: 'h' })
+    expect(await store.findByUsername('juan')).toBeNull()
+    expect(await store.updateUser('inconnu', { username: 'x' })).toBeNull()
+  })
+
+  it('le groupe garde toujours au moins un master', async () => {
+    const store = createMemoryAccountStore()
+    const steve = (await store.createFirstMaster({ username: 'steve', passwordHash: 'h' }))!
+    const myriam = (await store.createUser({ username: 'myriam', passwordHash: 'h', role: 'player', mustChangePassword: false }))!
+    expect(await store.updateUser(steve.id, { role: 'player' })).toBe('lastMaster')
+    expect(await store.updateUser(myriam.id, { role: 'master' })).toMatchObject({ role: 'master' })
+    expect(await store.updateUser(steve.id, { role: 'player' })).toMatchObject({ role: 'player' })
+    expect(await store.updateUser(myriam.id, { role: 'player' })).toBe('lastMaster')
+  })
+})
+
 describe('migrations', () => {
   it('chaque instruction peut être rejouée (IF NOT EXISTS)', () => {
     for (const statement of MIGRATIONS.flat()) expect(statement).toMatch(/IF NOT EXISTS/)

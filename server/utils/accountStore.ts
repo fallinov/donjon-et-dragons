@@ -15,6 +15,11 @@ export interface NewUser {
   mustChangePassword: boolean
 }
 
+export interface UserChanges {
+  username?: string
+  role?: Role
+}
+
 export interface StoredSession {
   user: StoredUser
   expiresAt: Date
@@ -33,6 +38,11 @@ export interface AccountStore {
   listUsers: () => Promise<AccountSummary[]>
   setPassword: (id: string, passwordHash: string, mustChangePassword: boolean) => Promise<boolean>
   deleteUser: (id: string) => Promise<boolean>
+  /**
+   * Renomme et/ou change le rôle. `taken` : identifiant déjà pris ; `lastMaster` : le groupe
+   * garderait zéro master ; null : compte introuvable.
+   */
+  updateUser: (id: string, changes: UserChanges) => Promise<StoredUser | 'taken' | 'lastMaster' | null>
   createSession: (tokenHash: string, userId: string, expiresAt: Date) => Promise<void>
   /** Session non expirée et son compte, ou null. */
   findSession: (tokenHash: string, now: Date) => Promise<StoredSession | null>
@@ -92,6 +102,16 @@ export function createMemoryAccountStore(): AccountStore {
       for (const [hash, session] of sessions) if (session.userId === id) sessions.delete(hash)
       return users.delete(id)
     },
+    async updateUser(id, changes) {
+      const user = users.get(id)
+      if (!user) return null
+      if (changes.username !== undefined && changes.username !== user.username && byUsername(changes.username)) return 'taken'
+      const masters = [...users.values()].filter(u => u.role === 'master').length
+      if (user.role === 'master' && changes.role === 'player' && masters <= 1) return 'lastMaster'
+      const updated = { ...user, ...changes }
+      users.set(id, updated)
+      return updated
+    },
     async createSession(tokenHash, userId, expiresAt) {
       sessions.set(tokenHash, { userId, expiresAt, lastSeenAt: new Date() })
     },
@@ -145,6 +165,8 @@ const fromRow = (row: UserRow): StoredUser => ({
 
 /** Verrou de la création du premier master : deux installations simultanées n'en créent qu'un. */
 const SETUP_LOCK = 4_247_002
+/** Verrou des changements de rôle : le groupe garde toujours au moins un master. */
+const ROLE_LOCK = 4_247_003
 
 export function createNeonAccountStore(sql: Sql): AccountStore {
   const schema = () => ensureSchema(sql)
@@ -199,6 +221,31 @@ export function createNeonAccountStore(sql: Sql): AccountStore {
       await schema()
       // Les sessions du compte disparaissent avec lui (ON DELETE CASCADE)
       return (await sql.query('DELETE FROM users WHERE id = $1 RETURNING id', [id])).length === 1
+    },
+    async updateUser(id, changes) {
+      await schema()
+      try {
+        const [, rows] = await sql.transaction([
+          // Deux masters qui se rétrogradent en même temps : l'un attend l'autre, il en reste un
+          sql.query('SELECT pg_advisory_xact_lock($1)', [ROLE_LOCK]),
+          sql.query(
+            `UPDATE users SET username = COALESCE($2, username), role = COALESCE($3, role)
+             WHERE id = $1 AND NOT (
+               role = 'master' AND $3 = 'player'
+               AND (SELECT count(*) FROM users WHERE role = 'master') <= 1
+             )
+             RETURNING ${USER_COLUMNS}`,
+            [id, changes.username ?? null, changes.role ?? null],
+          ),
+        ]) as [unknown, UserRow[]]
+        if (rows[0]) return fromRow(rows[0])
+        return (await one(`SELECT ${USER_COLUMNS} FROM users WHERE id = $1`, [id])) ? 'lastMaster' : null
+      }
+      catch (error) {
+        // Contrainte UNIQUE sur l'identifiant
+        if ((error as { code?: string }).code === '23505') return 'taken'
+        throw error
+      }
     },
     async createSession(tokenHash, userId, expiresAt) {
       await schema()

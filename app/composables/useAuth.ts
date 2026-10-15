@@ -1,4 +1,4 @@
-import type { AccountSummary, PublicUser } from '~~/shared/types/account'
+import type { AccountSummary, PublicUser, Role } from '~~/shared/types/account'
 import type { MessageKey } from '~/composables/useT'
 
 export type AuthResult<T = undefined> = { ok: true, value: T } | { ok: false, error: MessageKey, status?: number }
@@ -105,5 +105,11 @@ export const accountsApi = {
     return result
   },
   resetPassword: (id: string) => callApi<{ password: string }>(`/api/users/${encodeURIComponent(id)}/reset-password`, 'POST', {}),
+  async update(id: string, changes: { username?: string, role?: Role }): Promise<AuthResult<{ user: PublicUser }>> {
+    const result = await callApi<{ user: PublicUser }>(`/api/users/${encodeURIComponent(id)}`, 'PATCH', changes)
+    if (!result.ok && result.status === 409) return fail(changes.username ? 'accounts.error.taken' : 'accounts.error.lastMaster', 409)
+    if (!result.ok && result.status === 400) return fail('auth.error.username', 400)
+    return result
+  },
   remove: (id: string) => callApi<{ ok: true }>(`/api/users/${encodeURIComponent(id)}`, 'DELETE'),
 }

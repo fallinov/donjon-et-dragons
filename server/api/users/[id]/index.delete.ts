@@ -1,7 +1,10 @@
 import { isUserId } from '../../../utils/accountRules'
 import { requireAccountStore, requireMaster } from '../../../utils/session'
 
-/** Suppression d'un compte joueur (master) ; le compte master ne peut pas se supprimer lui-même. */
+/**
+ * Suppression d'un autre compte, joueur ou master (master). Un master ne peut pas se supprimer
+ * lui-même : le groupe garde donc toujours au moins un master.
+ */
 export default defineEventHandler(async (event) => {
   const store = requireAccountStore()
   const { user: master } = await requireMaster(event, store)

@@ -2,7 +2,7 @@ import { generatePassword, isUserId } from '../../../utils/accountRules'
 import { hashPassword } from '../../../utils/password'
 import { requireAccountStore, requireMaster } from '../../../utils/session'
 
-/** Nouveau mot de passe provisoire pour un joueur (master) ; ses sessions sont fermées. */
+/** Nouveau mot de passe provisoire pour un autre compte, joueur ou master (master) ; ses sessions sont fermées. */
 export default defineEventHandler(async (event) => {
   // Réponse contenant un mot de passe provisoire : jamais mise en cache
   setResponseHeader(event, 'Cache-Control', 'no-store')
