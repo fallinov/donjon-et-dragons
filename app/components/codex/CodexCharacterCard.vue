@@ -7,7 +7,8 @@ import { t } from '~/composables/useT'
 const props = defineProps<{ character: Character }>()
 const portraitUrl = useObjectUrl(() => props.character.portrait)
 
-const cardRef = ref<HTMLElement>()
+// NuxtLink est un composant : l'élément DOM est dans $el
+const cardRef = ref<{ $el: HTMLElement }>()
 const fogAnimating = ref(false)
 const fogRevealed = ref(false)
 let observer: IntersectionObserver | null = null
@@ -17,7 +18,7 @@ onMounted(() => {
   if (!el) return
   observer = new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting) {
+      if (entry?.isIntersecting) {
         fogAnimating.value = true
         setTimeout(() => { fogRevealed.value = true }, 300)
         observer?.disconnect()
