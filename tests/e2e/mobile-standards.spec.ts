@@ -119,6 +119,15 @@ const screens: { name: string, url: string, prepare?: (page: Page) => Promise<vo
     await p.getByRole('button', { name: 'Autres actions' }).click()
     await p.getByRole('button', { name: 'Supprimer' }).click()
   } },
+  { name: 'boîte de transfert (code affiché)', url: '/personnages/dareth-brumeval', prepare: async (p) => {
+    await p.getByRole('button', { name: 'Autres actions' }).click()
+    await p.getByRole('button', { name: 'Transférer' }).click()
+    await p.locator('dialog[open] [data-transfer-code]').waitFor({ timeout: 15_000 })
+  } },
+  { name: 'recevoir une fiche (code inconnu)', url: '/recevoir#ZZZZZZZZ', prepare: async (p) => {
+    await p.getByRole('button', { name: /^Recevoir/ }).click()
+    await p.locator('[data-receive-error]').waitFor()
+  } },
   { name: 'accueil avec fiche de départ supprimée et erreur d\'import', url: '/', prepare: async (p) => {
     await p.goto('/personnages/zanna')
     await p.getByRole('button', { name: 'Autres actions' }).click()
