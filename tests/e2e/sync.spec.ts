@@ -103,6 +103,8 @@ test.describe('Synchronisation des fiches', () => {
   test('déconnexion : les fiches sont retirées de l\'appareil et reviennent à la connexion', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByText('6 personnages consignés')).toBeVisible()
+    // Première synchronisation finie : les fiches de départ n'entrent dans l'outbox qu'à la fusion
+    await expect.poll(async () => (await (await page.request.get('/api/sync?since=0')).json() as { rows: unknown[] }).rows.length, { timeout: 20_000 }).toBe(6)
     await expect.poll(() => outboxCount(page), { timeout: 20_000 }).toBe(0)
     await page.locator('[data-auth-bar]').getByRole('button', { name: 'Se déconnecter' }).click()
     await page.getByRole('dialog').getByRole('button', { name: 'Se déconnecter' }).click()

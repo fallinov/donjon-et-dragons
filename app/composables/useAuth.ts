@@ -1,7 +1,7 @@
 import type { AccountSummary, PublicUser, Role } from '~~/shared/types/account'
 import type { MessageKey } from '~/composables/useT'
 import { resetPersistedStates } from '~/composables/persistState'
-import { stopSync } from '~/composables/useSync'
+import { resumeSync, stopSync } from '~/composables/useSync'
 import { clearLocalData, getMeta, getSessionCache, setSessionCache } from '~/db/syncRepository'
 
 export type AuthResult<T = undefined> = { ok: true, value: T } | { ok: false, error: MessageKey, status?: number }
@@ -98,8 +98,13 @@ export function useAuth() {
    * (un appareil peut être partagé). Hors ligne, rien n'est effacé : la session resterait ouverte.
    */
   async function logout(): Promise<AuthResult> {
+    // Plus aucun envoi pendant la déconnexion : refusé (401), il passerait pour une session expirée
+    await stopSync()
     const result = await callApi('/api/auth/logout', 'POST', {})
-    if (!result.ok) return result
+    if (!result.ok) {
+      resumeSync()
+      return result
+    }
     await forgetDevice()
     user.value = null
     return { ok: true, value: undefined }

@@ -284,10 +284,13 @@ let generation = 0
 let timer: ReturnType<typeof setTimeout> | null = null
 let stopLoop: (() => void) | null = null
 let trigger: (() => Promise<void>) | null = null
+/** Relance de la dernière boucle arrêtée (déconnexion refusée). */
+let restart: (() => void) | null = null
 
 /** Synchronisation en arrière-plan pour le compte connecté ; renvoie la fonction d'arrêt. */
 export function startSync(user: PublicUser, onUnauthorized: () => void): () => void {
   stopLoop?.()
+  restart = () => startSync(user, onUnauthorized)
   const mine = generation
   const alive = () => generation === mine
   const run = (): Promise<void> => {
@@ -347,6 +350,11 @@ export async function stopSync(): Promise<void> {
   stopLoop?.()
   generation++
   await running?.catch(() => undefined)
+}
+
+/** Reprend la synchronisation arrêtée par `stopSync` (la déconnexion a échoué, le compte reste). */
+export function resumeSync(): void {
+  if (!stopLoop) restart?.()
 }
 
 /** Synchronisation immédiate (après une attribution, par exemple) ; attend la fin. */
