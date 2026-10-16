@@ -27,7 +27,7 @@ Bibliothèque de fiches de personnages **D&D 5e** en codex médiévaux (parchemi
 - **État interactif persisté** : composable `useCharacterState` singleton (HP, inspiration, repos, jets de mort, slots multi-niveaux, sorts daily) via `useState` Nuxt, enregistré dans IndexedDB à chaque changement
 - **Sac persisté** : composable `useInventory` (équipement, argent, notes), modifiable et enregistré dans IndexedDB
 - **Éditeur de fiche** : création, modification et suppression sur l'appareil (`/personnages/nouveau`, `/personnages/<id>/modifier`), validation structurelle, confirmation avant de quitter sans enregistrer
-- **Tests** : Vitest (unit, 299 tests) + Playwright (e2e, 146 tests, chromium desktop + mobile safari)
+- **Tests** : Vitest (unit, 301 tests) + Playwright (e2e, 146 tests, chromium desktop + mobile safari)
 - **Déploiement** : Vercel (Nitro preset) via `vercel.json`
 
 ## Structure
@@ -140,7 +140,7 @@ pnpm typecheck        # vérification TS stricte
 ## Tests
 
 ```bash
-pnpm test             # Vitest (unit) — 299 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
+pnpm test             # Vitest (unit) — 301 tests (requêtes SQL sur PGlite, stockage IndexedDB, composables d'état et de sac, dataset, composants, swipe)
 pnpm test:watch       # Vitest en mode watch
 pnpm test:e2e         # Playwright e2e — 146 tests (chromium desktop + mobile safari)
                       # dont mobile-standards.spec.ts : normes smartphone (débordement, 44 px, tailles, contraste 7:1) sur tous les écrans
@@ -163,7 +163,7 @@ Le composable [`app/composables/useCharacterState.ts`](app/composables/useCharac
 Le composable [`app/composables/useInventory.ts`](app/composables/useInventory.ts) gère l'équipement, les cinq pièces et les notes :
 
 - **Point de départ** : champ optionnel `inventory` des fiches de départ (`equipment`, `coins`, `notes`), copié dans le sac au premier lancement. Une fiche créée sur l'appareil démarre avec un sac vide.
-- **Persistance** : store IndexedDB `inventories`, clé = identifiant de la fiche. Propre à chaque appareil, non synchronisé.
+- **Persistance** : store IndexedDB `inventories`, clé = identifiant de la fiche. Synchronisé avec le compte (partie « sac » de la fiche, voir Synchronisation dans l'app).
 - **Affichage** : cinquième onglet « Sac » sur mobile, section sous les rites sur ordinateur. Non imprimé.
 - **Robustesse** : une sauvegarde abîmée est nettoyée, une quantité à 0 retire l'objet.
 
@@ -223,7 +223,7 @@ Connexion par identifiant et mot de passe, **obligatoire** (issue #53). Le **mas
 - **Droits** (`useOwnership`) : un master modifie tout ; un joueur, ses fiches. Fiche d'un autre : mention « Fiche de X — lecture seule », zone de jeu désactivée (`CodexLock`, un `fieldset disabled`), ni Modifier, ni Restaurer, ni Supprimer. Importer la fiche d'un autre en fait une copie à soi.
 - **Première connexion d'un compte sur l'appareil** : une fiche déjà présente et modifiée ici part sur le serveur si le compte peut l'écrire, sinon elle devient une copie à soi ; les autres prennent la version du serveur. Le premier master envoie les 6 fiches de départ.
 - **Attribution** : `/comptes` → section Fiches, un propriétaire par fiche (ou « Groupe (masters) »).
-- **Déconnexion** : les fiches sont retirées de l'appareil (il peut être partagé) ; confirmation, avec un avertissement si des modifications n'ont pas encore été envoyées.
+- **Déconnexion** : la synchronisation s'arrête d'abord (elle reprend si la déconnexion échoue, hors ligne), puis les fiches sont retirées de l'appareil (il peut être partagé) ; confirmation, avec un avertissement si des modifications n'ont pas encore été envoyées.
 
 ### API de synchronisation (serveur)
 
