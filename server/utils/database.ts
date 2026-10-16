@@ -1,5 +1,5 @@
 import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
-import { rateWindow } from './transferRules'
+import { rateWindow } from './rateLimit'
 
 export type Sql = NeonQueryFunction<false, false>
 
@@ -9,7 +9,7 @@ export type Sql = NeonQueryFunction<false, false>
  * (IF NOT EXISTS) : deux fonctions démarrées en même temps peuvent appliquer la même version.
  */
 export const MIGRATIONS: readonly (readonly string[])[] = [
-  // 1. Relais de transfert (tables créées avant l'existence des migrations)
+  // 1. Relais de transfert (tables créées avant l'existence des migrations ; `transfers` supprimée en 4)
   [
     `CREATE TABLE IF NOT EXISTS transfers (
       id text PRIMARY KEY,
@@ -67,7 +67,8 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
       mime text NOT NULL,
       base64 text NOT NULL
     )`,
-  ],
+  ],  // 4. Transfert par code retiré (la synchronisation le remplace, #56)
+  ['DROP TABLE IF EXISTS transfers'],
 ]
 
 /** Verrou pris pendant chaque migration : une seule fonction à la fois modifie le schéma. */

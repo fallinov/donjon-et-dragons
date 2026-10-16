@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 import type { AccountSummary, PublicUser, Role } from '~~/shared/types/account'
 import { ensureSchema, hitRateLimit, useSql, type Sql } from './database'
 import { e2eTenant, tenantStore } from './e2eTenant'
-import { rateWindow } from './transferRules'
+import { rateWindow } from './rateLimit'
 
 export interface StoredUser extends PublicUser {
   passwordHash: string
@@ -52,7 +52,8 @@ export interface AccountStore {
   deleteSession: (tokenHash: string) => Promise<void>
   /** Ferme les sessions d'un compte, sauf éventuellement la session courante. */
   deleteSessions: (userId: string, keepTokenHash?: string) => Promise<void>
-  deleteExpiredSessions: (now: Date) => Promise<void>
+  /** Supprime les sessions expirées et les compteurs de limitation des heures passées. */
+  deleteExpired: (now: Date) => Promise<void>
   /** Incrémente le compteur de la fenêtre courante (une heure) et renvoie sa nouvelle valeur. */
   hit: (key: string, now: Date) => Promise<number>
 }
@@ -133,8 +134,10 @@ export function createMemoryAccountStore(): AccountStore {
     async deleteSessions(userId, keepTokenHash) {
       for (const [hash, session] of sessions) if (session.userId === userId && hash !== keepTokenHash) sessions.delete(hash)
     },
-    async deleteExpiredSessions(now) {
+    async deleteExpired(now) {
       for (const [hash, session] of sessions) if (session.expiresAt <= now) sessions.delete(hash)
+      const current = rateWindow(now).getTime()
+      for (const key of counters.keys()) if (Number(key.split('|').at(-1)) < current) counters.delete(key)
     },
     async hit(key, now) {
       const bucket = `${key}|${rateWindow(now).getTime()}`
@@ -277,9 +280,12 @@ export function createNeonAccountStore(sql: Sql): AccountStore {
       await schema()
       await sql.query('DELETE FROM sessions WHERE user_id = $1 AND token_hash <> $2', [userId, keepTokenHash ?? ''])
     },
-    async deleteExpiredSessions(now) {
+    async deleteExpired(now) {
       await schema()
-      await sql.query('DELETE FROM sessions WHERE expires_at <= $1', [now.toISOString()])
+      await sql.transaction([
+        sql.query('DELETE FROM sessions WHERE expires_at <= $1', [now.toISOString()]),
+        sql.query('DELETE FROM rate_limits WHERE window_start < $1', [rateWindow(now).toISOString()]),
+      ])
     },
     async hit(key, now) {
       return hitRateLimit(sql, key, now)

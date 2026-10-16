@@ -78,20 +78,6 @@ async function restore(slug: string): Promise<void> {
         >
           <span aria-hidden="true">+</span> {{ t('actions.newCharacter') }}
         </NuxtLink>
-        <button
-          v-if="status === 'ready'"
-          type="button"
-          class="mt-3 ml-0 inline-flex min-h-11 items-center gap-2 border border-gold/30 px-5 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright hover:border-gold/60 transition-colors disabled:opacity-50 sm:mt-6 sm:ml-3"
-          :disabled="importing"
-          data-import-button
-          @click="importInput?.click()"
-        >{{ t('import.button') }}</button>
-        <NuxtLink
-          v-if="status === 'ready'"
-          to="/recevoir"
-          class="mt-3 ml-0 inline-flex min-h-11 items-center gap-2 border border-gold/30 px-5 font-display text-sm tracking-wider-2 uppercase text-parchment-dim hover:text-gold-bright hover:border-gold/60 transition-colors sm:mt-6 sm:ml-3"
-          data-receive-link
-        >{{ t('transfer.receive.button') }}</NuxtLink>
         <input
           ref="importInput"
           type="file"
@@ -102,8 +88,7 @@ async function restore(slug: string): Promise<void> {
           data-import-input
           @change="onImport"
         >
-        <p v-if="importError" role="alert" class="mx-auto mt-4 max-w-md text-ember-light" data-import-error>{{ t(importError) }}</p>
-        <p v-else-if="status === 'error'" class="mt-4 text-ember-light italic" role="alert">
+        <p v-if="status === 'error'" class="mt-4 text-ember-light italic" role="alert">
           {{ t('home.loadError') }}
         </p>
       </header>
@@ -139,6 +124,18 @@ async function restore(slug: string): Promise<void> {
           </li>
         </ul>
       </section>
+
+      <p class="mt-12 text-center">
+        <button
+          v-if="status === 'ready'"
+          type="button"
+          class="min-h-11 px-3 text-sm text-parchment-dim underline underline-offset-4 hover:text-gold-bright disabled:opacity-50"
+          :disabled="importing"
+          data-import-button
+          @click="importInput?.click()"
+        >{{ t('import.button') }}</button>
+      </p>
+      <p v-if="importError" role="alert" class="mx-auto mt-2 max-w-md text-center text-ember-light" data-import-error>{{ t(importError) }}</p>
 
       <AuthBar />
     </div>

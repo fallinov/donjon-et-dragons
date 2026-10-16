@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it } from 'vitest'
 import type { PGlite } from '@electric-sql/pglite'
 import { createNeonAccountStore } from '~~/server/utils/accountStore'
 import { ensureSchema, MIGRATIONS } from '~~/server/utils/database'
-import { createNeonStore } from '~~/server/utils/transferStore'
 import { createTestSql } from '../../helpers/pgliteSql'
 
 // Vraies requêtes SQL des stores Neon, exécutées sur PGlite (Postgres embarqué)
@@ -92,13 +91,21 @@ describe('comptes sur Postgres', () => {
     expect(await store.deleteUser(user.id)).toBe(false)
   })
 
-  it('compteurs de limitation partagés avec le relais', async () => {
-    const sql = await setup()
-    const accounts = createNeonAccountStore(sql)
-    const transfers = createNeonStore(sql)
+  it('compteurs de limitation par heure, purgés avec les sessions expirées', async () => {
+    const store = createNeonAccountStore(await setup())
     const now = new Date('2026-10-15T10:20:00Z')
-    expect(await accounts.hit('k', now)).toBe(1)
-    expect(await transfers.hit('k', now)).toBe(2)
-    expect(await accounts.hit('k', new Date('2026-10-15T11:00:00Z'))).toBe(1)
+    expect(await store.hit('k', now)).toBe(1)
+    expect(await store.hit('k', now)).toBe(2)
+    expect(await store.hit('k', new Date('2026-10-15T11:00:00Z'))).toBe(1)
+    await store.deleteExpired(new Date('2026-10-15T11:30:00Z'))
+    expect(await store.hit('k', now)).toBe(1)
+  })
+
+  it('migration 4 : la table du transfert par code est supprimée', async () => {
+    const sql = await setup()
+    await ensureSchema(sql)
+    const tables = await sql.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`) as { table_name: string }[]
+    expect(tables.map(t => t.table_name)).not.toContain('transfers')
+    expect(tables.map(t => t.table_name)).toEqual(expect.arrayContaining(['users', 'sessions', 'characters', 'portraits', 'rate_limits']))
   })
 })
