@@ -39,7 +39,6 @@ Features inspirées de [D&D Beyond](https://www.dndbeyond.com/) pour transformer
 
 Ne pas implémenter — ça transformerait le codex en gestionnaire d'état complet type D&D Beyond :
 
-- Gestion de compte utilisateur / multi-joueurs
 - Import DDB / sync API
 - Combat tracker multi-personnages (MJ screen)
 - Build / level up (progression de classe)

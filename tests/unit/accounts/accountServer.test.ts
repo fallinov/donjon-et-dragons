@@ -108,7 +108,7 @@ describe('stockage mémoire des comptes', () => {
     expect(await store.deleteUser(user.id)).toBe(false)
   })
 
-  it('mot de passe remplacé, sessions expirées purgées, compteur par heure', async () => {
+  it('mot de passe remplacé, sessions et compteurs expirés purgés, compteur par heure', async () => {
     const store = createMemoryAccountStore()
     const user = (await store.createUser(newPlayer('normand')))!
     expect(await store.setPassword(user.id, 'h2', false)).toBe(true)
@@ -117,12 +117,16 @@ describe('stockage mémoire des comptes', () => {
 
     const now = new Date('2026-10-15T10:00:00Z')
     await store.createSession('old', user.id, now)
-    await store.deleteExpiredSessions(now)
+    await store.deleteExpired(now)
     expect(await store.findSession('old', new Date(0))).toBeNull()
 
     expect(await store.hit('k', now)).toBe(1)
     expect(await store.hit('k', now)).toBe(2)
     expect(await store.hit('k', new Date('2026-10-15T11:00:00Z'))).toBe(1)
+    // Compteurs des heures passées purgés : l'heure courante est gardée
+    await store.deleteExpired(new Date('2026-10-15T11:30:00Z'))
+    expect(await store.hit('k', new Date('2026-10-15T11:00:00Z'))).toBe(2)
+    expect(await store.hit('k', now)).toBe(1)
   })
 })
 
@@ -150,8 +154,8 @@ describe('renommer et changer de rôle', () => {
 })
 
 describe('migrations', () => {
-  it('chaque instruction peut être rejouée (IF NOT EXISTS)', () => {
-    for (const statement of MIGRATIONS.flat()) expect(statement).toMatch(/IF NOT EXISTS/)
+  it('chaque instruction peut être rejouée (IF NOT EXISTS, IF EXISTS)', () => {
+    for (const statement of MIGRATIONS.flat()) expect(statement).toMatch(/IF (NOT )?EXISTS/)
     expect(MIGRATIONS.flat().some(s => s.includes('CREATE TABLE IF NOT EXISTS users'))).toBe(true)
   })
 })

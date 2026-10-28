@@ -38,7 +38,7 @@ export default defineNuxtConfig({
       // Exclus : portraits (copiés dans IndexedDB au premier lancement), icônes et favicons (gardés par le système)
       globPatterns: ['**/*.{js,css,html,woff2,svg}', 'img/fog*.png'],
       cleanupOutdatedCaches: true,
-      // L'API du relais ne passe jamais par la coquille hors ligne
+      // L'API ne passe jamais par la coquille hors ligne
       navigateFallbackDenylist: [/^\/api\//],
     },
     client: {
@@ -83,11 +83,11 @@ export default defineNuxtConfig({
     preset: 'vercel',
     // Coquille SPA statique, servie aussi hors ligne par le service worker
     prerender: { routes: ['/'] },
-    // Fonctions du relais de transfert à Francfort, près de la base Neon (eu-central-1)
+    // Fonctions de l'API (comptes, synchronisation) à Francfort, près de la base Neon (eu-central-1)
     vercel: {
       functions: { regions: ['fra1'] },
-      // Nettoyage quotidien des transferts expirés (tâche Cron Vercel, une par jour sur l'offre gratuite)
-      config: { crons: [{ path: '/api/cron/transfers-cleanup', schedule: '0 3 * * *' }] },
+      // Nettoyage quotidien des sessions expirées (tâche Cron Vercel, une par jour sur l'offre gratuite)
+      config: { crons: [{ path: '/api/cron/cleanup', schedule: '0 3 * * *' }] },
     },
   },
 })
